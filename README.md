@@ -53,3 +53,8 @@ Full Installation
 6. Click "Start Automatic Update".
 7. Get a Dwarven Ale; it's going to be a while.
 8. Once finished, close SoundSense, and muck about with LNP as normal.
+
+Tested On
+=========
+
+* Debian 7 "Wheezy", stable
