@@ -125,10 +125,10 @@ install_dfhack () {
 
 install_falconne_dfhack_plugins () {
   local FALCONNE_PLUGINS_ZIP="$DOWNLOAD_DIR/Utility_Plugins_v0.35-Windows-0.34.11.r3.zip.zip"
+  local FALCONNE_TEMP_FOLDER="./falconne_unzip"
+  mkdir -p $FALCONNE_TEMP_FOLDER
   
-  mkdir -p "falconne_unzip"
-  
-  unzip -d falconne_unzip $FALCONNE_PLUGINS_ZIP
+  unzip -d $FALCONNE_TEMP_FOLDER $FALCONNE_PLUGINS_ZIP
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
@@ -145,7 +145,7 @@ install_falconne_dfhack_plugins () {
 	exit_with_error "Copying Falconne UI plugins failed."
   fi
   
-  rm -rf "./falconne_unzip"
+  rm -r $FALCONNE_TEMP_FOLDER
 }
 
 install_all () {
