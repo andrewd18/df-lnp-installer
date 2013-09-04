@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# -nc is "no clobber" for not overwriting files we already have.
-WGET_OPTIONS='-nc'
-
 VERSION=0.0.1
 echo 'Dwarf Fortress LNP Linux Installer'
 echo 'Version:' $VERSION
@@ -14,6 +11,9 @@ echo 'Version:' $VERSION
 # If arg == version, output version.
 # Check for df-lnp-installer requirements like wget and sha1sum.
 # Check for DF OS requirements.
+
+# -nc is "no clobber" for not overwriting files we already have.
+WGET_OPTIONS='-nc'
 
 # Download official DF.
 DF_FOR_LINUX="http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
