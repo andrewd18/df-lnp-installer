@@ -12,8 +12,13 @@ echo "Version: $VERSION"
 # Check for df-lnp-installer requirements like wget and sha1sum.
 # Check for DF OS requirements.
 
+# Set up the downloads folder if it doesn't already exist.
+DOWNLOAD_FOLDER="./downloads/"
+mkdir -p $DOWNLOAD_FOLDER
+
 # -nc is "no clobber" for not overwriting files we already have.
-WGET_OPTIONS="-nc"
+# --directory-prefix drops the files into the download folder.
+WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_FOLDER"
 
 # Download official DF.
 DF_FOR_LINUX="http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
