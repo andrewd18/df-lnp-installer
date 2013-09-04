@@ -17,6 +17,9 @@ download_all () {
 
   # -nc is "no clobber" for not overwriting files we already have.
   # --directory-prefix drops the files into the download folder.
+  # --content-disposition asks DFFI for the actual name of the file, not the php link.
+  #   Sadly, simply asking for the filename counts as a "download" so this script will be
+  #   inflating people's DFFI download counts. Oh well.
   WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_FOLDER"
   DFFI_WGET_OPTIONS="$WGET_OPTIONS --content-disposition"
 
