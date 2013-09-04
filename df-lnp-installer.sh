@@ -167,14 +167,14 @@ install_all () {
 # TODO
 # If arg == version, output version.
 # Check for df-lnp-installer requirements like wget and sha1sum.
-# Check for DF OS requirements.
+# Check for DF OS requirements like libSDL and Java.
 
 # Globals.
 INSTALL_DIR="$HOME/bin/Dwarf Fortress"
 DOWNLOAD_DIR="./downloads"
 
 # Download all the things!
-# download_all
+download_all
 
 # Checksum all the things!
 checksum_all
@@ -188,3 +188,8 @@ install_all
 # Drop graphics packs into LNP/Graphics/
 # Drop custom lnp.yaml into LNP/.
 
+echo ""
+echo "Installation successful!"
+echo "Run $INSTALL_DIR/startlnp to run the Lazy Newb Pack."
+
+exit 0
