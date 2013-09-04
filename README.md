@@ -4,6 +4,10 @@ Overview
 Included Mods
 -------------
 
+* Lazy Newb Pack for Linux 0.5.3-SNAPSHOT-20130822
+* DF Hack 0.34.11-r3
+* Falconne's DFHack UI Plugins v0.35
+* SoundSense r42
 * Tilesets
   - [08x12] ASCII Default 0.34.11
   - [16x16] CLA v15
@@ -12,8 +16,6 @@ Included Mods
   - [12x12] Jolly Bastion 34.10v5
   - [16x16] Ironhand 0.73.3
   - [16x16] Phoebus 34.11v01
-
-* DF Hack with SoundSense r42
 
 
 Feature Status
@@ -57,4 +59,4 @@ Full Installation
 Tested On
 =========
 
-* Debian 7 "Wheezy", stable
+* Debian 7 "Wheezy", stable, using Dash (default) shell.

@@ -29,13 +29,17 @@ DFFI_WGET_OPTIONS="$WGET_OPTIONS --content-disposition"
 DF_FOR_LINUX="http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
 wget $WGET_OPTIONS $DF_FOR_LINUX
 
-# Download latest DFHack with soundsense.
+# Download latest DFHack.
 DFHACK="http://github.com/peterix/dfhack/archive/0.34.11-r3.tar.gz"
 wget $WGET_OPTIONS $DFHACK
 
 # Download Falconne's DF Hack Plugins
 FALCONNE_PLUGINS="http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.35-Windows-0.34.11.r3.zip.zip"
 wget $DFFI_WGET_OPTIONS $FALCONNE_PLUGINS
+
+# Download SoundSense.
+SOUNDSENSE_APP="http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
+wget $WGET_OPTIONS $SOUNDSENSE_APP
 
 # Download latest LNP GUI.
 LNP_LINUX_SNAPSHOT="http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
