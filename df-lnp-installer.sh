@@ -4,8 +4,12 @@ VERSION=0.0.1
 echo "Dwarf Fortress LNP Linux Installer"
 echo "Version: $VERSION"
 
-# Everyone loves pseudocode!
-#
+# Function declarations.
+exit_with_error () {
+   echo "df-lnp-installer.sh: $1 Exiting."
+   exit 1
+}
+
 
 # TODO
 # If arg == version, output version.
@@ -38,8 +42,10 @@ wget $WGET_OPTIONS $LNP_LINUX_SNAPSHOT
 # Check for file validity.
 sha1sum -c sha1sums
 
-# TODO
 # Quit if one or more of the files fails its checksum.
+if [ "$?" != "0" ]; then
+  exit_with_error "One or more file failed its checksum."
+fi
 
 # TODO
 # Unzip DF.
