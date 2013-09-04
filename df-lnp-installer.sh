@@ -1,8 +1,8 @@
 #!/bin/sh
 
 VERSION=0.0.1
-echo 'Dwarf Fortress LNP Linux Installer'
-echo 'Version:' $VERSION
+echo "Dwarf Fortress LNP Linux Installer"
+echo "Version: $VERSION"
 
 # Everyone loves pseudocode!
 #
@@ -13,7 +13,7 @@ echo 'Version:' $VERSION
 # Check for DF OS requirements.
 
 # -nc is "no clobber" for not overwriting files we already have.
-WGET_OPTIONS='-nc'
+WGET_OPTIONS="-nc"
 
 # Download official DF.
 DF_FOR_LINUX="http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
@@ -32,6 +32,9 @@ wget $WGET_OPTIONS $LNP_LINUX_SNAPSHOT
 
 # Check for file validity.
 sha1sum -c sha1sums
+
+# TODO
+# Quit if one or more of the files fails its checksum.
 
 # TODO
 # Unzip DF.
