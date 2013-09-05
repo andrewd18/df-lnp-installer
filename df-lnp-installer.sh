@@ -48,7 +48,7 @@ download_all () {
   fi
   
   # Set up the downloads folder if it doesn't already exist.
-  mkdir -p $DOWNLOAD_DIR
+  mkdir -p "$DOWNLOAD_DIR"
 
   # -nc is "no clobber" for not overwriting files we already have.
   # --directory-prefix drops the files into the download folder.
@@ -57,35 +57,38 @@ download_all () {
   #   inflating people's DFFI download counts. Oh well.
   local WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_DIR"
   local DFFI_WGET_OPTIONS="$WGET_OPTIONS --content-disposition"
+  
+  # NOTE
+  # Don't wrap $WGET_OPTIONS in quotes; wget doesn't like it.
 
   # Download official DF.
   local DF_FOR_LINUX="http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
-  wget $WGET_OPTIONS $DF_FOR_LINUX
+  wget $WGET_OPTIONS "$DF_FOR_LINUX"
 
   # Download latest DFHack.
   local DFHACK="http://dethware.org/dfhack/download/dfhack-0.34.11-r3-Linux.tar.gz"
-  wget $WGET_OPTIONS $DFHACK
+  wget $WGET_OPTIONS "$DFHACK"
 
   # Download Falconne's DF Hack Plugins
   local FALCONNE_PLUGINS="http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.35-Windows-0.34.11.r3.zip.zip"
-  wget $DFFI_WGET_OPTIONS $FALCONNE_PLUGINS
+  wget $DFFI_WGET_OPTIONS "$FALCONNE_PLUGINS"
 
   # Download SoundSense.
   local SOUNDSENSE_APP="http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
-  wget $WGET_OPTIONS $SOUNDSENSE_APP
+  wget $WGET_OPTIONS "$SOUNDSENSE_APP"
 
   # Download latest LNP GUI.
   local LNP_LINUX_SNAPSHOT="http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
-  wget $WGET_OPTIONS $LNP_LINUX_SNAPSHOT
+  wget $WGET_OPTIONS "$LNP_LINUX_SNAPSHOT"
 
   # TODO
   # Download each graphics pack.
   # Download Phoebus.
   local PHOEBUS_GFX_PACK="http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
-  wget $DFFI_WGET_OPTIONS $PHOEBUS_GFX_PACK
+  wget $DFFI_WGET_OPTIONS "$PHOEBUS_GFX_PACK"
   
   local CLA_GFX_PACK="http://dffd.wimbli.com/download.php?id=5945&f=CLA_graphic_set_v15-STANDALONE.rar"
-  wget $DFFI_WGET_OPTIONS $CLA_GFX_PACK
+  wget $DFFI_WGET_OPTIONS "$CLA_GFX_PACK"
 }
 
 exit_with_error () {
@@ -134,9 +137,9 @@ install_dfhack () {
 install_falconne_dfhack_plugins () {
   local FALCONNE_PLUGINS_ZIP="$DOWNLOAD_DIR/Utility_Plugins_v0.35-Windows-0.34.11.r3.zip.zip"
   local FALCONNE_TEMP_FOLDER="./falconne_unzip"
-  mkdir -p $FALCONNE_TEMP_FOLDER
+  mkdir -p "$FALCONNE_TEMP_FOLDER"
   
-  unzip -d $FALCONNE_TEMP_FOLDER $FALCONNE_PLUGINS_ZIP
+  unzip -d "$FALCONNE_TEMP_FOLDER" "$FALCONNE_PLUGINS_ZIP"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
@@ -146,14 +149,14 @@ install_falconne_dfhack_plugins () {
   local PLUGINS_DIR="$INSTALL_DIR/df_linux/hack/plugins/"
   
   # Copy all files from Linux/ directory to DF Hack Plugins dir.
-  cp falconne_unzip/Linux/*.so "${PLUGINS_DIR}"
+  cp falconne_unzip/Linux/*.so "$PLUGINS_DIR"
   
   # Quit if copying failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Copying Falconne UI plugins failed."
   fi
   
-  rm -r $FALCONNE_TEMP_FOLDER
+  rm -r "$FALCONNE_TEMP_FOLDER"
 }
 
 install_lnp () {
@@ -172,10 +175,9 @@ install_phoebus_gfx_pack () {
   local PHOEBUS_GFX_PACK="$DOWNLOAD_DIR/Phoebus_34_11v01.zip"
   local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/Phoebus_34_11v01"
   
-  mkdir -p $PHOEBUS_FOLDER
+  mkdir -p "$PHOEBUS_FOLDER"
   
-  # Unzip doesn't like spaces in the folder name so wrap the folder in quotes.
-  unzip -d "$PHOEBUS_FOLDER" $PHOEBUS_GFX_PACK
+  unzip -d "$PHOEBUS_FOLDER" "$PHOEBUS_GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
@@ -243,7 +245,7 @@ ask_for_preferred_install_dir
 create_install_dir
 
 # Download all the things!
-if [ "$SKIP_DOWNLOAD" == "0" ]; then
+if [ "$SKIP_DOWNLOAD" = "0" ]; then
   download_all
 fi
 
