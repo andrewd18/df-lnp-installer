@@ -43,7 +43,8 @@ System Requirements
 * A Java runtime environment for the LNP GUI.
 * SDL 1.2, 32-bit
 * OpenAL 1.2, 32-bit
-* The following Linux utilities:
+* Git
+* The following fairly standard Linux utilities:
   - wget
   - sha1sum
   - tar
@@ -55,6 +56,7 @@ System Requirements
 Full Installation
 =================
 
+0. Clone the git repository with "git clone https://github.com/andrewd18/df-lnp-installer.git"
 1. Run ./df-lnp-installer.sh and follow the prompts.
 2. Once DF is installed, enter the DF folder and run ./startlnp.
 3. Start the SoundSense r42 utility from the Utilities tab.
