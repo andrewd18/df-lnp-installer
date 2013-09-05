@@ -27,6 +27,6 @@ terminalPath: xterm
 utilities: 
 -  name: Soundsense r42
    autostart: true
-   directory: soundsense_r42/
+   directory: soundsense/
    executable: soundSense.sh
    showTerminal: true
