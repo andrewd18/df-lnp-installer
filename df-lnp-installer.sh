@@ -80,15 +80,19 @@ download_all () {
   # Download latest LNP GUI.
   local LNP_LINUX_SNAPSHOT="http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
   wget $WGET_OPTIONS "$LNP_LINUX_SNAPSHOT"
-
-  # TODO
-  # Download each graphics pack.
+  
+  # GRAPHICS PACKS
   # Download Phoebus.
   local PHOEBUS_GFX_PACK="http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
   wget $DFFI_WGET_OPTIONS "$PHOEBUS_GFX_PACK"
   
+  # Download CLA.
   local CLA_GFX_PACK="http://dffd.wimbli.com/download.php?id=5945&f=CLA_graphic_set_v15-STANDALONE.rar"
   wget $DFFI_WGET_OPTIONS "$CLA_GFX_PACK"
+  
+  # Download Ironhand16.
+  local IRONHAND_GFX_PACK="http://dffd.wimbli.com/download.php?id=7362&f=Ironhand16+upgrade+0.73.4.zip"
+  wget $DFFI_WGET_OPTIONS "$IRONHAND_GFX_PACK"
 }
 
 exit_with_error () {
@@ -108,6 +112,7 @@ install_all () {
   install_falconne_dfhack_plugins
   install_phoebus_gfx_pack
   install_cla_graphics_pack
+  install_ironhand_gfx_pack
 }
 
 install_cla_graphics_pack () {
@@ -157,6 +162,34 @@ install_falconne_dfhack_plugins () {
   fi
   
   rm -r "$FALCONNE_TEMP_FOLDER"
+}
+
+install_ironhand_gfx_pack () {
+  local IRONHAND_ZIP="$DOWNLOAD_DIR/Ironhand16 upgrade 0.73.4.zip"
+  local IRONHAND_TEMP_FOLDER="./ironhand_unzip"
+  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics/Ironhand"
+  
+  mkdir -p "$IRONHAND_TEMP_FOLDER"
+  
+  mkdir -p "$GFX_FOLDER"
+  
+  unzip -d "$IRONHAND_TEMP_FOLDER" "$IRONHAND_ZIP"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Unzipping Ironhand graphics pack failed."
+  fi
+  
+  # Copy data and raw folders to GFX dir.
+  cp -r "$IRONHAND_TEMP_FOLDER/Dwarf Fortress/data" "$GFX_FOLDER"
+  cp -r "$IRONHAND_TEMP_FOLDER/Dwarf Fortress/raw" "$GFX_FOLDER"
+  
+  # Quit if copying failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Copying Ironhand graphics pack failed."
+  fi
+  
+  rm -r "$IRONHAND_TEMP_FOLDER"
 }
 
 install_lnp () {
