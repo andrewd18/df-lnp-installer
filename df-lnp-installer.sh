@@ -392,7 +392,7 @@ print_version () {
 ##############
 
 # Globals.
-VERSION=0.1.0
+VERSION=0.1.1
 INSTALL_DIR="$HOME/bin/Dwarf Fortress"
 DOWNLOAD_DIR="./downloads"
 SKIP_DOWNLOAD=0
