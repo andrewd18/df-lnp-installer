@@ -128,6 +128,7 @@ install_all () {
   install_mayday_gfx_pack
   install_obsidian_gfx_pack
   install_spacefox_gfx_pack
+  install_vanilla_df_gfx_pack
 }
 
 install_cla_graphics_pack () {
@@ -278,6 +279,25 @@ install_vanilla_df () {
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Untarring Vanilla DF failed."
+  fi
+}
+
+install_vanilla_df_gfx_pack () {
+  local DATA_FOLDER="$INSTALL_DIR/df_linux/data"
+  local RAW_FOLDER="$INSTALL_DIR/df_linux/raw"
+  
+  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics/ASCII Default"
+  
+  mkdir -p "$GFX_FOLDER"
+  
+  # Copy the data and raw folders from the vanilla df install location
+  # Put them in $GFX_FOLDER
+  cp -r "$DATA_FOLDER" "$GFX_FOLDER"
+  cp -r "$RAW_FOLDER" "$GFX_FOLDER"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Copying Vanilla DF graphics pack failed."
   fi
 }
 
