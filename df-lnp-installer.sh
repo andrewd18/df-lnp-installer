@@ -122,6 +122,7 @@ install_all () {
   install_vanilla_df
   install_dfhack
   install_falconne_dfhack_plugins
+  
   install_phoebus_gfx_pack
   install_cla_graphics_pack
   install_ironhand_gfx_pack
@@ -129,6 +130,8 @@ install_all () {
   install_obsidian_gfx_pack
   install_spacefox_gfx_pack
   install_vanilla_df_gfx_pack
+  install_jolly_bastion_gfx_pack
+  
   install_soundsense_app
   
   # TODO
@@ -211,6 +214,42 @@ install_ironhand_gfx_pack () {
   fi
   
   rm -r "$IRONHAND_TEMP_FOLDER"
+}
+
+install_jolly_bastion_gfx_pack () {
+  local JOLLY_BASTION_ZIP="$DOWNLOAD_DIR/JollyBastion34-10v5.zip"
+  local JOLLY_BASTION_TEMP_FOLDER="./jolly_bastion_unzip"
+  
+  local JB_NINE_BY_TWELVE_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/JollyBastion9x12"
+  local JB_TWELVE_BY_TWELVE_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/JollyBastion12x12"
+  
+  mkdir -p "$JB_NINE_BY_TWELVE_GFX_FOLDER"
+  mkdir -p "$JB_TWELVE_BY_TWELVE_GFX_FOLDER"
+  
+  unzip -d "$JOLLY_BASTION_TEMP_FOLDER" "$JOLLY_BASTION_ZIP"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Unzipping Jolly Bastion graphics pack failed."
+  fi
+  
+  cp -r "$JOLLY_BASTION_TEMP_FOLDER/JollyBastion34-10v5/9x12 (recommended)/data" "$JB_NINE_BY_TWELVE_GFX_FOLDER"
+  cp -r "$JOLLY_BASTION_TEMP_FOLDER/JollyBastion34-10v5/9x12 (recommended)/raw" "$JB_NINE_BY_TWELVE_GFX_FOLDER"
+  
+  # Quit if copying failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Copying Jolly Bastion 9x12 graphics pack failed."
+  fi
+  
+  cp -r "$JOLLY_BASTION_TEMP_FOLDER/JollyBastion34-10v5/12x12/data" "$JB_TWELVE_BY_TWELVE_GFX_FOLDER"
+  cp -r "$JOLLY_BASTION_TEMP_FOLDER/JollyBastion34-10v5/12x12/raw" "$JB_TWELVE_BY_TWELVE_GFX_FOLDER"
+  
+  # Quit if copying failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Copying Jolly Bastion 12x12 graphics pack failed."
+  fi
+  
+  rm -r "$JOLLY_BASTION_TEMP_FOLDER"
 }
 
 install_lnp () {
