@@ -83,6 +83,9 @@ download_all () {
   # Download Phoebus.
   local PHOEBUS_GFX_PACK="http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
   wget $DFFI_WGET_OPTIONS $PHOEBUS_GFX_PACK
+  
+  local CLA_GFX_PACK="http://dffd.wimbli.com/download.php?id=5945&f=CLA_graphic_set_v15-STANDALONE.rar"
+  wget $DFFI_WGET_OPTIONS $CLA_GFX_PACK
 }
 
 exit_with_error () {
@@ -101,6 +104,19 @@ install_all () {
   install_dfhack
   install_falconne_dfhack_plugins
   install_phoebus_gfx_pack
+  install_cla_graphics_pack
+}
+
+install_cla_graphics_pack () {
+  local CLA_GFX_RAR="$DOWNLOAD_DIR/CLA_graphic_set_v15-STANDALONE.rar"
+  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics"
+  
+  unrar x "$CLA_GFX_RAR" "$GFX_FOLDER"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Unraring CLA graphics pack failed."
+  fi
 }
 
 install_dfhack () {
