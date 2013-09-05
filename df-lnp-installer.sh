@@ -21,6 +21,10 @@ exit_with_error () {
 }
 
 download_all () {
+  if [ -z "$DOWNLOAD_DIR" ]; then
+	exit_with_error "Script failure. DOWNLOAD_DIR undefined."
+  fi
+  
   # Set up the downloads folder if it doesn't already exist.
   mkdir -p $DOWNLOAD_DIR
 
@@ -173,14 +177,16 @@ install_all () {
 INSTALL_DIR="$HOME/bin/Dwarf Fortress"
 DOWNLOAD_DIR="./downloads"
 
+ask_for_preferred_install_dir
+create_install_dir
+
 # Download all the things!
 download_all
 
 # Checksum all the things!
 checksum_all
 
-ask_for_preferred_install_dir
-create_install_dir
+# Install all the things!
 install_all
 
 # TODO
@@ -188,6 +194,7 @@ install_all
 # Drop graphics packs into LNP/Graphics/
 # Drop custom lnp.yaml into LNP/.
 
+# Strike the earth!
 echo ""
 echo "Installation successful!"
 echo "Run $INSTALL_DIR/startlnp to run the Lazy Newb Pack."
