@@ -119,6 +119,7 @@ install_all () {
   
   # Install in dependency-fulfilling order.
   install_lnp
+  install_lnp_yaml
   install_vanilla_df
   install_dfhack
   install_falconne_dfhack_plugins
@@ -261,6 +262,18 @@ install_lnp () {
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Untarring LNP failed."
+  fi
+}
+
+install_lnp_yaml () {
+  local LNP_YAML_FILE="./lnp.yaml"
+  local LNP_DIR="$INSTALL_DIR/LNP"
+  
+  install --mode=644 "$LNP_YAML_FILE" "$LNP_DIR"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Copying LNP Yaml file failed."
   fi
 }
 

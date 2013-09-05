@@ -1,0 +1,32 @@
+customKeybindsFiles: []
+dfDirectory: df_linux
+dfExecutable: dfhack
+folders: []
+graphicsPacks: 
+-  name: '[08x12] ASCII Default 0.34.11'
+   directory: ASCII Default
+-  name: '[09x12] Jolly Bastion 34.10v5'
+   directory: JollyBastion9x12
+-  name: '[12x12] Jolly Bastion 34.10v5'
+   directory: JollyBastion12x12
+-  name: '[16x16] CLA v15'
+   directory: CLA
+-  name: '[16x16] Ironhand 0.73.4'
+   directory: Ironhand
+-  name: '[16x16] Mayday 0.34.11'
+   directory: Mayday
+-  name: '[16x16] Phoebus 34.11v01'
+   directory: Phoebus_34_11v01
+-  name: '[16x16] Obsidian 0.8a'
+   directory: '[16x16] Obsidian'
+-  name: '[16x16] Spacefox 34.11v1.0'
+   directory: '[16x16] Spacefox 34.11v1.0'
+launchDfWithTerminal: true
+links: []
+terminalPath: xterm
+utilities: 
+-  name: Soundsense r42
+   autostart: true
+   directory: soundsense_r42/
+   executable: soundSense.sh
+   showTerminal: true
