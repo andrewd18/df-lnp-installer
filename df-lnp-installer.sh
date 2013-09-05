@@ -129,6 +129,11 @@ install_all () {
   install_obsidian_gfx_pack
   install_spacefox_gfx_pack
   install_vanilla_df_gfx_pack
+  install_soundsense_app
+  
+  # TODO
+  # Make a decision about downloading/installing soundsense audio.
+  # Drop custom lnp.yaml into LNP/.
 }
 
 install_cla_graphics_pack () {
@@ -258,6 +263,18 @@ install_phoebus_gfx_pack () {
   fi
 }
 
+install_soundsense_app () {
+  local SOUNDSENSE_ZIP="$DOWNLOAD_DIR/soundSense_42_186.zip"
+  local UTILITIES_FOLDER="$INSTALL_DIR/LNP/utilities"
+  
+  unzip -d "$UTILITIES_FOLDER" "$SOUNDSENSE_ZIP"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Unzipping SoundSense application failed."
+  fi
+}
+
 install_spacefox_gfx_pack () {
   local SPACEFOX_ZIP="$DOWNLOAD_DIR/[16x16] Spacefox 34.11v1.0.zip"
   local GFX_FOLDER="$INSTALL_DIR/LNP/graphics"
@@ -358,11 +375,6 @@ checksum_all
 
 # Install all the things!
 install_all
-
-# TODO
-# Extract SoundSense
-# Drop graphics packs into LNP/Graphics/
-# Drop custom lnp.yaml into LNP/.
 
 # Strike the earth!
 echo ""
