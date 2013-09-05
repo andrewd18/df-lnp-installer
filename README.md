@@ -7,41 +7,49 @@ Included Mods
 * Lazy Newb Pack for Linux 0.5.3-SNAPSHOT-20130822
 * DF Hack 0.34.11-r3
 * Falconne's DFHack UI Plugins v0.35
-* SoundSense r42
+* SoundSense r42 (app only)
 * Tilesets
   - [08x12] ASCII Default 0.34.11
-  - [16x16] CLA v15
-  - [16x16] Mayday 0.34.11
-  - [16x20] Shizzle 1.3
+  - [09x12] Jolly Bastion 34.10v5
   - [12x12] Jolly Bastion 34.10v5
-  - [16x16] Ironhand 0.73.3
+  - [16x16] CLA v15
+  - [16x16] Ironhand 0.73.4
+  - [16x16] Mayday 0.34.11
   - [16x16] Phoebus 34.11v01
+  - [16x16] Obsidian 0.8a
+  - [16x16] Spacefox 34.11v1.0
 
 
-Feature Status
-==============
+Features
+========
 
-Stuff that works:
------------------
+Complete
+--------
 
- * The Lazy Newb Pack UI runs.
- * You can change tilesets.
- * You can update savegames with new tilesets.
- * DF Hack
- * SoundSense plays audio.
+ * Downloads and installs the latest Lazy Newb Pack UI.
+ * Downloads and installs tilesets.
+ * Checks all files for SHA1 validity.
+ 
+TODO
+----
 
-Stuff that didn't work for me but might work for you:
------------------------------------------------------
-
- * The LNP UI doesn't want to open the Utilities, Graphics, etc. folders.
- * Dwarf Fortress keeps complaining about missing 32-bit OpenAL libraries though I have them installed.
- * SoundSense doesn't allow me to change or mute its sound level.
+ * Automatically check your system for program requirements and install as necessary.
+ * Continue adding more features from the Windows and Mac LNPs.
 
 
 System Requirements
 ===================
 
 * A Java runtime environment for the LNP GUI.
+* SDL 1.2, 32-bit
+* OpenAL 1.2, 32-bit
+* The following Linux utilities:
+  - wget
+  - sha1sum
+  - tar
+  - unzip
+  - unrar
+
 
 
 Full Installation

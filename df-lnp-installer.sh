@@ -137,7 +137,6 @@ install_all () {
   
   # TODO
   # Make a decision about downloading/installing soundsense audio.
-  # Drop custom lnp.yaml into LNP/.
 }
 
 install_cla_graphics_pack () {
