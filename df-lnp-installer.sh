@@ -93,6 +93,10 @@ download_all () {
   # Download Ironhand16.
   local IRONHAND_GFX_PACK="http://dffd.wimbli.com/download.php?id=7362&f=Ironhand16+upgrade+0.73.4.zip"
   wget $DFFI_WGET_OPTIONS "$IRONHAND_GFX_PACK"
+  
+  # Download Mayday
+  local MAYDAY_GFX_PACK="http://dffd.wimbli.com/download.php?id=7025&f=Mayday+34.11.zip"
+  wget $DFFI_WGET_OPTIONS "$MAYDAY_GFX_PACK"
 }
 
 exit_with_error () {
@@ -113,6 +117,7 @@ install_all () {
   install_phoebus_gfx_pack
   install_cla_graphics_pack
   install_ironhand_gfx_pack
+  install_mayday_gfx_pack
 }
 
 install_cla_graphics_pack () {
@@ -190,6 +195,18 @@ install_ironhand_gfx_pack () {
   fi
   
   rm -r "$IRONHAND_TEMP_FOLDER"
+}
+
+install_mayday_gfx_pack () {
+  local MAYDAY_ZIP="$DOWNLOAD_DIR/Mayday 34.11.zip"
+  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics"
+  
+  unzip -d "$GFX_FOLDER" "$MAYDAY_ZIP"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Unzipping Mayday graphics pack failed."
+  fi
 }
 
 install_lnp () {
