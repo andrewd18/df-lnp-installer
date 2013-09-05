@@ -33,31 +33,34 @@ download_all () {
   # --content-disposition asks DFFI for the actual name of the file, not the php link.
   #   Sadly, simply asking for the filename counts as a "download" so this script will be
   #   inflating people's DFFI download counts. Oh well.
-  WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_DIR"
-  DFFI_WGET_OPTIONS="$WGET_OPTIONS --content-disposition"
+  local WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_DIR"
+  local DFFI_WGET_OPTIONS="$WGET_OPTIONS --content-disposition"
 
   # Download official DF.
-  DF_FOR_LINUX="http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
+  local DF_FOR_LINUX="http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
   wget $WGET_OPTIONS $DF_FOR_LINUX
 
   # Download latest DFHack.
-  DFHACK="http://dethware.org/dfhack/download/dfhack-0.34.11-r3-Linux.tar.gz"
+  local DFHACK="http://dethware.org/dfhack/download/dfhack-0.34.11-r3-Linux.tar.gz"
   wget $WGET_OPTIONS $DFHACK
 
   # Download Falconne's DF Hack Plugins
-  FALCONNE_PLUGINS="http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.35-Windows-0.34.11.r3.zip.zip"
+  local FALCONNE_PLUGINS="http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.35-Windows-0.34.11.r3.zip.zip"
   wget $DFFI_WGET_OPTIONS $FALCONNE_PLUGINS
 
   # Download SoundSense.
-  SOUNDSENSE_APP="http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
+  local SOUNDSENSE_APP="http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
   wget $WGET_OPTIONS $SOUNDSENSE_APP
 
   # Download latest LNP GUI.
-  LNP_LINUX_SNAPSHOT="http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
+  local LNP_LINUX_SNAPSHOT="http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
   wget $WGET_OPTIONS $LNP_LINUX_SNAPSHOT
 
   # TODO
   # Download each graphics pack.
+  # Download Phoebus.
+  local PHOEBUS_GFX_PACK="http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
+  wget $DFFI_WGET_OPTIONS $PHOEBUS_GFX_PACK
 }
 
 ask_for_preferred_install_dir () {
@@ -152,6 +155,21 @@ install_falconne_dfhack_plugins () {
   rm -r $FALCONNE_TEMP_FOLDER
 }
 
+install_phoebus_gfx_pack () {
+  local PHOEBUS_GFX_PACK="$DOWNLOAD_DIR/Phoebus_34_11v01.zip"
+  local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/Phoebus_34_11v01"
+  
+  mkdir -p $PHOEBUS_FOLDER
+  
+  # Unzip doesn't like spaces in the folder name so wrap the folder in quotes.
+  unzip -d "$PHOEBUS_FOLDER" $PHOEBUS_GFX_PACK
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Unzipping Phoebus graphics pack failed."
+  fi
+}
+
 install_all () {
   if [ -z "$INSTALL_DIR" ]; then
 	exit_with_error "Script failure. INSTALL_DIR undefined."
@@ -162,6 +180,7 @@ install_all () {
   install_vanilla_df
   install_dfhack
   install_falconne_dfhack_plugins
+  install_phoebus_gfx_pack
 }
 
 ##############
