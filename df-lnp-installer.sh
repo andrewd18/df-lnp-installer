@@ -97,6 +97,10 @@ download_all () {
   # Download Mayday
   local MAYDAY_GFX_PACK="http://dffd.wimbli.com/download.php?id=7025&f=Mayday+34.11.zip"
   wget $DFFI_WGET_OPTIONS "$MAYDAY_GFX_PACK"
+  
+  # Download Obsidian
+  local OBSIDIAN_GFX_PACK="http://dffd.wimbli.com/download.php?id=7728&f=%5B16x16%5D+Obsidian+%28v.0.8%29.zip"
+  wget $DFFI_WGET_OPTIONS "$OBSIDIAN_GFX_PACK"
 }
 
 exit_with_error () {
@@ -118,6 +122,7 @@ install_all () {
   install_cla_graphics_pack
   install_ironhand_gfx_pack
   install_mayday_gfx_pack
+  install_obsidian_gfx_pack
 }
 
 install_cla_graphics_pack () {
@@ -197,6 +202,18 @@ install_ironhand_gfx_pack () {
   rm -r "$IRONHAND_TEMP_FOLDER"
 }
 
+install_lnp () {
+  local LNP_TARBALL="$DOWNLOAD_DIR/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
+  
+  # Extract to the installation directory.
+  tar --directory "$INSTALL_DIR" -xjvf "$LNP_TARBALL"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Untarring LNP failed."
+  fi
+}
+
 install_mayday_gfx_pack () {
   local MAYDAY_ZIP="$DOWNLOAD_DIR/Mayday 34.11.zip"
   local GFX_FOLDER="$INSTALL_DIR/LNP/graphics"
@@ -209,15 +226,15 @@ install_mayday_gfx_pack () {
   fi
 }
 
-install_lnp () {
-  local LNP_TARBALL="$DOWNLOAD_DIR/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
+install_obsidian_gfx_pack () {
+  local OBSIDIAN_ZIP="$DOWNLOAD_DIR/[16x16] Obsidian (v.0.8).zip"
+  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics"
   
-  # Extract to the installation directory.
-  tar --directory "$INSTALL_DIR" -xjvf "$LNP_TARBALL"
+  unzip -d "$GFX_FOLDER" "$OBSIDIAN_ZIP"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
-	exit_with_error "Untarring LNP failed."
+	exit_with_error "Unzipping Obsidian graphics pack failed."
   fi
 }
 
