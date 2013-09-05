@@ -1,10 +1,21 @@
 #!/bin/sh
 
-VERSION=0.0.1
-echo "Dwarf Fortress LNP Linux Installer"
-echo "Version: $VERSION"
-
 # Function declarations.
+ask_for_preferred_install_dir () {
+  echo ""
+  echo -n "Where should Dwarf Fortress be installed? [$INSTALL_DIR]: "
+  
+  # Get the user's preferred installation location.
+  read PREFERRED_DIR
+  
+  # If the user entered a preferred directory, use that,
+  # otherwise use the install directory.
+  if [ -n "$PREFERRED_DIR" ]; then
+	# Use sed and custom ; delimeter to replace the first instance of ~ with the user's home directory.
+	INSTALL_DIR=$(echo "$PREFERRED_DIR" | sed "s;~;$HOME;")
+  fi
+}
+
 checksum_all () {
   # Check for file validity.
   sha1sum -c sha1sums
@@ -15,9 +26,20 @@ checksum_all () {
   fi
 }
 
-exit_with_error () {
-  echo "df-lnp-installer.sh: $1 Exiting."
-  exit 1
+create_install_dir () {
+  mkdir -p "$INSTALL_DIR"
+  
+  # Quit if we couldn't make the install directory.
+  if [ "$?" != "0" ]; then
+	exit_with_error "You probably do not have write permission to $INSTALL_DIR."
+  fi
+  
+  local LS_OUTPUT="$(ls -A "$INSTALL_DIR")"
+  
+  # Verify it's empty.
+  if [ -n "$LS_OUTPUT" ]; then
+	exit_with_error "Cannot install. $INSTALL_DIR must be empty."
+  fi
 }
 
 download_all () {
@@ -63,59 +85,22 @@ download_all () {
   wget $DFFI_WGET_OPTIONS $PHOEBUS_GFX_PACK
 }
 
-ask_for_preferred_install_dir () {
-  echo ""
-  echo -n "Where should Dwarf Fortress be installed? [$INSTALL_DIR]: "
-  
-  # Get the user's preferred installation location.
-  read PREFERRED_DIR
-  
-  # If the user entered a preferred directory, use that,
-  # otherwise use the install directory.
-  if [ -n "$PREFERRED_DIR" ]; then
-	# Use sed and custom ; delimeter to replace the first instance of ~ with the user's home directory.
-	INSTALL_DIR=$(echo "$PREFERRED_DIR" | sed "s;~;$HOME;")
-  fi
+exit_with_error () {
+  echo "df-lnp-installer.sh: $1 Exiting."
+  exit 1
 }
 
-create_install_dir () {
-  mkdir -p "$INSTALL_DIR"
-  
-  # Quit if we couldn't make the install directory.
-  if [ "$?" != "0" ]; then
-	exit_with_error "You probably do not have write permission to $INSTALL_DIR."
+install_all () {
+  if [ -z "$INSTALL_DIR" ]; then
+	exit_with_error "Script failure. INSTALL_DIR undefined."
   fi
   
-  local LS_OUTPUT="$(ls -A "$INSTALL_DIR")"
-  
-  # Verify it's empty.
-  if [ -n "$LS_OUTPUT" ]; then
-	exit_with_error "Cannot install. $INSTALL_DIR must be empty."
-  fi
-}
-
-install_lnp () {
-  local LNP_TARBALL="$DOWNLOAD_DIR/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
-  
-  # Extract to the installation directory.
-  tar --directory "$INSTALL_DIR" -xjvf "$LNP_TARBALL"
-  
-  # Quit if extracting failed.
-  if [ "$?" != "0" ]; then
-	exit_with_error "Untarring LNP failed."
-  fi
-}
-
-install_vanilla_df () {
-  local VANILLA_DF_TARBALL="$DOWNLOAD_DIR/df_34_11_linux.tar.bz2"
-  
-  # Extract to the installation directory.
-  tar --directory "$INSTALL_DIR" -xjvf "$VANILLA_DF_TARBALL"
-  
-  # Quit if extracting failed.
-  if [ "$?" != "0" ]; then
-	exit_with_error "Untarring Vanilla DF failed."
-  fi
+  # Install in dependency-fulfilling order.
+  install_lnp
+  install_vanilla_df
+  install_dfhack
+  install_falconne_dfhack_plugins
+  install_phoebus_gfx_pack
 }
 
 install_dfhack () {
@@ -155,6 +140,18 @@ install_falconne_dfhack_plugins () {
   rm -r $FALCONNE_TEMP_FOLDER
 }
 
+install_lnp () {
+  local LNP_TARBALL="$DOWNLOAD_DIR/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
+  
+  # Extract to the installation directory.
+  tar --directory "$INSTALL_DIR" -xjvf "$LNP_TARBALL"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Untarring LNP failed."
+  fi
+}
+
 install_phoebus_gfx_pack () {
   local PHOEBUS_GFX_PACK="$DOWNLOAD_DIR/Phoebus_34_11v01.zip"
   local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/Phoebus_34_11v01"
@@ -170,37 +167,69 @@ install_phoebus_gfx_pack () {
   fi
 }
 
-install_all () {
-  if [ -z "$INSTALL_DIR" ]; then
-	exit_with_error "Script failure. INSTALL_DIR undefined."
-  fi
+install_vanilla_df () {
+  local VANILLA_DF_TARBALL="$DOWNLOAD_DIR/df_34_11_linux.tar.bz2"
   
-  # Install in dependency-fulfilling order.
-  install_lnp
-  install_vanilla_df
-  install_dfhack
-  install_falconne_dfhack_plugins
-  install_phoebus_gfx_pack
+  # Extract to the installation directory.
+  tar --directory "$INSTALL_DIR" -xjvf "$VANILLA_DF_TARBALL"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Untarring Vanilla DF failed."
+  fi
+}
+
+print_usage () {
+  echo "Usage: df-lnp-installer.sh [OPTIONS]"
+  echo ""
+  echo "Options:"
+  echo "--skip-download  # Install using the existing contents of the ./downloads folder."
+  echo "--version, -v    # Print the df-lnp-installer version."
+  echo "--help, --usage  # Print this message."
+}
+
+print_version () {
+  echo "Dwarf Fortress LNP Linux Installer"
+  echo "Version: $VERSION"
 }
 
 ##############
 # "Main"
 ##############
 
+# Globals.
+VERSION=0.0.1
+INSTALL_DIR="$HOME/bin/Dwarf Fortress"
+DOWNLOAD_DIR="./downloads"
+SKIP_DOWNLOAD=0
+
 # TODO
-# If arg == version, output version.
 # Check for df-lnp-installer requirements like wget and sha1sum.
 # Check for DF OS requirements like libSDL and Java.
 
-# Globals.
-INSTALL_DIR="$HOME/bin/Dwarf Fortress"
-DOWNLOAD_DIR="./downloads"
+# If the user passed in arguments, parse them, otherwise assume "do everything". 
+if [ -n "$1" ]; then
+  while [ "$1" ]; do
+	case "$1" in
+	  '--skip-download') SKIP_DOWNLOAD=1 ;;
+	  '--version'|'-v') print_version; exit 0 ;;
+	  '--help'|'--usage') print_usage; exit 0 ;;
+	  *) echo "Unknown argument: $1"; print_usage; exit 1 ;;
+	esac
+	
+	# Shift arguments left, dropping off $1.
+	# Make $1 = $2, $2 = $3, etc.
+	shift
+  done
+fi
 
 ask_for_preferred_install_dir
 create_install_dir
 
 # Download all the things!
-download_all
+if [ "$SKIP_DOWNLOAD" == "0" ]; then
+  download_all
+fi
 
 # Checksum all the things!
 checksum_all
