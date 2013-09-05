@@ -94,6 +94,10 @@ download_all () {
   local IRONHAND_GFX_PACK="http://dffd.wimbli.com/download.php?id=7362&f=Ironhand16+upgrade+0.73.4.zip"
   wget $DFFI_WGET_OPTIONS "$IRONHAND_GFX_PACK"
   
+  # Download JollyBastion
+  local JOLLY_BASTION_GFX_PACK="http://www.alexanderocias.com/jollybastion/JollyBastion34-10v5.zip"
+  wget $WGET_OPTIONS "$JOLLY_BASTION_GFX_PACK"
+  
   # Download Mayday
   local MAYDAY_GFX_PACK="http://dffd.wimbli.com/download.php?id=7025&f=Mayday+34.11.zip"
   wget $DFFI_WGET_OPTIONS "$MAYDAY_GFX_PACK"
