@@ -101,6 +101,10 @@ download_all () {
   # Download Obsidian
   local OBSIDIAN_GFX_PACK="http://dffd.wimbli.com/download.php?id=7728&f=%5B16x16%5D+Obsidian+%28v.0.8%29.zip"
   wget $DFFI_WGET_OPTIONS "$OBSIDIAN_GFX_PACK"
+  
+  # Download Spacefox
+  local SPACEFOX_GFX_PACK="http://dffd.wimbli.com/download.php?id=7867&f=%5B16x16%5D+Spacefox+34.11v1.0.zip"
+  wget $DFFI_WGET_OPTIONS "$SPACEFOX_GFX_PACK"
 }
 
 exit_with_error () {
@@ -123,6 +127,7 @@ install_all () {
   install_ironhand_gfx_pack
   install_mayday_gfx_pack
   install_obsidian_gfx_pack
+  install_spacefox_gfx_pack
 }
 
 install_cla_graphics_pack () {
@@ -249,6 +254,18 @@ install_phoebus_gfx_pack () {
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Unzipping Phoebus graphics pack failed."
+  fi
+}
+
+install_spacefox_gfx_pack () {
+  local SPACEFOX_ZIP="$DOWNLOAD_DIR/[16x16] Spacefox 34.11v1.0.zip"
+  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics"
+  
+  unzip -d "$GFX_FOLDER" "$SPACEFOX_ZIP"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Unzipping Spacefox graphics pack failed."
   fi
 }
 
