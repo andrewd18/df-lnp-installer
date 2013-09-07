@@ -328,6 +328,12 @@ install_soundsense_app () {
   if [ "$?" != "0" ]; then
 	exit_with_error "Unzipping SoundSense application failed."
   fi
+  
+  # Fix GitHub issue #5.
+  cp "$PHOEBUS_FOLDER/data/init/phoebus/colors.txt" "$PHOEBUS_FOLDER/data/init/"
+  cp "$PHOEBUS_FOLDER/data/init/phoebus/d_init.txt" "$PHOEBUS_FOLDER/data/init/"
+  cp "$PHOEBUS_FOLDER/data/init/phoebus/embark_profiles.txt" "$PHOEBUS_FOLDER/data/init/"
+  cp "$PHOEBUS_FOLDER/data/init/phoebus/init.txt" "$PHOEBUS_FOLDER/data/init/"
 }
 
 install_spacefox_gfx_pack () {
