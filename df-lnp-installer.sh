@@ -116,6 +116,14 @@ exit_with_error () {
   exit 1
 }
 
+fix_phoebus_missing_mouse_png () {
+  # Resolves GitHub issue #6.
+  local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/Phoebus_34_11v01"
+  local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/ASCII Default"
+  
+  cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$PHOEBUS_FOLDER/data/art/mouse.png"
+}
+
 install_all () {
   if [ -z "$INSTALL_DIR" ]; then
 	exit_with_error "Script failure. INSTALL_DIR undefined."
@@ -136,6 +144,8 @@ install_all () {
   install_spacefox_gfx_pack
   install_vanilla_df_gfx_pack
   install_jolly_bastion_gfx_pack
+  
+  fix_phoebus_missing_mouse_png
   
   install_soundsense_app
   
