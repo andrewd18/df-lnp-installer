@@ -30,3 +30,8 @@ utilities:
    directory: soundsense/
    executable: soundSense.sh
    showTerminal: true
+-  name: Dwarf Therapist
+   autostart: true
+   directory: dwarf_therapist/
+   executable: DwarfTherapist
+   showTerminal: false

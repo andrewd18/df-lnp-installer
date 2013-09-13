@@ -16,6 +16,25 @@ ask_for_preferred_install_dir () {
   fi
 }
 
+build_dwarf_therapist () {
+  if [ -z "$DOWNLOAD_DIR" ]; then
+	exit_with_error "Script failure. DOWNLOAD_DIR undefined."
+  fi
+
+  local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
+  
+  # Create the makefile.
+  qmake "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
+  
+  # Build from the Makefile.
+  make -C "$DWARF_THERAPIST_HG_DIR"
+  
+  # Quit if building failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Compiling Dwarf Therapist failed."
+  fi
+}
+
 checksum_all () {
   # Check for file validity.
   sha1sum -c sha1sums
@@ -109,6 +128,24 @@ download_all () {
   # Download Spacefox
   local SPACEFOX_GFX_PACK="http://dffd.wimbli.com/download.php?id=7867&f=%5B16x16%5D+Spacefox+34.11v1.0.zip"
   wget $DFFI_WGET_OPTIONS "$SPACEFOX_GFX_PACK"
+  
+  # Download Splintermind Attributes HG repo
+  download_dwarf_therapist
+}
+
+download_dwarf_therapist () {
+  local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
+  
+  if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
+	hg update --cwd "$DWARF_THERAPIST_HG_DIR"
+  else
+	hg clone https://dwarftherapist.googlecode.com/hg/ "$DWARF_THERAPIST_HG_DIR"
+  fi
+  
+  # Quit if downloading failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
+  fi
 }
 
 exit_with_error () {
@@ -149,6 +186,9 @@ install_all () {
   
   install_soundsense_app
   
+  build_dwarf_therapist
+  install_dwarf_therapist
+  
   # TODO
   # Make a decision about downloading/installing soundsense audio.
 }
@@ -174,6 +214,43 @@ install_dfhack () {
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Untarring Vanilla DF failed."
+  fi
+}
+
+install_dwarf_therapist () {
+  if [ -z "$DOWNLOAD_DIR" ]; then
+	exit_with_error "Script failure. DOWNLOAD_DIR undefined."
+  fi
+  
+  if [ -z "$INSTALL_DIR" ]; then
+	exit_with_error "Script failure. INSTALL_DIR undefined."
+  fi
+
+  local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
+  local RELEASE_DIR="$DWARF_THERAPIST_HG_DIR/bin/release"
+  
+  local UTILITIES_FOLDER="$INSTALL_DIR/LNP/utilities"
+  
+  mkdir -p "$UTILITIES_FOLDER/dwarf_therapist"
+  
+  # Copy app.
+  cp "$RELEASE_DIR/DwarfTherapist" "$UTILITIES_FOLDER/dwarf_therapist/"
+  
+  # Quit if copying failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Copying Dwarf Therapist app failed."
+  fi
+  
+  # Create log file.
+  mkdir -p "$UTILITIES_FOLDER/dwarf_therapist/log"
+  touch "$UTILITIES_FOLDER/dwarf_therapist/log/run.log"
+  
+  # Copy etc files.
+  cp -r "$DWARF_THERAPIST_HG_DIR/etc" "$UTILITIES_FOLDER/dwarf_therapist/"
+  
+  # Quit if copying failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Copying Dwarf Therapist ancillary files failed."
   fi
 }
 
