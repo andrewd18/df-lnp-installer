@@ -8,6 +8,7 @@ Included Mods
 * DF Hack 0.34.11-r3
 * Falconne's DFHack UI Plugins v0.35
 * SoundSense r42 (app only)
+* Dwarf Therapist pulled and built from source
 * Tilesets
   - [08x12] ASCII Default 0.34.11
   - [09x12] Jolly Bastion 34.10v5
@@ -44,12 +45,16 @@ System Requirements
 * SDL 1.2, 32-bit
 * OpenAL 1.2, 32-bit
 * Git
+* Mercurial (hg)
+* Qt4 Development Libraries including qmake
 * The following fairly standard Linux utilities:
   - wget
   - sha1sum
   - tar
   - unzip
   - unrar
+  - make
+  - gcc
 
 
 
@@ -70,3 +75,4 @@ Tested On
 =========
 
 * Debian 7 "Wheezy", stable, using Dash (default) shell.
+* Debian 7 "Jessie/Sid", testing, using Dash (default) shell.
