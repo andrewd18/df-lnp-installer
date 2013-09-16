@@ -16,6 +16,23 @@ ask_for_preferred_install_dir () {
   fi
 }
 
+backup_save_files () {
+  local SAVE_DIR="$INSTALL_DIR/df_linux/data/save"
+  local BACKUPS_DIR="./save_backups"
+  
+  # Check to see if they even have save files.
+  if [ -d "$SAVE_DIR" ]; then
+	mkdir -p "$BACKUPS_DIR"
+	
+	cp -r "$SAVE_DIR" "$BACKUPS_DIR"
+	
+	# Quit if backing up failed.
+	if [ "$?" != "0" ]; then
+	  exit_with_error "Backing up saved games failed."
+	fi
+  fi
+}
+
 build_dwarf_therapist () {
   if [ -z "$DOWNLOAD_DIR" ]; then
 	exit_with_error "Script failure. DOWNLOAD_DIR undefined."
@@ -52,12 +69,23 @@ create_install_dir () {
   if [ "$?" != "0" ]; then
 	exit_with_error "You probably do not have write permission to $INSTALL_DIR."
   fi
-  
+}
+
+check_install_dir_is_empty () {
   local LS_OUTPUT="$(ls -A "$INSTALL_DIR")"
   
   # Verify it's empty.
   if [ -n "$LS_OUTPUT" ]; then
-	exit_with_error "Cannot install. $INSTALL_DIR must be empty."
+	exit_with_error "Cannot install. $INSTALL_DIR must be an empty or nonexistant folder. If this is an existing DF installation, use --upgrade."
+  fi
+}
+
+delete_install_dir () {
+  rm -r "$INSTALL_DIR"
+  
+  # Quit if we couldn't make the install directory.
+  if [ "$?" != "0" ]; then
+	exit_with_error "You probably do not have write permission to $INSTALL_DIR."
   fi
 }
 
@@ -471,6 +499,7 @@ print_usage () {
   echo ""
   echo "Options:"
   echo "--skip-download  # Install using the existing contents of the ./downloads folder."
+  echo "--upgrade, -u    # Upgrade an existing DF installation."
   echo "--version, -v    # Print the df-lnp-installer version."
   echo "--help, --usage  # Print this message."
 }
@@ -478,6 +507,24 @@ print_usage () {
 print_version () {
   echo "Dwarf Fortress LNP Linux Installer"
   echo "Version: $VERSION"
+}
+
+restore_save_files () {
+  local DATA_DIR="$INSTALL_DIR/df_linux/data"
+  local BACKUPS_DIR="./save_backups"
+  
+  # Restore if a save folder exists in $BACKUPS_DIR
+  if [ -d "$BACKUPS_DIR/save" ]; then
+	mv "$BACKUPS_DIR/save" "$DATA_DIR"
+	
+	# Quit if restoring failed.
+	if [ "$?" != "0" ]; then
+	  exit_with_error "Restoring saved games failed."
+	fi
+  fi
+  
+  # Delete the backups dir.
+  rmdir --ignore-fail-on-non-empty "$BACKUPS_DIR"
 }
 
 ##############
@@ -489,6 +536,7 @@ VERSION=0.1.4
 INSTALL_DIR="$HOME/bin/Dwarf Fortress"
 DOWNLOAD_DIR="./downloads"
 SKIP_DOWNLOAD=0
+UPGRADE=0
 
 # TODO
 # Check for df-lnp-installer requirements like wget and sha1sum.
@@ -499,6 +547,7 @@ if [ -n "$1" ]; then
   while [ "$1" ]; do
 	case "$1" in
 	  '--skip-download') SKIP_DOWNLOAD=1 ;;
+	  '--upgrade'|'-u') UPGRADE=1 ;;
 	  '--version'|'-v') print_version; exit 0 ;;
 	  '--help'|'--usage') print_usage; exit 0 ;;
 	  *) echo "Unknown argument: $1"; print_usage; exit 1 ;;
@@ -511,7 +560,15 @@ if [ -n "$1" ]; then
 fi
 
 ask_for_preferred_install_dir
+
+# If we are upgrading, backup the save files (if any) and then wipe the slate clean.
+if [ "$UPGRADE" = "1" ]; then
+  backup_save_files
+  delete_install_dir
+fi
+
 create_install_dir
+check_install_dir_is_empty
 
 # Download all the things!
 if [ "$SKIP_DOWNLOAD" = "0" ]; then
@@ -523,6 +580,11 @@ checksum_all
 
 # Install all the things!
 install_all
+
+# If we upgraded, restore the save files (if any).
+if [ "$UPGRADE" = "1" ]; then
+  restore_save_files
+fi
 
 # Strike the earth!
 echo ""
