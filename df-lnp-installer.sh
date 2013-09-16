@@ -95,6 +95,23 @@ check_dependencies () {
 	MISSING_DEPS="${MISSING_DEPS}make "
   fi
   
+  # Check for QT Libraries (required for Dwarf Therapist)
+  if [ -z "$(find /usr/lib -name libQtCore.so)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}libQtCore "
+  fi
+  
+  if [ -z "$(find /usr/lib -name libQtGui.so)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}libQtGui "
+  fi
+  
+  if [ -z "$(find /usr/lib -name libQtNetwork.so)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}libQtNetwork "
+  fi
+  
+  if [ -z "$(find /usr/lib -name libQtScript.so)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}libQtScript "
+  fi
+  
   # java runtime environment (required for LNP)
   if [ -z "$(which java)" ]; then
 	MISSING_DEPS="${MISSING_DEPS}java "
