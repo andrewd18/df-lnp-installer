@@ -614,10 +614,6 @@ DOWNLOAD_DIR="./downloads"
 SKIP_DOWNLOAD=0
 UPGRADE=0
 
-# TODO
-# Check for df-lnp-installer requirements like wget and sha1sum.
-# Check for DF OS requirements like libSDL and Java.
-
 # If the user passed in arguments, parse them, otherwise assume "do everything". 
 if [ -n "$1" ]; then
   while [ "$1" ]; do
