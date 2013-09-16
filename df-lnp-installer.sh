@@ -80,6 +80,57 @@ check_install_dir_is_empty () {
   fi
 }
 
+check_installer_dependencies () {
+  local MISSING_DEPS=""
+  
+  # WGET
+  if [ -z "$(which wget)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}wget "
+  fi
+  
+  # sha1sum
+  if [ -z "$(which wget)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}sha1sum "
+  fi
+  
+  # Tar
+  if [ -z "$(which tar)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}tar "
+  fi
+  
+  # Unzip
+  if [ -z "$(which unzip)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}unzip "
+  fi
+  
+  # Unrar
+  if [ -z "$(which unrar)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}unrar "
+  fi
+  
+  # Mercurial (required for DwarfTherapist)
+  if [ -z "$(which hg)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}hg "
+  fi
+  
+  # qmake (required for DwarfTherapist)
+  if [ -z "$(which hg)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}qmake "
+  fi
+  
+  # make (required for DwarfTherapist)
+  if [ -z "$(which make)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}make "
+  fi
+  
+  ######
+  # Error if the $MISSING_DEPS string contains a value (aka there are missing dependencies).
+  ######
+  if [ -n "$MISSING_DEPS" ]; then
+	exit_with_error "Your computer is missing the following programs: $MISSING_DEPS. You must install them before continuing."
+  fi
+}
+
 delete_install_dir () {
   rm -r "$INSTALL_DIR"
   
@@ -558,6 +609,8 @@ if [ -n "$1" ]; then
 	shift
   done
 fi
+
+check_installer_dependencies
 
 ask_for_preferred_install_dir
 
