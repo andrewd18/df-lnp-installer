@@ -102,17 +102,22 @@ check_dependencies () {
   
   # Check for libSDL base
   if [ -z "$(find /usr/lib -name libSDL-1.2.so.0)" ]; then
-	MISSING_DEPS="${MISSING_DEPS}libSDL-1.2 "
+	MISSING_DEPS="${MISSING_DEPS}libSDL-1.2_(32-bit) "
   fi
   
   # Check for libSDL image
   if [ -z "$(find /usr/lib -name libSDL_image-1.2.so.0)" ]; then
-	MISSING_DEPS="${MISSING_DEPS}libSDL_image-1.2 "
+	MISSING_DEPS="${MISSING_DEPS}libSDL_image-1.2_(32-bit) "
   fi
   
   # Check for libSDL ttf
   if [ -z "$(find /usr/lib -name libSDL_ttf-2.0.so.0)" ]; then
-	MISSING_DEPS="${MISSING_DEPS}libSDL_ttf-2.0 "
+	MISSING_DEPS="${MISSING_DEPS}libSDL_ttf-2.0_(32-bit) "
+  fi
+  
+  # Check for OpenAL
+  if [ -z "$(find /usr/lib -name libopenal.so.1)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}OpenAL1_(32-bit) "
   fi
   
   ######
