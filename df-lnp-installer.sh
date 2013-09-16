@@ -100,6 +100,21 @@ check_dependencies () {
 	MISSING_DEPS="${MISSING_DEPS}java "
   fi
   
+  # Check for libSDL base
+  if [ -z "$(find /usr/lib -name libSDL-1.2.so.0)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}libSDL-1.2 "
+  fi
+  
+  # Check for libSDL image
+  if [ -z "$(find /usr/lib -name libSDL_image-1.2.so.0)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}libSDL_image-1.2 "
+  fi
+  
+  # Check for libSDL ttf
+  if [ -z "$(find /usr/lib -name libSDL_ttf-2.0.so.0)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}libSDL_ttf-2.0 "
+  fi
+  
   ######
   # Error if the $MISSING_DEPS string contains a value (aka there are missing dependencies).
   ######
