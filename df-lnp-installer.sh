@@ -52,35 +52,7 @@ build_dwarf_therapist () {
   fi
 }
 
-checksum_all () {
-  # Check for file validity.
-  sha1sum -c sha1sums
-  
-  # Quit if one or more of the files fails its checksum.
-  if [ "$?" != "0" ]; then
-	exit_with_error "One or more file failed its checksum."
-  fi
-}
-
-create_install_dir () {
-  mkdir -p "$INSTALL_DIR"
-  
-  # Quit if we couldn't make the install directory.
-  if [ "$?" != "0" ]; then
-	exit_with_error "You probably do not have write permission to $INSTALL_DIR."
-  fi
-}
-
-check_install_dir_is_empty () {
-  local LS_OUTPUT="$(ls -A "$INSTALL_DIR")"
-  
-  # Verify it's empty.
-  if [ -n "$LS_OUTPUT" ]; then
-	exit_with_error "Cannot install. $INSTALL_DIR must be an empty or nonexistant folder. If this is an existing DF installation, use --upgrade."
-  fi
-}
-
-check_installer_dependencies () {
+check_dependencies () {
   local MISSING_DEPS=""
   
   # WGET
@@ -123,11 +95,44 @@ check_installer_dependencies () {
 	MISSING_DEPS="${MISSING_DEPS}make "
   fi
   
+  # java runtime environment (required for LNP)
+  if [ -z "$(which java)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}java "
+  fi
+  
   ######
   # Error if the $MISSING_DEPS string contains a value (aka there are missing dependencies).
   ######
   if [ -n "$MISSING_DEPS" ]; then
 	exit_with_error "Your computer is missing the following programs: $MISSING_DEPS. You must install them before continuing."
+  fi
+}
+
+check_install_dir_is_empty () {
+  local LS_OUTPUT="$(ls -A "$INSTALL_DIR")"
+  
+  # Verify it's empty.
+  if [ -n "$LS_OUTPUT" ]; then
+	exit_with_error "Cannot install. $INSTALL_DIR must be an empty or nonexistant folder. If this is an existing DF installation, use --upgrade."
+  fi
+}
+
+checksum_all () {
+  # Check for file validity.
+  sha1sum -c sha1sums
+  
+  # Quit if one or more of the files fails its checksum.
+  if [ "$?" != "0" ]; then
+	exit_with_error "One or more file failed its checksum."
+  fi
+}
+
+create_install_dir () {
+  mkdir -p "$INSTALL_DIR"
+  
+  # Quit if we couldn't make the install directory.
+  if [ "$?" != "0" ]; then
+	exit_with_error "You probably do not have write permission to $INSTALL_DIR."
   fi
 }
 
@@ -610,7 +615,7 @@ if [ -n "$1" ]; then
   done
 fi
 
-check_installer_dependencies
+check_dependencies
 
 ask_for_preferred_install_dir
 
