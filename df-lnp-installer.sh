@@ -52,6 +52,13 @@ build_dwarf_therapist () {
   fi
 }
 
+# One-off bugfixes that either require multiple packages to be installed first
+# or have other non-trivial consequences.
+bugfix_all () {
+  fix_phoebus_missing_mouse_png
+  fix_vanilla_df_openal_issue
+}
+
 check_dependencies () {
   echo "Checking for dependencies..."
   
@@ -379,10 +386,6 @@ install_all () {
   install_spacefox_gfx_pack
   install_vanilla_df_gfx_pack
   install_jolly_bastion_gfx_pack
-  
-  fix_phoebus_missing_mouse_png
-  
-  fix_vanilla_df_openal_issue
   
   install_soundsense_app
   
@@ -795,6 +798,9 @@ checksum_all
 
 # Install all the things!
 install_all
+
+# Apply all the bug fixes!
+bugfix_all
 
 # If we upgraded, restore the save files (if any).
 if [ "$UPGRADE" = "1" ]; then
