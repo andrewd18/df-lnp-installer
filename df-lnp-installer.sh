@@ -622,6 +622,15 @@ install_soundsense_app () {
   if [ "$?" != "0" ]; then
 	exit_with_error "Unzipping SoundSense application failed."
   fi
+  
+  # Replace SoundSense shell script with a duplicate that uses Unix line endings.
+  # sed didn't work for some reason; using tr. :/
+  tr -d '\015' <"$UTILITIES_FOLDER/soundsense/soundSense.sh" >"$UTILITIES_FOLDER/soundsense/soundsense_unix.sh"
+  rm "$UTILITIES_FOLDER/soundsense/soundSense.sh"
+  mv "$UTILITIES_FOLDER/soundsense/soundsense_unix.sh" "$UTILITIES_FOLDER/soundsense/soundSense.sh"
+  
+  # Make soundSense shell script executable.
+  chmod +x "$UTILITIES_FOLDER/soundsense/soundSense.sh"
 }
 
 install_spacefox_gfx_pack () {
