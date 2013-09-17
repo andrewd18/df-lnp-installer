@@ -92,6 +92,11 @@ check_dependencies () {
 	MISSING_DEPS="${MISSING_DEPS}patch "
   fi
   
+  # xterm for LNP
+  if [ -z "$(which xterm)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}xterm "
+  fi
+  
   # Mercurial (required for DwarfTherapist)
   if [ -z "$(which hg)" ]; then
 	MISSING_DEPS="${MISSING_DEPS}hg "
