@@ -1,6 +1,8 @@
 Overview
 ========
 
+df-lnp-installer is a shell script that installs the Dwarf Fortress Lazy Newb Pack. It downloads and builds a DF installation from available source code and binaries.
+
 Included Mods
 -------------
 
@@ -21,28 +23,13 @@ Included Mods
   - [16x16] Spacefox 34.11v1.0
 
 
-Features
-========
-
-Complete
---------
-
- * Downloads and installs the latest Lazy Newb Pack UI.
- * Downloads and installs tilesets.
- * Checks all files for SHA1 validity.
- 
-TODO
-----
-
- * Automatically check your system for program requirements and install as necessary.
- * Continue adding more features from the Windows and Mac LNPs.
-
-
 System Requirements
 ===================
 
 * A Java runtime environment for the LNP GUI.
 * SDL 1.2, 32-bit
+* LibGLU 1, 32-bit
+* LibGTK 2.0, 32-bit
 * OpenAL 1.2, 32-bit
 * Git
 * Mercurial (hg)
@@ -56,7 +43,12 @@ System Requirements
   - make
   - gcc
 
+The df-lnp-installer script will automatically check your system for the required libraries.
 
+The Debian (and possibly Ubuntu) command to install these dependencies is: 
+```
+sudo apt-get install default-jre libsdl1.2debian:i386 libsdl-image1.2:i386 libsdl-ttf2.0-0:i386 libglu1-mesa:i386 libgtk2.0-0:i386 libopenal1:i386 git hg libqt4-dev qt4-qmake wget coreutils tar unzip unrar make gcc
+```
 
 Full Installation
 =================
