@@ -1,0 +1,20 @@
+--- /home/andrew/dftest/LNP/graphics/Phoebus_34_11v01/data/init/phoebus_nott/init.txt	2012-05-14 10:09:32.000000000 -0500
++++ ./init.txt	2013-08-21 06:56:57.000000000 -0500
+@@ -114,7 +114,7 @@
+ Use this to set how fast the game zooms.  The default corresponds to
+ increasing grid size by 10 units each time you zoom.
+ 
+-[ZOOM_SPEED:10]
++[ZOOM_SPEED:5]
+ 
+ Change this to NO if you don't want to have the mouse involved at all.
+ 
+@@ -139,7 +139,7 @@
+ 
+ This controls the number of milliseconds between macro instructions.
+ 
+-[MACRO_MS:15]
++[MACRO_MS:0]
+ 
+ This controls the number of milliseconds that must pass before input works again after the view recenters on an event in dwarf mode.
+ 

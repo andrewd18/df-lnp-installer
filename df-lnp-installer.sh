@@ -57,7 +57,7 @@ check_dependencies () {
   
   local MISSING_DEPS=""
   
-  # WGET
+  # file
   if [ -z "$(which file)" ]; then
 	MISSING_DEPS="${MISSING_DEPS}file "
   fi
@@ -85,6 +85,11 @@ check_dependencies () {
   # Unrar
   if [ -z "$(which unrar)" ]; then
 	MISSING_DEPS="${MISSING_DEPS}unrar "
+  fi
+  
+  # Patch
+  if [ -z "$(which patch)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}patch "
   fi
   
   # Mercurial (required for DwarfTherapist)
@@ -311,10 +316,14 @@ exit_with_error () {
 
 fix_phoebus_missing_mouse_png () {
   # Resolves GitHub issue #6.
-  local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/Phoebus_34_11v01"
+  local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
   local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/ASCII Default"
   
   cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$PHOEBUS_FOLDER/data/art/mouse.png"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Applying Phoebus Missing Mouse patch failed."
+  fi
 }
 
 install_all () {
@@ -549,22 +558,53 @@ install_obsidian_gfx_pack () {
 
 install_phoebus_gfx_pack () {
   local PHOEBUS_GFX_PACK="$DOWNLOAD_DIR/Phoebus_34_11v01.zip"
-  local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/Phoebus_34_11v01"
+  local PHOEBUS_UNZIP="./phoebus_unzip"
+  local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
+  local PHOEBUS_LNP_PATCH_DIR="./patches/phoebus_gfx"
   
   mkdir -p "$PHOEBUS_FOLDER"
   
-  unzip -d "$PHOEBUS_FOLDER" "$PHOEBUS_GFX_PACK"
+  unzip -d "$PHOEBUS_UNZIP" "$PHOEBUS_GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Unzipping Phoebus graphics pack failed."
   fi
   
-  # Fix GitHub issue #5.
-  cp "$PHOEBUS_FOLDER/data/init/phoebus/colors.txt" "$PHOEBUS_FOLDER/data/init/"
-  cp "$PHOEBUS_FOLDER/data/init/phoebus/d_init.txt" "$PHOEBUS_FOLDER/data/init/"
-  cp "$PHOEBUS_FOLDER/data/init/phoebus/embark_profiles.txt" "$PHOEBUS_FOLDER/data/init/"
-  cp "$PHOEBUS_FOLDER/data/init/phoebus/init.txt" "$PHOEBUS_FOLDER/data/init/"
+  # Install Art
+  mkdir -p "$PHOEBUS_FOLDER/data/art"
+  cp "$PHOEBUS_UNZIP/data/art/"* "$PHOEBUS_FOLDER/data/art/"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Phoebus art failed."
+  fi
+  
+  # Install init
+  mkdir -p "$PHOEBUS_FOLDER/data/init"
+  cp "$PHOEBUS_UNZIP/data/init/phoebus_nott/"* "$PHOEBUS_FOLDER/data/init/"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Phoebus init failed."
+  fi
+  
+  # Apply LNP patches.
+  patch -d "$PHOEBUS_FOLDER/data/init/" < "patches/phoebus_gfx/init_lnp_defaults.patch"
+  patch -d "$PHOEBUS_FOLDER/data/init/" < "patches/phoebus_gfx/dinit_lnp_defaults.patch"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Applying Phoebus LNP patches failed."
+  fi
+  
+  # Install raws
+  mkdir -p "$PHOEBUS_FOLDER/raw"
+  cp -r "$PHOEBUS_UNZIP/raw/graphics" "$PHOEBUS_FOLDER/raw"
+  cp -r "$PHOEBUS_UNZIP/raw/objects" "$PHOEBUS_FOLDER/raw"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Phoebus raws failed."
+  fi
+  
+  rm -r "$PHOEBUS_UNZIP"
 }
 
 install_soundsense_app () {
