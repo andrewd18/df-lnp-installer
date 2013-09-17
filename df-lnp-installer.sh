@@ -68,8 +68,13 @@ check_dependencies () {
   fi
   
   # sha1sum
-  if [ -z "$(which wget)" ]; then
+  if [ -z "$(which sha1sum)" ]; then
 	MISSING_DEPS="${MISSING_DEPS}sha1sum "
+  fi
+  
+  # sed
+  if [ -z "$(which sed)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}sed "
   fi
   
   # Tar
