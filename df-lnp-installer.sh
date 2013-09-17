@@ -53,7 +53,14 @@ build_dwarf_therapist () {
 }
 
 check_dependencies () {
+  echo "Checking for dependencies..."
+  
   local MISSING_DEPS=""
+  
+  # WGET
+  if [ -z "$(which file)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}file "
+  fi
   
   # WGET
   if [ -z "$(which wget)" ]; then
@@ -117,31 +124,43 @@ check_dependencies () {
 	MISSING_DEPS="${MISSING_DEPS}java "
   fi
   
-  # Check for libSDL base
-  if [ -z "$(find /usr/lib -name libSDL-1.2.so.0)" ]; then
+  # Check for libSDL base; must be 32-bit.
+  local LIBSDL_BASE_SO="$(find /usr/lib -name libSDL-1.2.so.0)"
+  local LIBSDL_FILTER_32_BIT="$(file -L $LIBSDL_BASE_SO | grep "32-bit")"
+  
+  if [ -z "$LIBSDL_FILTER_32_BIT" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libSDL-1.2_(32-bit) "
   fi
   
-  # Check for libSDL image
-  if [ -z "$(find /usr/lib -name libSDL_image-1.2.so.0)" ]; then
+  # Check for libSDL image; must be 32-bit.
+  local LIBSDL_IMAGE_SO="$(find /usr/lib -name libSDL_image-1.2.so.0)"
+  local LIBSDL_IMAGE_FILTER_32_BIT="$(file -L $LIBSDL_IMAGE_SO | grep "32-bit")"
+  
+  if [ -z "$LIBSDL_IMAGE_FILTER_32_BIT" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libSDL_image-1.2_(32-bit) "
   fi
   
-  # Check for libSDL ttf
-  if [ -z "$(find /usr/lib -name libSDL_ttf-2.0.so.0)" ]; then
+  # Check for libSDL ttf; must be 32-bit.
+  local LIBSDL_TTF_SO="$(find /usr/lib -name libSDL_ttf-2.0.so.0)"
+  local LIBSDL_TTF_FILTER_32_BIT="$(file -L $LIBSDL_TTF_SO | grep "32-bit")"
+  
+  if [ -z "$LIBSDL_TTF_FILTER_32_BIT" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libSDL_ttf-2.0_(32-bit) "
   fi
   
-  # Check for OpenAL
-  if [ -z "$(find /usr/lib -name libopenal.so.1)" ]; then
-	MISSING_DEPS="${MISSING_DEPS}OpenAL1_(32-bit) "
+  # Check for OpenAL; must be 32-bit.
+  local OPENAL_SO="$(find /usr/lib -name libopenal.so.1)"
+  local OPENAL_SO_FILTER_32_BIT="$(file -L $OPENAL_SO | grep "32-bit")"
+  
+  if [ -z "$OPENAL_SO_FILTER_32_BIT" ]; then
+	MISSING_DEPS="${MISSING_DEPS}libOpenAL_1_(32-bit) "
   fi
   
   ######
   # Error if the $MISSING_DEPS string contains a value (aka there are missing dependencies).
   ######
   if [ -n "$MISSING_DEPS" ]; then
-	exit_with_error "Your computer is missing the following programs: $MISSING_DEPS. You must install them before continuing."
+	exit_with_error "Your computer is missing the following programs or libraries: $MISSING_DEPS. Install them using your distribution's package manager or use --skip-deps to override."
   fi
 }
 
@@ -592,6 +611,7 @@ print_usage () {
   echo ""
   echo "Options:"
   echo "--skip-download  # Install using the existing contents of the ./downloads folder."
+  echo "--skip-deps      # Install without checking for dependencies."
   echo "--upgrade, -u    # Upgrade an existing DF installation."
   echo "--version, -v    # Print the df-lnp-installer version."
   echo "--help, --usage  # Print this message."
@@ -629,6 +649,7 @@ VERSION="0.1.4+dev"
 INSTALL_DIR="$HOME/bin/Dwarf Fortress"
 DOWNLOAD_DIR="./downloads"
 SKIP_DOWNLOAD=0
+SKIP_DEPS=0
 UPGRADE=0
 
 # If the user passed in arguments, parse them, otherwise assume "do everything". 
@@ -636,6 +657,7 @@ if [ -n "$1" ]; then
   while [ "$1" ]; do
 	case "$1" in
 	  '--skip-download') SKIP_DOWNLOAD=1 ;;
+	  '--skip-deps') SKIP_DEPS=1 ;;
 	  '--upgrade'|'-u') UPGRADE=1 ;;
 	  '--version'|'-v') print_version; exit 0 ;;
 	  '--help'|'--usage') print_usage; exit 0 ;;
@@ -648,7 +670,9 @@ if [ -n "$1" ]; then
   done
 fi
 
-check_dependencies
+if [ "$SKIP_DEPS" = "0" ]; then
+  check_dependencies
+fi
 
 ask_for_preferred_install_dir
 
