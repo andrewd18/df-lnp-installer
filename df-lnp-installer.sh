@@ -156,6 +156,22 @@ check_dependencies () {
 	MISSING_DEPS="${MISSING_DEPS}libOpenAL_1_(32-bit) "
   fi
   
+  # Check for libGLU; must be 32-bit.
+  local LIBGLU_SO="$(find /usr/lib -name libGLU.so.1)"
+  local LIBGLU_SO_FILTER_32_BIT="$(file -L $LIBGLU_SO | grep "32-bit")"
+  
+  if [ -z "$LIBGLU_SO_FILTER_32_BIT" ]; then
+	MISSING_DEPS="${MISSING_DEPS}libGLU_(32-bit) "
+  fi
+  
+  # Check for libgtk-x11; must be 32-bit.
+  local LIBGTK_SO="$(find /usr/lib -name libgtk-x11-2.0.so.0)"
+  local LIBGTK_SO_FILTER_32_BIT="$(file -L $LIBGTK_SO | grep "32-bit")"
+  
+  if [ -z "$LIBGTK_SO_FILTER_32_BIT" ]; then
+	MISSING_DEPS="${MISSING_DEPS}libGTK-x11_(32-bit) "
+  fi
+  
   ######
   # Error if the $MISSING_DEPS string contains a value (aka there are missing dependencies).
   ######
