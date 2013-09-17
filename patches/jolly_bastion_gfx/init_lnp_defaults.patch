@@ -1,0 +1,74 @@
+--- downloads/JollyBastion34-10v5/JollyBastion34-10v5/12x12/data/init/init.txt	2012-05-18 04:49:10.000000000 -0500
++++ lnp_gfx/[12x12] Jolly Bastion 34.10v5/data/init/init.txt	2013-08-21 06:47:32.000000000 -0500
+@@ -25,8 +25,8 @@
+ This is the size and font for windowed mode.  Changing to the 800x600 font might make you happier.
+ If set below 256x256 it specifies the grid size instead, with a minimum of 80x25.
+ 
+-[WINDOWEDX:80]
+-[WINDOWEDY:25]
++[WINDOWEDX:0]
++[WINDOWEDY:0]
+ [FONT:jolly12x12.png]
+ 
+ You may disable window resizing if you wish.
+@@ -48,10 +48,10 @@
+ [GRAPHICS:NO]
+ [GRAPHICS_WINDOWEDX:0]
+ [GRAPHICS_WINDOWEDY:0]
+-[GRAPHICS_FONT:curses_square_16x16.png]
++[GRAPHICS_FONT:jolly12x12.png]
+ [GRAPHICS_FULLSCREENX:0]
+ [GRAPHICS_FULLSCREENY:0]
+-[GRAPHICS_FULLFONT:curses_square_16x16.png]
++[GRAPHICS_FULLFONT:jolly12x12.png]
+ [GRAPHICS_BLACK_SPACE:YES]
+ 
+ These settings can have a significant impact on frame rate, especially for people that have slow frame rates on the title screen.  Available modes are 2D, 2DSW, 2DASYNC, STANDARD, PARTIAL:<number>, ACCUM_BUFFER, FRAME_BUFFER and VBO. The number after PARTIAL refers to how many frames it will redo a printed tile before skipping it, so you might try increasing it a bit if you have flickering when PARTIAL is set.  Please note that any of these combinations might cause frame rates to drop significantly or cause unpleasant side effects like flickering.
+@@ -64,7 +64,7 @@
+ 
+ Linux/OS X users may also use PRINT_MODE:TEXT for primitive ncurses output.
+ 
+-[PRINT_MODE:STANDARD]
++[PRINT_MODE:2D]
+ 	Mode examples:
+ 	 PRINT_MODE:2D
+ 	 PRINT_MODE:TEXT
+@@ -88,11 +88,11 @@
+ 
+ You may set FPS_CAP to 0 to make it uncapped.
+ 
+-[FPS_CAP:300]
++[FPS_CAP:100]
+ 
+ Use this to set the maximum graphical frame refresh rate during play.
+ 
+-[G_FPS_CAP:30]
++[G_FPS_CAP:50]
+ 
+ On cards that support the OpenGL ARB_sync extension, turning this on can improve framerates in GPU overload conditions. It defaults to NO, as many cards that claim to support this will crash if asked to do so.
+ 
+@@ -114,7 +114,7 @@
+ Use this to set how fast the game zooms.  The default corresponds to
+ increasing grid size by 10 units each time you zoom.
+ 
+-[ZOOM_SPEED:10]
++[ZOOM_SPEED:5]
+ 
+ Change this to NO if you don't want to have the mouse involved at all.
+ 
+@@ -139,7 +139,7 @@
+ 
+ This controls the number of milliseconds between macro instructions.
+ 
+-[MACRO_MS:15]
++[MACRO_MS:0]
+ 
+ This controls the number of milliseconds that must pass before input works again after the view recenters on an event in dwarf mode.
+ 
+@@ -147,4 +147,4 @@
+ 
+ Change this to NO if you want to leave save uncompressed (you might want to do this if you are experience save corruption).
+ 
+-[COMPRESSED_SAVES:YES]
+\ No newline at end of file
++[COMPRESSED_SAVES:YES]

@@ -533,39 +533,53 @@ install_ironhand_gfx_pack () {
 }
 
 install_jolly_bastion_gfx_pack () {
-  local JOLLY_BASTION_ZIP="$DOWNLOAD_DIR/JollyBastion34-10v5.zip"
-  local JOLLY_BASTION_TEMP_FOLDER="./jolly_bastion_unzip"
+  local GFX_PACK="$DOWNLOAD_DIR/JollyBastion34-10v5.zip"
+  local TEMP_UNZIP_DIR="./jolly_bastion_unzip"
+  local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
+  local LNP_PATCH_DIR="./patches/jolly_bastion_gfx"
   
-  local JB_NINE_BY_TWELVE_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/JollyBastion9x12"
-  local JB_TWELVE_BY_TWELVE_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/JollyBastion12x12"
-  
-  mkdir -p "$JB_NINE_BY_TWELVE_GFX_FOLDER"
-  mkdir -p "$JB_TWELVE_BY_TWELVE_GFX_FOLDER"
-  
-  unzip -d "$JOLLY_BASTION_TEMP_FOLDER" "$JOLLY_BASTION_ZIP"
+  mkdir -p "$TEMP_UNZIP_DIR"
+  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Unzipping Jolly Bastion graphics pack failed."
   fi
   
-  cp -r "$JOLLY_BASTION_TEMP_FOLDER/JollyBastion34-10v5/9x12 (recommended)/data" "$JB_NINE_BY_TWELVE_GFX_FOLDER"
-  cp -r "$JOLLY_BASTION_TEMP_FOLDER/JollyBastion34-10v5/9x12 (recommended)/raw" "$JB_NINE_BY_TWELVE_GFX_FOLDER"
+  # Install Art
+  mkdir -p "$INSTALL_GFX_DIR/data/art"
+  cp "$TEMP_UNZIP_DIR/JollyBastion34-10v5/12x12/data/art/"* "$INSTALL_GFX_DIR/data/art/"
   
-  # Quit if copying failed.
   if [ "$?" != "0" ]; then
-	exit_with_error "Copying Jolly Bastion 9x12 graphics pack failed."
+	exit_with_error "Installing Jolly Bastion art failed."
   fi
   
-  cp -r "$JOLLY_BASTION_TEMP_FOLDER/JollyBastion34-10v5/12x12/data" "$JB_TWELVE_BY_TWELVE_GFX_FOLDER"
-  cp -r "$JOLLY_BASTION_TEMP_FOLDER/JollyBastion34-10v5/12x12/raw" "$JB_TWELVE_BY_TWELVE_GFX_FOLDER"
+  # Install init
+  mkdir -p "$INSTALL_GFX_DIR/data/init"
+  cp "$TEMP_UNZIP_DIR/JollyBastion34-10v5/12x12/data/init/"* "$INSTALL_GFX_DIR/data/init/"
   
-  # Quit if copying failed.
   if [ "$?" != "0" ]; then
-	exit_with_error "Copying Jolly Bastion 12x12 graphics pack failed."
+	exit_with_error "Installing Jolly Bastion init failed."
   fi
   
-  rm -r "$JOLLY_BASTION_TEMP_FOLDER"
+  # Apply LNP patches.
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Applying Jolly Bastion LNP patches failed."
+  fi
+  
+  # Install raws
+  mkdir -p "$INSTALL_GFX_DIR/raw"
+  # GFX folder doesn't exist.
+  cp -r "$TEMP_UNZIP_DIR/JollyBastion34-10v5/12x12/raw/objects" "$INSTALL_GFX_DIR/raw"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Jolly Bastion raws failed."
+  fi
+  
+  rm -r "$TEMP_UNZIP_DIR"
 }
 
 install_lnp () {
