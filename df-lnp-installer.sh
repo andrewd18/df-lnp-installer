@@ -571,14 +571,13 @@ install_lnp_yaml () {
 }
 
 install_mayday_gfx_pack () {
-  local MAYDAY_GFX_PACK="$DOWNLOAD_DIR/Mayday 34.11.zip"
-  local MAYDAY_UNZIP="./mayday_unzip"
-  local MAYDAY_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] Mayday 0.34.11"
-  local MAYDAY_LNP_PATCH_DIR="./patches/mayday_gfx"
+  local GFX_PACK="$DOWNLOAD_DIR/Mayday 34.11.zip"
+  local TEMP_UNZIP_DIR="./mayday_unzip"
+  local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Mayday 0.34.11"
+  local LNP_PATCH_DIR="./patches/mayday_gfx"
   
-  mkdir -p "$MAYDAY_UNZIP"
-  
-  unzip -d "$MAYDAY_UNZIP" "$MAYDAY_GFX_PACK"
+  mkdir -p "$TEMP_UNZIP_DIR"
+  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
@@ -586,39 +585,39 @@ install_mayday_gfx_pack () {
   fi
   
   # Install Art
-  mkdir -p "$MAYDAY_FOLDER/data/art"
-  cp "$MAYDAY_UNZIP/Mayday/data/art/"* "$MAYDAY_FOLDER/data/art/"
+  mkdir -p "$INSTALL_GFX_DIR/data/art"
+  cp "$TEMP_UNZIP_DIR/Mayday/data/art/"* "$INSTALL_GFX_DIR/data/art/"
   
   if [ "$?" != "0" ]; then
 	exit_with_error "Installing Mayday art failed."
   fi
   
   # Install init
-  mkdir -p "$MAYDAY_FOLDER/data/init"
-  cp "$MAYDAY_UNZIP/Mayday/data/init/"* "$MAYDAY_FOLDER/data/init/"
+  mkdir -p "$INSTALL_GFX_DIR/data/init"
+  cp "$TEMP_UNZIP_DIR/Mayday/data/init/"* "$INSTALL_GFX_DIR/data/init/"
   
   if [ "$?" != "0" ]; then
 	exit_with_error "Installing Mayday init failed."
   fi
   
   # Apply LNP patches.
-  patch -d "$MAYDAY_FOLDER/data/init/" < "$MAYDAY_LNP_PATCH_DIR/init_lnp_defaults.patch"
-  patch -d "$MAYDAY_FOLDER/data/init/" < "$MAYDAY_LNP_PATCH_DIR/dinit_lnp_defaults.patch"
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
   
   if [ "$?" != "0" ]; then
 	exit_with_error "Applying Mayday LNP patches failed."
   fi
   
   # Install raws
-  mkdir -p "$MAYDAY_FOLDER/raw"
-  cp -r "$MAYDAY_UNZIP/Mayday/raw/graphics" "$MAYDAY_FOLDER/raw"
-  cp -r "$MAYDAY_UNZIP/Mayday/raw/objects" "$MAYDAY_FOLDER/raw"
+  mkdir -p "$INSTALL_GFX_DIR/raw"
+  cp -r "$TEMP_UNZIP_DIR/Mayday/raw/graphics" "$INSTALL_GFX_DIR/raw"
+  cp -r "$TEMP_UNZIP_DIR/Mayday/raw/objects" "$INSTALL_GFX_DIR/raw"
   
   if [ "$?" != "0" ]; then
 	exit_with_error "Installing Mayday raws failed."
   fi
   
-  rm -r "$MAYDAY_UNZIP"
+  rm -r "$TEMP_UNZIP_DIR"
 }
 
 install_obsidian_gfx_pack () {
@@ -634,13 +633,13 @@ install_obsidian_gfx_pack () {
 }
 
 install_phoebus_gfx_pack () {
-  local PHOEBUS_GFX_PACK="$DOWNLOAD_DIR/Phoebus_34_11v01.zip"
-  local PHOEBUS_UNZIP="./phoebus_unzip"
-  local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
-  local PHOEBUS_LNP_PATCH_DIR="./patches/phoebus_gfx"
+  local GFX_PACK="$DOWNLOAD_DIR/Phoebus_34_11v01.zip"
+  local TEMP_UNZIP_DIR="./phoebus_unzip"
+  local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
+  local LNP_PATCH_DIR="./patches/phoebus_gfx"
   
-  mkdir -p "$PHOEBUS_UNZIP"
-  unzip -d "$PHOEBUS_UNZIP" "$PHOEBUS_GFX_PACK"
+  mkdir -p "$TEMP_UNZIP_DIR"
+  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
@@ -648,39 +647,39 @@ install_phoebus_gfx_pack () {
   fi
   
   # Install Art
-  mkdir -p "$PHOEBUS_FOLDER/data/art"
-  cp "$PHOEBUS_UNZIP/data/art/"* "$PHOEBUS_FOLDER/data/art/"
+  mkdir -p "$INSTALL_GFX_DIR/data/art"
+  cp "$TEMP_UNZIP_DIR/data/art/"* "$INSTALL_GFX_DIR/data/art/"
   
   if [ "$?" != "0" ]; then
 	exit_with_error "Installing Phoebus art failed."
   fi
   
   # Install init
-  mkdir -p "$PHOEBUS_FOLDER/data/init"
-  cp "$PHOEBUS_UNZIP/data/init/phoebus_nott/"* "$PHOEBUS_FOLDER/data/init/"
+  mkdir -p "$INSTALL_GFX_DIR/data/init"
+  cp "$TEMP_UNZIP_DIR/data/init/phoebus_nott/"* "$INSTALL_GFX_DIR/data/init/"
   
   if [ "$?" != "0" ]; then
 	exit_with_error "Installing Phoebus init failed."
   fi
   
   # Apply LNP patches.
-  patch -d "$PHOEBUS_FOLDER/data/init/" < "$PHOEBUS_LNP_PATCH_DIR/init_lnp_defaults.patch"
-  patch -d "$PHOEBUS_FOLDER/data/init/" < "$PHOEBUS_LNP_PATCH_DIR/dinit_lnp_defaults.patch"
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
   
   if [ "$?" != "0" ]; then
 	exit_with_error "Applying Phoebus LNP patches failed."
   fi
   
   # Install raws
-  mkdir -p "$PHOEBUS_FOLDER/raw"
-  cp -r "$PHOEBUS_UNZIP/raw/graphics" "$PHOEBUS_FOLDER/raw"
-  cp -r "$PHOEBUS_UNZIP/raw/objects" "$PHOEBUS_FOLDER/raw"
+  mkdir -p "$INSTALL_GFX_DIR/raw"
+  cp -r "$TEMP_UNZIP_DIR/raw/graphics" "$INSTALL_GFX_DIR/raw"
+  cp -r "$TEMP_UNZIP_DIR/raw/objects" "$INSTALL_GFX_DIR/raw"
   
   if [ "$?" != "0" ]; then
 	exit_with_error "Installing Phoebus raws failed."
   fi
   
-  rm -r "$PHOEBUS_UNZIP"
+  rm -r "$TEMP_UNZIP_DIR"
 }
 
 install_soundsense_app () {
