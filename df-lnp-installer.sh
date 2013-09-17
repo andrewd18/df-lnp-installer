@@ -571,15 +571,54 @@ install_lnp_yaml () {
 }
 
 install_mayday_gfx_pack () {
-  local MAYDAY_ZIP="$DOWNLOAD_DIR/Mayday 34.11.zip"
-  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics"
+  local MAYDAY_GFX_PACK="$DOWNLOAD_DIR/Mayday 34.11.zip"
+  local MAYDAY_UNZIP="./mayday_unzip"
+  local MAYDAY_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] Mayday 0.34.11"
+  local MAYDAY_LNP_PATCH_DIR="./patches/mayday_gfx"
   
-  unzip -d "$GFX_FOLDER" "$MAYDAY_ZIP"
+  mkdir -p "$MAYDAY_UNZIP"
+  
+  unzip -d "$MAYDAY_UNZIP" "$MAYDAY_GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Unzipping Mayday graphics pack failed."
   fi
+  
+  # Install Art
+  mkdir -p "$MAYDAY_FOLDER/data/art"
+  cp "$MAYDAY_UNZIP/Mayday/data/art/"* "$MAYDAY_FOLDER/data/art/"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Mayday art failed."
+  fi
+  
+  # Install init
+  mkdir -p "$MAYDAY_FOLDER/data/init"
+  cp "$MAYDAY_UNZIP/Mayday/data/init/"* "$MAYDAY_FOLDER/data/init/"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Mayday init failed."
+  fi
+  
+  # Apply LNP patches.
+  patch -d "$MAYDAY_FOLDER/data/init/" < "$MAYDAY_LNP_PATCH_DIR/init_lnp_defaults.patch"
+  patch -d "$MAYDAY_FOLDER/data/init/" < "$MAYDAY_LNP_PATCH_DIR/dinit_lnp_defaults.patch"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Applying Mayday LNP patches failed."
+  fi
+  
+  # Install raws
+  mkdir -p "$MAYDAY_FOLDER/raw"
+  cp -r "$MAYDAY_UNZIP/Mayday/raw/graphics" "$MAYDAY_FOLDER/raw"
+  cp -r "$MAYDAY_UNZIP/Mayday/raw/objects" "$MAYDAY_FOLDER/raw"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Mayday raws failed."
+  fi
+  
+  rm -r "$MAYDAY_UNZIP"
 }
 
 install_obsidian_gfx_pack () {
@@ -600,8 +639,7 @@ install_phoebus_gfx_pack () {
   local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
   local PHOEBUS_LNP_PATCH_DIR="./patches/phoebus_gfx"
   
-  mkdir -p "$PHOEBUS_FOLDER"
-  
+  mkdir -p "$PHOEBUS_UNZIP"
   unzip -d "$PHOEBUS_UNZIP" "$PHOEBUS_GFX_PACK"
   
   # Quit if extracting failed.
@@ -626,8 +664,8 @@ install_phoebus_gfx_pack () {
   fi
   
   # Apply LNP patches.
-  patch -d "$PHOEBUS_FOLDER/data/init/" < "patches/phoebus_gfx/init_lnp_defaults.patch"
-  patch -d "$PHOEBUS_FOLDER/data/init/" < "patches/phoebus_gfx/dinit_lnp_defaults.patch"
+  patch -d "$PHOEBUS_FOLDER/data/init/" < "$PHOEBUS_LNP_PATCH_DIR/init_lnp_defaults.patch"
+  patch -d "$PHOEBUS_FOLDER/data/init/" < "$PHOEBUS_LNP_PATCH_DIR/dinit_lnp_defaults.patch"
   
   if [ "$?" != "0" ]; then
 	exit_with_error "Applying Phoebus LNP patches failed."

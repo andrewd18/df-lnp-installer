@@ -1,0 +1,95 @@
+--- downloads/Mayday/data/init/d_init.txt	2012-10-10 10:17:14.000000000 -0500
++++ lnp_gfx/[16x16] Mayday 0.34.11/data/init/d_init.txt	2013-07-30 04:25:32.000000000 -0500
+@@ -1,12 +1,12 @@
+ Use these to control the automatic saving behavior in the dwarf fortress mode of game.  AUTOSAVE can be set to NONE, SEASONAL or YEARLY.  This updates your save at these intervals, so that some of your progress will be saved in case of system instability.  You can set AUTOBACKUP to YES if you want the updated save to be copied to another folder so that you'll have several copies of your world at different times.  Set AUTOSAVE_PAUSE to YES if you want the game to pause every time it autosaves.
+ 
+-[AUTOSAVE:YEARLY]
++[AUTOSAVE:SEASONAL]
+ [AUTOBACKUP:NO]
+ [AUTOSAVE_PAUSE:YES]
+ 
+ Set this to YES if you want it to save the game when you start a new fortress.  If AUTOBACKUP above is set to YES, it will also create a copy of this new save.
+ 
+-[INITIAL_SAVE:NO]
++[INITIAL_SAVE:YES]
+ 
+ Set this to NO to make Dwarf Fortress remain in the saved pause state when you load an active game.
+ 
+@@ -14,17 +14,17 @@
+ 
+ Set this to YES if you want Dwarf Fortress to show the warning window on embark as a confirmation even if there are no issues.
+ 
+-[EMBARK_WARNING_ALWAYS:NO]
++[EMBARK_WARNING_ALWAYS:YES]
+ 
+ You can change these to ALWAYS and NO.  More restrictive world parameter settings override these.  ALWAYS lets you see the features in the Local view during embark, and NO stops you from looking for features in the site finder (though if you really want to stop the finder, it might be better for you to generate worlds that restrict the use of this feature completely, in which case you don't need to change the settings here).
+ 
+-[SHOW_EMBARK_TUNNEL:FINDER]
++[SHOW_EMBARK_TUNNEL:ALWAYS]
+ 
+ Use these options to remove features from the game.  Permitted values are YES and NO.  Removal might speed the game up in the case of temperature and weather.
+ 
+-[TEMPERATURE:YES]
++[TEMPERATURE:NO]
+ [WEATHER:YES]
+-[ECONOMY:YES]
++[ECONOMY:NO]
+ [INVADERS:YES]
+ [CAVEINS:YES]
+ [ARTIFACTS:YES]
+@@ -56,7 +56,7 @@
+ 
+ Change this to YES to disallow pets from coffin burial as the default option.
+ 
+-[COFFIN_NO_PETS_DEFAULT:NO]
++[COFFIN_NO_PETS_DEFAULT:YES]
+ 
+ Use these to set the color of wounded body parts.  The format is <foreground color>:<background color>:<brightness>.
+ 
+@@ -69,15 +69,15 @@
+ 
+ This controls the display of areas that are far below outside.  The format is SKY:<character>:<foreground color>:<background color>:<brightness>.  The <character> can be either an ASCII tile number or a character in quotes, like '#'.
+ 
+-[SKY:172:3:0:0]
++[SKY:32:8:9:0]
+ 
+ As above, for inside/subterranean areas.
+ 
+-[CHASM:250:0:0:1]
++[CHASM:0:0:0:1]
+ 
+ Pillar tile, <character> as above.
+ 
+-[PILLAR_TILE:245]
++[PILLAR_TILE:199]
+ 
+ Track tiles.  I at the end inverts the material colors.
+ 
+@@ -122,15 +122,15 @@
+ 
+ You can set the maximum population of your fortress here.  Keep in mind that your population must be at least 80 to get a king and 100 to obtain the current game features.
+ 
+-[POPULATION_CAP:120]
++[POPULATION_CAP:80]
+ 
+ This allows you to control the number of babies+children in your fortress.  The first number is an absolute cap on the number of babies+children.  The second is a percentage of the current number of adults in your fortress (the default is the essentially meaningless 1000% here).  The lower number is used as the cap.  The cap only prevents further pregancies, so migrant children, multiple births and existing pregnancies from old saves can still push you over the cap.  Setting either number to zero will disallow pregnancies in the fortress.
+ 
+-[BABY_CHILD_CAP:100:15]
++[BABY_CHILD_CAP:10:20]
+ 
+ If you don't like the ,.`' ground, try setting this to NO.  The ground will turn into periods only.
+ 
+-[VARIED_GROUND_TILES:YES]
++[VARIED_GROUND_TILES:NO]
+ 
+ If you'd like your engravings to start off looking the same (you can toggle them on individual later), set this to YES.
+ 
+@@ -143,7 +143,7 @@
+ 
+ Set this to YES to display fluids as numbers indicating depth.
+ 
+-[SHOW_FLOW_AMOUNTS:NO]
++[SHOW_FLOW_AMOUNTS:YES]
+ 
+ If you'd prefer to leave the history behind every engraving for your adventurers to discover, then set this to NO.
+ 
