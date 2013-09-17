@@ -483,31 +483,53 @@ install_falconne_dfhack_plugins () {
 }
 
 install_ironhand_gfx_pack () {
-  local IRONHAND_ZIP="$DOWNLOAD_DIR/Ironhand16 upgrade 0.73.4.zip"
-  local IRONHAND_TEMP_FOLDER="./ironhand_unzip"
-  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics/Ironhand"
+  local GFX_PACK="$DOWNLOAD_DIR/Ironhand16 upgrade 0.73.4.zip"
+  local TEMP_UNZIP_DIR="./ironhand_unzip"
+  local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Ironhand 0.73.4"
+  local LNP_PATCH_DIR="./patches/ironhand_gfx"
   
-  mkdir -p "$IRONHAND_TEMP_FOLDER"
-  
-  mkdir -p "$GFX_FOLDER"
-  
-  unzip -d "$IRONHAND_TEMP_FOLDER" "$IRONHAND_ZIP"
+  mkdir -p "$TEMP_UNZIP_DIR"
+  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Unzipping Ironhand graphics pack failed."
   fi
   
-  # Copy data and raw folders to GFX dir.
-  cp -r "$IRONHAND_TEMP_FOLDER/Dwarf Fortress/data" "$GFX_FOLDER"
-  cp -r "$IRONHAND_TEMP_FOLDER/Dwarf Fortress/raw" "$GFX_FOLDER"
+  # Install Art
+  mkdir -p "$INSTALL_GFX_DIR/data/art"
+  cp "$TEMP_UNZIP_DIR/Dwarf Fortress/data/art/"* "$INSTALL_GFX_DIR/data/art/"
   
-  # Quit if copying failed.
   if [ "$?" != "0" ]; then
-	exit_with_error "Copying Ironhand graphics pack failed."
+	exit_with_error "Installing Ironhand art failed."
   fi
   
-  rm -r "$IRONHAND_TEMP_FOLDER"
+  # Install init
+  mkdir -p "$INSTALL_GFX_DIR/data/init"
+  cp "$TEMP_UNZIP_DIR/Dwarf Fortress/data/init/"* "$INSTALL_GFX_DIR/data/init/"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Ironhand init failed."
+  fi
+  
+  # Apply LNP patches.
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Applying Ironhand LNP patches failed."
+  fi
+  
+  # Install raws
+  mkdir -p "$INSTALL_GFX_DIR/raw"
+  cp -r "$TEMP_UNZIP_DIR/Dwarf Fortress/raw/graphics" "$INSTALL_GFX_DIR/raw"
+  cp -r "$TEMP_UNZIP_DIR/Dwarf Fortress/raw/objects" "$INSTALL_GFX_DIR/raw"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Ironhand raws failed."
+  fi
+  
+  rm -r "$TEMP_UNZIP_DIR"
 }
 
 install_jolly_bastion_gfx_pack () {

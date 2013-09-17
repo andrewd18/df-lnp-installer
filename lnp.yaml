@@ -12,7 +12,7 @@ graphicsPacks:
 -  name: '[16x16] CLA v15'
    directory: CLA
 -  name: '[16x16] Ironhand 0.73.4'
-   directory: Ironhand
+   directory: '[16x16] Ironhand 0.73.4'
 -  name: '[16x16] Mayday 0.34.11'
    directory: '[16x16] Mayday 0.34.11'
 -  name: '[16x16] Phoebus 34.11v01'
