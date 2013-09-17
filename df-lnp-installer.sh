@@ -55,6 +55,8 @@ build_dwarf_therapist () {
 # One-off bugfixes that either require multiple packages to be installed first
 # or have other non-trivial consequences.
 bugfix_all () {
+  fix_jolly_bastion_missing_graphics_dir
+  fix_jolly_bastion_missing_mouse_png
   fix_phoebus_missing_mouse_png
   fix_vanilla_df_openal_issue
 }
@@ -331,6 +333,23 @@ exit_with_error () {
   exit 1
 }
 
+fix_jolly_bastion_missing_graphics_dir () {
+  local JB_FOLDER="$INSTALL_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
+  
+  mkdir -p "$JB_FOLDER/raw/graphics"
+}
+
+fix_jolly_bastion_missing_mouse_png () {
+  local JB_FOLDER="$INSTALL_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
+  local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/ASCII Default"
+  
+  cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$JB_FOLDER/data/art/mouse.png"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Applying Jolly Bastion Missing Mouse patch failed."
+  fi
+}
+
 fix_phoebus_missing_mouse_png () {
   # Resolves GitHub issue #6.
   local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
@@ -572,7 +591,6 @@ install_jolly_bastion_gfx_pack () {
   
   # Install raws
   mkdir -p "$INSTALL_GFX_DIR/raw"
-  # GFX folder doesn't exist.
   cp -r "$TEMP_UNZIP_DIR/JollyBastion34-10v5/12x12/raw/objects" "$INSTALL_GFX_DIR/raw"
   
   if [ "$?" != "0" ]; then
