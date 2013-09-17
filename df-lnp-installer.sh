@@ -141,49 +141,49 @@ check_dependencies () {
   
   # Check for libSDL base; must be 32-bit.
   local LIBSDL_BASE_SO="$(find /usr/lib -name libSDL-1.2.so.0)"
-  local LIBSDL_FILTER_32_BIT="$(file -L $LIBSDL_BASE_SO | grep "32-bit")"
+  local LIBSDL_32_BIT_FILENAME="$(file -L $LIBSDL_BASE_SO | grep "32-bit" | cut -d: -f1)"
   
-  if [ -z "$LIBSDL_FILTER_32_BIT" ]; then
+  if [ -z "$LIBSDL_32_BIT_FILENAME" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libSDL-1.2_(32-bit) "
   fi
   
   # Check for libSDL image; must be 32-bit.
   local LIBSDL_IMAGE_SO="$(find /usr/lib -name libSDL_image-1.2.so.0)"
-  local LIBSDL_IMAGE_FILTER_32_BIT="$(file -L $LIBSDL_IMAGE_SO | grep "32-bit")"
+  local LIBSDL_IMAGE_32_BIT_FILENAME="$(file -L $LIBSDL_IMAGE_SO | grep "32-bit" | cut -d: -f1)"
   
-  if [ -z "$LIBSDL_IMAGE_FILTER_32_BIT" ]; then
+  if [ -z "$LIBSDL_IMAGE_32_BIT_FILENAME" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libSDL_image-1.2_(32-bit) "
   fi
   
   # Check for libSDL ttf; must be 32-bit.
   local LIBSDL_TTF_SO="$(find /usr/lib -name libSDL_ttf-2.0.so.0)"
-  local LIBSDL_TTF_FILTER_32_BIT="$(file -L $LIBSDL_TTF_SO | grep "32-bit")"
+  local LIBSDL_TTF_32_BIT_FILENAME="$(file -L $LIBSDL_TTF_SO | grep "32-bit" | cut -d: -f1)"
   
-  if [ -z "$LIBSDL_TTF_FILTER_32_BIT" ]; then
+  if [ -z "$LIBSDL_TTF_32_BIT_FILENAME" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libSDL_ttf-2.0_(32-bit) "
   fi
   
   # Check for OpenAL; must be 32-bit.
   local OPENAL_SO="$(find /usr/lib -name libopenal.so.1)"
-  local OPENAL_SO_FILTER_32_BIT="$(file -L $OPENAL_SO | grep "32-bit")"
+  local OPENAL_SO_32_BIT_FILENAME="$(file -L $OPENAL_SO | grep "32-bit" | cut -d: -f1)"
   
-  if [ -z "$OPENAL_SO_FILTER_32_BIT" ]; then
+  if [ -z "$OPENAL_SO_32_BIT_FILENAME" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libOpenAL_1_(32-bit) "
   fi
   
   # Check for libGLU; must be 32-bit.
   local LIBGLU_SO="$(find /usr/lib -name libGLU.so.1)"
-  local LIBGLU_SO_FILTER_32_BIT="$(file -L $LIBGLU_SO | grep "32-bit")"
+  local LIBGLU_SO_32_BIT_FILENAME="$(file -L $LIBGLU_SO | grep "32-bit" | cut -d: -f1)"
   
-  if [ -z "$LIBGLU_SO_FILTER_32_BIT" ]; then
+  if [ -z "$LIBGLU_SO_32_BIT_FILENAME" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libGLU_(32-bit) "
   fi
   
   # Check for libgtk-x11; must be 32-bit.
   local LIBGTK_SO="$(find /usr/lib -name libgtk-x11-2.0.so.0)"
-  local LIBGTK_SO_FILTER_32_BIT="$(file -L $LIBGTK_SO | grep "32-bit")"
+  local LIBGTK_SO_32_BIT_FILENAME="$(file -L $LIBGTK_SO | grep "32-bit" | cut -d: -f1)"
   
-  if [ -z "$LIBGTK_SO_FILTER_32_BIT" ]; then
+  if [ -z "$LIBGTK_SO_32_BIT_FILENAME" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libGTK-x11_(32-bit) "
   fi
   
@@ -336,6 +336,29 @@ fix_phoebus_missing_mouse_png () {
   fi
 }
 
+fix_vanilla_df_openal_issue () {
+  # See http://dwarffortresswiki.org/index.php/DF2012:Installation
+  
+  # The filename variables will be empty strings if no file exists.
+  # Otherwise they will contain the filename of the associated 32-bit library.
+  local OPENAL_SO="$(find /usr/lib -name libopenal.so.1)"
+  local OPENAL_SO_32_BIT_FILENAME="$(file -L $OPENAL_SO | grep "32-bit" | cut -d: -f1)"
+  
+  local LIBSNDFILE_SO="$(find /usr/lib -name libsndfile.so.1)"
+  local LIBSNDFILE_SO_32_BIT_FILENAME="$(file -L $LIBSNDFILE_SO | grep "32-bit" | cut -d: -f1)"
+  
+  local VANILLA_DF_LIBS_DIR="$INSTALL_DIR/df_linux/libs"
+  
+  # If the file given by the filename string exists, link it.
+  if [ -e "$OPENAL_SO_32_BIT_FILENAME" ]; then
+    ln -s "$OPENAL_SO_32_BIT_FILENAME" "$VANILLA_DF_LIBS_DIR/libopenal.so"
+  fi
+  
+  if [ -e "$LIBSNDFILE_SO_32_BIT_FILENAME" ]; then
+	ln -s "$LIBSNDFILE_SO_32_BIT_FILENAME" "$VANILLA_DF_LIBS_DIR/libsndfile.so"
+  fi
+}
+
 install_all () {
   if [ -z "$INSTALL_DIR" ]; then
 	exit_with_error "Script failure. INSTALL_DIR undefined."
@@ -358,6 +381,8 @@ install_all () {
   install_jolly_bastion_gfx_pack
   
   fix_phoebus_missing_mouse_png
+  
+  fix_vanilla_df_openal_issue
   
   install_soundsense_app
   
