@@ -501,34 +501,37 @@ install_falconne_dfhack_plugins () {
   rm -r "$FALCONNE_TEMP_FOLDER"
 }
 
-install_ironhand_gfx_pack () {
-  local GFX_PACK="$DOWNLOAD_DIR/Ironhand16 upgrade 0.73.4.zip"
-  local TEMP_UNZIP_DIR="./ironhand_unzip"
-  local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Ironhand 0.73.4"
-  local LNP_PATCH_DIR="./patches/ironhand_gfx"
+install_gfx_pack () {
+  local GFX_PACK="$1"
+  local GFX_PREFIX="$2"
+  local INSTALL_GFX_DIR="$3"
+  local PATCH_DIR="$4"
+  
+  local TEMP_UNZIP_DIR="./gfx_unzip"
+  
   
   mkdir -p "$TEMP_UNZIP_DIR"
   unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
-	exit_with_error "Unzipping Ironhand graphics pack failed."
+	exit_with_error "Unzipping "$GFX_PACK" failed."
   fi
   
   # Install Art
   mkdir -p "$INSTALL_GFX_DIR/data/art"
-  cp "$TEMP_UNZIP_DIR/Dwarf Fortress/data/art/"* "$INSTALL_GFX_DIR/data/art/"
+  cp "$TEMP_UNZIP_DIR/$GFX_PREFIX/data/art/"* "$INSTALL_GFX_DIR/data/art/"
   
   if [ "$?" != "0" ]; then
-	exit_with_error "Installing Ironhand art failed."
+	exit_with_error "Installing $INSTALL_GFX_DIR/data/art failed."
   fi
   
   # Install init
   mkdir -p "$INSTALL_GFX_DIR/data/init"
-  cp "$TEMP_UNZIP_DIR/Dwarf Fortress/data/init/"* "$INSTALL_GFX_DIR/data/init/"
+  cp "$TEMP_UNZIP_DIR/$GFX_PREFIX/data/init/"* "$INSTALL_GFX_DIR/data/init/"
   
   if [ "$?" != "0" ]; then
-	exit_with_error "Installing Ironhand init failed."
+	exit_with_error "Installing $INSTALL_GFX_DIR/data/init failed."
   fi
   
   # Apply LNP patches.
@@ -536,68 +539,43 @@ install_ironhand_gfx_pack () {
   patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
   
   if [ "$?" != "0" ]; then
-	exit_with_error "Applying Ironhand LNP patches failed."
+	exit_with_error "Applying $LNP_PATCH_DIR patches failed."
   fi
   
   # Install raws
   mkdir -p "$INSTALL_GFX_DIR/raw"
-  cp -r "$TEMP_UNZIP_DIR/Dwarf Fortress/raw/graphics" "$INSTALL_GFX_DIR/raw"
-  cp -r "$TEMP_UNZIP_DIR/Dwarf Fortress/raw/objects" "$INSTALL_GFX_DIR/raw"
+  
+  if [ -d "$TEMP_UNZIP_DIR/$GFX_PREFIX/raw/graphics" ]; then
+	cp -r "$TEMP_UNZIP_DIR/$GFX_PREFIX/raw/graphics" "$INSTALL_GFX_DIR/raw"
+  fi
+  
+  if [ -d "$TEMP_UNZIP_DIR/$GFX_PREFIX/raw/objects" ]; then
+	cp -r "$TEMP_UNZIP_DIR/$GFX_PREFIX/raw/objects" "$INSTALL_GFX_DIR/raw"
+  fi
   
   if [ "$?" != "0" ]; then
-	exit_with_error "Installing Ironhand raws failed."
+	exit_with_error "Installing $INSTALL_GFX_DIR raws failed."
   fi
   
   rm -r "$TEMP_UNZIP_DIR"
 }
 
+install_ironhand_gfx_pack () {
+  local GFX_PACK="$DOWNLOAD_DIR/Ironhand16 upgrade 0.73.4.zip"
+  local GFX_PREFIX="Dwarf Fortress"
+  local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Ironhand 0.73.4"
+  local LNP_PATCH_DIR="./patches/ironhand_gfx"
+  
+  install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
+}
+
 install_jolly_bastion_gfx_pack () {
   local GFX_PACK="$DOWNLOAD_DIR/JollyBastion34-10v5.zip"
-  local TEMP_UNZIP_DIR="./jolly_bastion_unzip"
+  local GFX_PREFIX="JollyBastion34-10v5/12x12"
   local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
   local LNP_PATCH_DIR="./patches/jolly_bastion_gfx"
   
-  mkdir -p "$TEMP_UNZIP_DIR"
-  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
-  
-  # Quit if extracting failed.
-  if [ "$?" != "0" ]; then
-	exit_with_error "Unzipping Jolly Bastion graphics pack failed."
-  fi
-  
-  # Install Art
-  mkdir -p "$INSTALL_GFX_DIR/data/art"
-  cp "$TEMP_UNZIP_DIR/JollyBastion34-10v5/12x12/data/art/"* "$INSTALL_GFX_DIR/data/art/"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Jolly Bastion art failed."
-  fi
-  
-  # Install init
-  mkdir -p "$INSTALL_GFX_DIR/data/init"
-  cp "$TEMP_UNZIP_DIR/JollyBastion34-10v5/12x12/data/init/"* "$INSTALL_GFX_DIR/data/init/"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Jolly Bastion init failed."
-  fi
-  
-  # Apply LNP patches.
-  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
-  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Applying Jolly Bastion LNP patches failed."
-  fi
-  
-  # Install raws
-  mkdir -p "$INSTALL_GFX_DIR/raw"
-  cp -r "$TEMP_UNZIP_DIR/JollyBastion34-10v5/12x12/raw/objects" "$INSTALL_GFX_DIR/raw"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Jolly Bastion raws failed."
-  fi
-  
-  rm -r "$TEMP_UNZIP_DIR"
+  install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
 }
 
 install_lnp () {
@@ -626,116 +604,35 @@ install_lnp_yaml () {
 
 install_mayday_gfx_pack () {
   local GFX_PACK="$DOWNLOAD_DIR/Mayday 34.11.zip"
-  local TEMP_UNZIP_DIR="./mayday_unzip"
+  local GFX_PREFIX="Mayday"
   local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Mayday 0.34.11"
   local LNP_PATCH_DIR="./patches/mayday_gfx"
   
-  mkdir -p "$TEMP_UNZIP_DIR"
-  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
-  
-  # Quit if extracting failed.
-  if [ "$?" != "0" ]; then
-	exit_with_error "Unzipping Mayday graphics pack failed."
-  fi
-  
-  # Install Art
-  mkdir -p "$INSTALL_GFX_DIR/data/art"
-  cp "$TEMP_UNZIP_DIR/Mayday/data/art/"* "$INSTALL_GFX_DIR/data/art/"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Mayday art failed."
-  fi
-  
-  # Install init
-  mkdir -p "$INSTALL_GFX_DIR/data/init"
-  cp "$TEMP_UNZIP_DIR/Mayday/data/init/"* "$INSTALL_GFX_DIR/data/init/"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Mayday init failed."
-  fi
-  
-  # Apply LNP patches.
-  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
-  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Applying Mayday LNP patches failed."
-  fi
-  
-  # Install raws
-  mkdir -p "$INSTALL_GFX_DIR/raw"
-  cp -r "$TEMP_UNZIP_DIR/Mayday/raw/graphics" "$INSTALL_GFX_DIR/raw"
-  cp -r "$TEMP_UNZIP_DIR/Mayday/raw/objects" "$INSTALL_GFX_DIR/raw"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Mayday raws failed."
-  fi
-  
-  rm -r "$TEMP_UNZIP_DIR"
+  install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
 }
 
 install_obsidian_gfx_pack () {
   local GFX_PACK="$DOWNLOAD_DIR/[16x16] Obsidian (v.0.8).zip"
-  local TEMP_UNZIP_DIR="./obsidian_unzip"
+  local GFX_PREFIX="[16x16] Obsidian"
   local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Obsidian 0.8a"
   local LNP_PATCH_DIR="./patches/obsidian_gfx"
   
-  mkdir -p "$TEMP_UNZIP_DIR"
-  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
-  
-  # Quit if extracting failed.
-  if [ "$?" != "0" ]; then
-	exit_with_error "Unzipping Obsidian graphics pack failed."
-  fi
-  
-  # Install Art
-  mkdir -p "$INSTALL_GFX_DIR/data/art"
-  cp "$TEMP_UNZIP_DIR/[16x16] Obsidian/data/art/"* "$INSTALL_GFX_DIR/data/art/"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Obsidian art failed."
-  fi
-  
-  # Install init
-  mkdir -p "$INSTALL_GFX_DIR/data/init"
-  cp "$TEMP_UNZIP_DIR/[16x16] Obsidian/data/init/"* "$INSTALL_GFX_DIR/data/init/"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Obsidian init failed."
-  fi
-  
-  # Apply LNP patches.
-  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
-  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Applying Obsidian LNP patches failed."
-  fi
-  
-  # Install raws
-  mkdir -p "$INSTALL_GFX_DIR/raw"
-  cp -r "$TEMP_UNZIP_DIR/[16x16] Obsidian/raw/graphics" "$INSTALL_GFX_DIR/raw"
-  cp -r "$TEMP_UNZIP_DIR/[16x16] Obsidian/raw/objects" "$INSTALL_GFX_DIR/raw"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Obsidian raws failed."
-  fi
-  
-  rm -r "$TEMP_UNZIP_DIR"
+  install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
 }
 
 install_phoebus_gfx_pack () {
+  # NOTE: Cannot use install_gfx_pack method because Phoebus data/init/ folder is packed weird.
   local GFX_PACK="$DOWNLOAD_DIR/Phoebus_34_11v01.zip"
   local TEMP_UNZIP_DIR="./phoebus_unzip"
   local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
   local LNP_PATCH_DIR="./patches/phoebus_gfx"
-  
+
   mkdir -p "$TEMP_UNZIP_DIR"
   unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
-	exit_with_error "Unzipping Phoebus graphics pack failed."
+       exit_with_error "Unzipping Phoebus graphics pack failed."
   fi
   
   # Install Art
@@ -743,7 +640,7 @@ install_phoebus_gfx_pack () {
   cp "$TEMP_UNZIP_DIR/data/art/"* "$INSTALL_GFX_DIR/data/art/"
   
   if [ "$?" != "0" ]; then
-	exit_with_error "Installing Phoebus art failed."
+       exit_with_error "Installing Phoebus art failed."
   fi
   
   # Install init
@@ -751,7 +648,23 @@ install_phoebus_gfx_pack () {
   cp "$TEMP_UNZIP_DIR/data/init/phoebus_nott/"* "$INSTALL_GFX_DIR/data/init/"
   
   if [ "$?" != "0" ]; then
-	exit_with_error "Installing Phoebus init failed."
+       exit_with_error "Installing Phoebus init failed."
+  fi
+  
+  # Install Art
+  mkdir -p "$INSTALL_GFX_DIR/data/art"
+  cp "$TEMP_UNZIP_DIR/data/art/"* "$INSTALL_GFX_DIR/data/art/"
+  
+  if [ "$?" != "0" ]; then
+       exit_with_error "Installing Phoebus art failed."
+  fi
+  
+  # Install init
+  mkdir -p "$INSTALL_GFX_DIR/data/init"
+  cp "$TEMP_UNZIP_DIR/data/init/phoebus_nott/"* "$INSTALL_GFX_DIR/data/init/"
+  
+  if [ "$?" != "0" ]; then
+       exit_with_error "Installing Phoebus init failed."
   fi
   
   # Apply LNP patches.
@@ -759,7 +672,7 @@ install_phoebus_gfx_pack () {
   patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
   
   if [ "$?" != "0" ]; then
-	exit_with_error "Applying Phoebus LNP patches failed."
+       exit_with_error "Applying Phoebus LNP patches failed."
   fi
   
   # Install raws
@@ -768,7 +681,7 @@ install_phoebus_gfx_pack () {
   cp -r "$TEMP_UNZIP_DIR/raw/objects" "$INSTALL_GFX_DIR/raw"
   
   if [ "$?" != "0" ]; then
-	exit_with_error "Installing Phoebus raws failed."
+       exit_with_error "Installing Phoebus raws failed."
   fi
   
   rm -r "$TEMP_UNZIP_DIR"
@@ -797,52 +710,11 @@ install_soundsense_app () {
 
 install_spacefox_gfx_pack () {
   local GFX_PACK="$DOWNLOAD_DIR/[16x16] Spacefox 34.11v1.0.zip"
-  local TEMP_UNZIP_DIR="./spacefox_unzip"
+  local GFX_PREFIX="[16x16] Spacefox 34.11v1.0"
   local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Spacefox 34.11v1.0"
   local LNP_PATCH_DIR="./patches/spacefox_gfx"
   
-  mkdir -p "$TEMP_UNZIP_DIR"
-  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
-  
-  # Quit if extracting failed.
-  if [ "$?" != "0" ]; then
-	exit_with_error "Unzipping Spacefox graphics pack failed."
-  fi
-  
-  # Install Art
-  mkdir -p "$INSTALL_GFX_DIR/data/art"
-  cp "$TEMP_UNZIP_DIR/[16x16] Spacefox 34.11v1.0/data/art/"* "$INSTALL_GFX_DIR/data/art/"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Spacefox art failed."
-  fi
-  
-  # Install init
-  mkdir -p "$INSTALL_GFX_DIR/data/init"
-  cp "$TEMP_UNZIP_DIR/[16x16] Spacefox 34.11v1.0/data/init/"* "$INSTALL_GFX_DIR/data/init/"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Spacefox init failed."
-  fi
-  
-  # Apply LNP patches.
-  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
-  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Applying Spacefox LNP patches failed."
-  fi
-  
-  # Install raws
-  mkdir -p "$INSTALL_GFX_DIR/raw"
-  cp -r "$TEMP_UNZIP_DIR/[16x16] Spacefox 34.11v1.0/raw/graphics" "$INSTALL_GFX_DIR/raw"
-  cp -r "$TEMP_UNZIP_DIR/[16x16] Spacefox 34.11v1.0/raw/objects" "$INSTALL_GFX_DIR/raw"
-  
-  if [ "$?" != "0" ]; then
-	exit_with_error "Installing Spacefox raws failed."
-  fi
-  
-  rm -r "$TEMP_UNZIP_DIR"
+  install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
 }
 
 install_vanilla_df () {
