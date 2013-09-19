@@ -438,6 +438,9 @@ install_all () {
   build_dwarf_therapist
   install_dwarf_therapist
   
+  # Must come after install_vanilla_df
+  install_lnp_embark_profiles
+  
   # TODO
   # Make a decision about downloading/installing soundsense audio.
 }
@@ -620,6 +623,18 @@ install_lnp () {
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Untarring LNP failed."
+  fi
+}
+
+install_lnp_embark_profiles () {
+  local EMBARK_PROFILES="./embark_profiles.txt"
+  local DF_INIT_DIR="$INSTALL_DIR/df_linux/data/init"
+  
+  install --mode=644 "$EMBARK_PROFILES" "$DF_INIT_DIR"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Copying LNP Embark Profiles failed."
   fi
 }
 
