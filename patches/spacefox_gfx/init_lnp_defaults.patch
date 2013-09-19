@@ -1,0 +1,27 @@
+--- downloads/[16x16] Spacefox 34.11v1.0/data/init/init.txt	2013-07-29 19:41:14.000000000 -0500
++++ lnp_gfx/[16x16] Spacefox 34.11v1.0/data/init/init.txt	2013-08-21 05:41:37.000000000 -0500
+@@ -74,7 +74,7 @@
+ 
+ Switches truetype on whenever the vertical tile size is this many pixels or larger.  You may also use YES/NO to force it on/off.  Turning it off may provide a minor speed boost (using font small enough that it doesn't activate won't).
+ 
+-[TRUETYPE:YES]
++[TRUETYPE:NO]
+ 
+ Change this to YES to keep the DF window on top of your other windows.
+ 
+@@ -139,7 +139,7 @@
+ 
+ This controls the number of milliseconds between macro instructions.
+ 
+-[MACRO_MS:15]
++[MACRO_MS:0]
+ 
+ This controls the number of milliseconds that must pass before input works again after the view recenters on an event in dwarf mode.
+ 
+@@ -147,4 +147,4 @@
+ 
+ Change this to NO if you want to leave save uncompressed (you might want to do this if you are experience save corruption).
+ 
+-[COMPRESSED_SAVES:YES]
+\ No newline at end of file
++[COMPRESSED_SAVES:YES]

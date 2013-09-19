@@ -1,0 +1,35 @@
+--- downloads/[16x16] Spacefox 34.11v1.0/data/init/d_init.txt	2013-07-29 02:35:34.000000000 -0500
++++ lnp_gfx/[16x16] Spacefox 34.11v1.0/data/init/d_init.txt	2013-08-17 03:54:04.000000000 -0500
+@@ -23,10 +23,10 @@
+ Use these options to remove features from the game.  Permitted values are YES and NO.  Removal might speed the game up in the case of temperature and weather.
+ 
+ [TEMPERATURE:NO]
+-[WEATHER:NO]
+-[ECONOMY:YES]
++[WEATHER:YES]
++[ECONOMY:NO]
+ [INVADERS:YES]
+-[CAVEINS:NO]
++[CAVEINS:YES]
+ [ARTIFACTS:YES]
+ [ZERO_RENT:NO]
+ [TESTING_ARENA:YES]
+@@ -69,8 +69,7 @@
+ 
+ This controls the display of areas that are far below outside.  The format is SKY:<character>:<foreground color>:<background color>:<brightness>.  The <character> can be either an ASCII tile number or a character in quotes, like '#'.
+ 
+-[SKY:250:0:0:2]
+-
++[SKY:32:8:9:0]
+ 
+ As above, for inside/subterranean areas.
+ 
+@@ -123,7 +122,7 @@
+ 
+ You can set the maximum population of your fortress here.  Keep in mind that your population must be at least 80 to get a king and 100 to obtain the current game features.
+ 
+-[POPULATION_CAP:150]
++[POPULATION_CAP:80]
+ 
+ This allows you to control the number of babies+children in your fortress.  The first number is an absolute cap on the number of babies+children.  The second is a percentage of the current number of adults in your fortress (the default is the essentially meaningless 1000% here).  The lower number is used as the cap.  The cap only prevents further pregancies, so migrant children, multiple births and existing pregnancies from old saves can still push you over the cap.  Setting either number to zero will disallow pregnancies in the fortress.
+ 

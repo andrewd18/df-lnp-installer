@@ -796,15 +796,53 @@ install_soundsense_app () {
 }
 
 install_spacefox_gfx_pack () {
-  local SPACEFOX_ZIP="$DOWNLOAD_DIR/[16x16] Spacefox 34.11v1.0.zip"
-  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics"
+  local GFX_PACK="$DOWNLOAD_DIR/[16x16] Spacefox 34.11v1.0.zip"
+  local TEMP_UNZIP_DIR="./spacefox_unzip"
+  local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Spacefox 34.11v1.0"
+  local LNP_PATCH_DIR="./patches/spacefox_gfx"
   
-  unzip -d "$GFX_FOLDER" "$SPACEFOX_ZIP"
+  mkdir -p "$TEMP_UNZIP_DIR"
+  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Unzipping Spacefox graphics pack failed."
   fi
+  
+  # Install Art
+  mkdir -p "$INSTALL_GFX_DIR/data/art"
+  cp "$TEMP_UNZIP_DIR/[16x16] Spacefox 34.11v1.0/data/art/"* "$INSTALL_GFX_DIR/data/art/"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Spacefox art failed."
+  fi
+  
+  # Install init
+  mkdir -p "$INSTALL_GFX_DIR/data/init"
+  cp "$TEMP_UNZIP_DIR/[16x16] Spacefox 34.11v1.0/data/init/"* "$INSTALL_GFX_DIR/data/init/"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Spacefox init failed."
+  fi
+  
+  # Apply LNP patches.
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Applying Spacefox LNP patches failed."
+  fi
+  
+  # Install raws
+  mkdir -p "$INSTALL_GFX_DIR/raw"
+  cp -r "$TEMP_UNZIP_DIR/[16x16] Spacefox 34.11v1.0/raw/graphics" "$INSTALL_GFX_DIR/raw"
+  cp -r "$TEMP_UNZIP_DIR/[16x16] Spacefox 34.11v1.0/raw/objects" "$INSTALL_GFX_DIR/raw"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Spacefox raws failed."
+  fi
+  
+  rm -r "$TEMP_UNZIP_DIR"
 }
 
 install_vanilla_df () {
