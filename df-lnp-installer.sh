@@ -60,6 +60,7 @@ bugfix_all () {
   fix_jolly_bastion_missing_mouse_png
   fix_phoebus_missing_mouse_png
   fix_vanilla_df_openal_issue
+  fix_vanilla_df_lnp_settings_not_applied_by_default
 }
 
 check_dependencies () {
@@ -336,7 +337,7 @@ exit_with_error () {
 
 fix_cla_missing_mouse_png () {
   local CLA_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] CLA v15"
-  local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/ASCII Default"
+  local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
   
   cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$CLA_FOLDER/data/art/mouse.png"
   
@@ -353,7 +354,7 @@ fix_jolly_bastion_missing_graphics_dir () {
 
 fix_jolly_bastion_missing_mouse_png () {
   local JB_FOLDER="$INSTALL_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
-  local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/ASCII Default"
+  local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
   
   cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$JB_FOLDER/data/art/mouse.png"
   
@@ -365,7 +366,7 @@ fix_jolly_bastion_missing_mouse_png () {
 fix_phoebus_missing_mouse_png () {
   # Resolves GitHub issue #6.
   local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
-  local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/ASCII Default"
+  local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
   
   cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$PHOEBUS_FOLDER/data/art/mouse.png"
   
@@ -395,6 +396,20 @@ fix_vanilla_df_openal_issue () {
   if [ -e "$LIBSNDFILE_SO_32_BIT_FILENAME" ]; then
 	ln -s "$LIBSNDFILE_SO_32_BIT_FILENAME" "$VANILLA_DF_LIBS_DIR/libsndfile.so"
   fi
+}
+
+fix_vanilla_df_lnp_settings_not_applied_by_default () {
+  # The df-lnp-installer will set up the appropriate "[16x16] ASCII Default" folder
+  # in $INSTALL_DIR/LNP/graphics/ but the LNP settings don't get applied to the df_linux/data folder
+  # until the user clicks LNP -> Graphics Tab -> ASCII Default -> Install Graphics.
+  #
+  # This method "fixes" that by applying the expected LNP settings to the df_linux folder right from the get-go.
+  
+  local LNP_PATCH_DIR="./patches/ascii_default_gfx"
+  local DF_FOLDER="$INSTALL_DIR/df_linux"
+  
+  patch -d "$DF_FOLDER/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
+  patch -d "$DF_FOLDER/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
 }
 
 install_all () {
@@ -748,21 +763,32 @@ install_vanilla_df () {
 }
 
 install_vanilla_df_gfx_pack () {
+  # NOTE: Cannot use install_gfx_pack because ascii default graphics aren't in a standalone .zip or .rar.
   local DATA_FOLDER="$INSTALL_DIR/df_linux/data"
   local RAW_FOLDER="$INSTALL_DIR/df_linux/raw"
   
-  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics/ASCII Default"
+  local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
+  local LNP_PATCH_DIR="./patches/ascii_default_gfx"
   
-  mkdir -p "$GFX_FOLDER"
+  mkdir -p "$INSTALL_GFX_DIR"
   
   # Copy the data and raw folders from the vanilla df install location
-  # Put them in $GFX_FOLDER
-  cp -r "$DATA_FOLDER" "$GFX_FOLDER"
-  cp -r "$RAW_FOLDER" "$GFX_FOLDER"
+  # Put them in $INSTALL_GFX_DIR
+  cp -r "$DATA_FOLDER" "$INSTALL_GFX_DIR"
+  cp -r "$RAW_FOLDER" "$INSTALL_GFX_DIR"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Copying Vanilla DF graphics pack failed."
+  fi
+  
+  # Apply LNP patches.
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
+  
+  # Quit if patching failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Applying Vanilla DF graphics patches failed."
   fi
 }
 

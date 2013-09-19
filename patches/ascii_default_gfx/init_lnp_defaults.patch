@@ -1,0 +1,85 @@
+--- downloads/df_linux/data/init/init.txt	2012-06-04 06:26:04.000000000 -0500
++++ lnp_gfx/[16x16] ASCII Default 0.34.11/data/init/init.txt	2013-08-21 05:40:01.000000000 -0500
+@@ -8,7 +8,7 @@
+ 
+ Change this to turn sound off.
+ 
+-[SOUND:YES]
++[SOUND:NO]
+ 
+ The sound volume runs from 0 (off) to 255 (full).  You can set the volume from the ESC options menu as well.
+ 
+@@ -16,7 +16,7 @@
+ 
+ Change this to skip the wonderful intro movies.
+ 
+-[INTRO:YES]
++[INTRO:NO]
+ 
+ This lets you set the starting windowed/fullscreen setting.  Can be YES, NO or PROMPT.
+ 
+@@ -25,9 +25,9 @@
+ This is the size and font for windowed mode.  Changing to the 800x600 font might make you happier.
+ If set below 256x256 it specifies the grid size instead, with a minimum of 80x25.
+ 
+-[WINDOWEDX:80]
+-[WINDOWEDY:25]
+-[FONT:curses_640x300.png]
++[WINDOWEDX:0]
++[WINDOWEDY:0]
++[FONT:curses_square_16x16.png]
+ 
+ You may disable window resizing if you wish.
+ [RESIZABLE:YES]
+@@ -36,7 +36,7 @@
+ 
+ [FULLSCREENX:0]
+ [FULLSCREENY:0]
+-[FULLFONT:curses_800x600.png]
++[FULLFONT:curses_square_16x16.png]
+ 
+ If this is set to NO, tiles will be stretched to fit the screen if there is a resolution mismatch.
+ If this is set to YES, the tiles will not be stretched, but rather the game view will be centralized, surrounded by black space.  Tiles that are too large will always be compressed rather than running off the screen.
+@@ -74,7 +74,7 @@
+ 
+ Switches truetype on whenever the vertical tile size is this many pixels or larger.  You may also use YES/NO to force it on/off.  Turning it off may provide a minor speed boost (using font small enough that it doesn't activate won't).
+ 
+-[TRUETYPE:24]
++[TRUETYPE:YES]
+ 
+ Change this to YES to keep the DF window on top of your other windows.
+ 
+@@ -82,7 +82,7 @@
+ 
+ Change this to YES if you want to see an FPS counter at the top left.
+ 
+-[FPS:NO]
++[FPS:YES]
+ 
+ Use this to set the maximum frame rate during play.  The movies are always capped at 100.  A frame in this case is not graphical but related to the movement speed of a creature.  A healthy, unencumbered dwarven peasant takes one step every 10 frames.
+ 
+@@ -114,7 +114,7 @@
+ Use this to set how fast the game zooms.  The default corresponds to
+ increasing grid size by 10 units each time you zoom.
+ 
+-[ZOOM_SPEED:10]
++[ZOOM_SPEED:5]
+ 
+ Change this to NO if you don't want to have the mouse involved at all.
+ 
+@@ -139,7 +139,7 @@
+ 
+ This controls the number of milliseconds between macro instructions.
+ 
+-[MACRO_MS:15]
++[MACRO_MS:0]
+ 
+ This controls the number of milliseconds that must pass before input works again after the view recenters on an event in dwarf mode.
+ 
+@@ -147,4 +147,4 @@
+ 
+ Change this to NO if you want to leave save uncompressed (you might want to do this if you are experience save corruption).
+ 
+-[COMPRESSED_SAVES:YES]
+\ No newline at end of file
++[COMPRESSED_SAVES:YES]

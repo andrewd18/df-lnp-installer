@@ -3,10 +3,10 @@ dfDirectory: df_linux
 dfExecutable: dfhack
 folders: []
 graphicsPacks: 
--  name: '[08x12] ASCII Default 0.34.11'
-   directory: ASCII Default
 -  name: '[12x12] Jolly Bastion 34.10v5'
    directory: '[12x12] Jolly Bastion 34.10v5'
+-  name: '[16x16] ASCII Default 0.34.11'
+   directory: '[16x16] ASCII Default 0.34.11'
 -  name: '[16x16] CLA v15'
    directory: '[16x16] CLA v15'
 -  name: '[16x16] Ironhand 0.73.4'
