@@ -1,0 +1,51 @@
+--- downloads/[16x16] Obsidian/data/init/init.txt	2013-06-15 00:15:46.000000000 -0500
++++ lnp_gfx/[16x16] Obsidian 0.8a/data/init/init.txt	2013-08-21 06:56:13.000000000 -0500
+@@ -88,7 +88,7 @@
+ 
+ You may set FPS_CAP to 0 to make it uncapped.
+ 
+-[FPS_CAP:50]
++[FPS_CAP:100]
+ 
+ Use this to set the maximum graphical frame refresh rate during play.
+ 
+@@ -100,7 +100,7 @@
+ 
+ This sets the applications vertical synchronization behavior.  Changing this to YES can impact your FPS if your G_FPS is high. ARB_SYNC is a better option, if your system supports it.
+ 
+-[VSYNC:YES]
++[VSYNC:NO]
+ 
+ Change this to NEAREST if you want the texture values to use the nearest pixel without averaging.
+ Change this to LINEAR if you want the texture values to be averaged over the adjacent pixels.
+@@ -109,12 +109,12 @@
+ 
+ Change this to make the dwarfort.exe process have a different priority.  From highest to lowest, the options are REALTIME, HIGH, ABOVE_NORMAL, NORMAL, BELOW_NORMAL and IDLE.
+ 
+-[PRIORITY:ABOVE_NORMAL]
++[PRIORITY:NORMAL]
+ 
+ Use this to set how fast the game zooms.  The default corresponds to
+ increasing grid size by 10 units each time you zoom.
+ 
+-[ZOOM_SPEED:10]
++[ZOOM_SPEED:5]
+ 
+ Change this to NO if you don't want to have the mouse involved at all.
+ 
+@@ -139,7 +139,7 @@
+ 
+ This controls the number of milliseconds between macro instructions.
+ 
+-[MACRO_MS:15]
++[MACRO_MS:0]
+ 
+ This controls the number of milliseconds that must pass before input works again after the view recenters on an event in dwarf mode.
+ 
+@@ -147,4 +147,4 @@
+ 
+ Change this to NO if you want to leave save uncompressed (you might want to do this if you are experience save corruption).
+ 
+-[COMPRESSED_SAVES:YES]
+\ No newline at end of file
++[COMPRESSED_SAVES:YES]

@@ -675,15 +675,53 @@ install_mayday_gfx_pack () {
 }
 
 install_obsidian_gfx_pack () {
-  local OBSIDIAN_ZIP="$DOWNLOAD_DIR/[16x16] Obsidian (v.0.8).zip"
-  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics"
+  local GFX_PACK="$DOWNLOAD_DIR/[16x16] Obsidian (v.0.8).zip"
+  local TEMP_UNZIP_DIR="./obsidian_unzip"
+  local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Obsidian 0.8a"
+  local LNP_PATCH_DIR="./patches/obsidian_gfx"
   
-  unzip -d "$GFX_FOLDER" "$OBSIDIAN_ZIP"
+  mkdir -p "$TEMP_UNZIP_DIR"
+  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
 	exit_with_error "Unzipping Obsidian graphics pack failed."
   fi
+  
+  # Install Art
+  mkdir -p "$INSTALL_GFX_DIR/data/art"
+  cp "$TEMP_UNZIP_DIR/[16x16] Obsidian/data/art/"* "$INSTALL_GFX_DIR/data/art/"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Obsidian art failed."
+  fi
+  
+  # Install init
+  mkdir -p "$INSTALL_GFX_DIR/data/init"
+  cp "$TEMP_UNZIP_DIR/[16x16] Obsidian/data/init/"* "$INSTALL_GFX_DIR/data/init/"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Obsidian init failed."
+  fi
+  
+  # Apply LNP patches.
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
+  patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Applying Obsidian LNP patches failed."
+  fi
+  
+  # Install raws
+  mkdir -p "$INSTALL_GFX_DIR/raw"
+  cp -r "$TEMP_UNZIP_DIR/[16x16] Obsidian/raw/graphics" "$INSTALL_GFX_DIR/raw"
+  cp -r "$TEMP_UNZIP_DIR/[16x16] Obsidian/raw/objects" "$INSTALL_GFX_DIR/raw"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Installing Obsidian raws failed."
+  fi
+  
+  rm -r "$TEMP_UNZIP_DIR"
 }
 
 install_phoebus_gfx_pack () {

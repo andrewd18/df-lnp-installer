@@ -1,0 +1,28 @@
+--- downloads/[16x16] Obsidian/data/init/d_init.txt	2013-06-11 21:27:54.000000000 -0500
++++ lnp_gfx/[16x16] Obsidian 0.8a/data/init/d_init.txt	2013-07-30 04:29:14.000000000 -0500
+@@ -22,9 +22,9 @@
+ 
+ Use these options to remove features from the game.  Permitted values are YES and NO.  Removal might speed the game up in the case of temperature and weather.
+ 
+-[TEMPERATURE:YES]
++[TEMPERATURE:NO]
+ [WEATHER:YES]
+-[ECONOMY:YES]
++[ECONOMY:NO]
+ [INVADERS:YES]
+ [CAVEINS:YES]
+ [ARTIFACTS:YES]
+@@ -122,11 +122,11 @@
+ 
+ You can set the maximum population of your fortress here.  Keep in mind that your population must be at least 80 to get a king and 100 to obtain the current game features.
+ 
+-[POPULATION_CAP:200]
++[POPULATION_CAP:80]
+ 
+ This allows you to control the number of babies+children in your fortress.  The first number is an absolute cap on the number of babies+children.  The second is a percentage of the current number of adults in your fortress (the default is the essentially meaningless 1000% here).  The lower number is used as the cap.  The cap only prevents further pregancies, so migrant children, multiple births and existing pregnancies from old saves can still push you over the cap.  Setting either number to zero will disallow pregnancies in the fortress.
+ 
+-[BABY_CHILD_CAP:100:1000]
++[BABY_CHILD_CAP:10:20]
+ 
+ If you don't like the ,.`' ground, try setting this to NO.  The ground will turn into periods only.
+ 

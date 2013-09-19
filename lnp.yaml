@@ -16,7 +16,7 @@ graphicsPacks:
 -  name: '[16x16] Phoebus 34.11v01'
    directory: '[16x16] Phoebus 34.11v01'
 -  name: '[16x16] Obsidian 0.8a'
-   directory: '[16x16] Obsidian'
+   directory: '[16x16] Obsidian 0.8a'
 -  name: '[16x16] Spacefox 34.11v1.0'
    directory: '[16x16] Spacefox 34.11v1.0'
 launchDfWithTerminal: true
