@@ -12,14 +12,13 @@ Included Mods
 * SoundSense r42 (app only)
 * Dwarf Therapist pulled and built from source
 * Tilesets
-  - [08x12] ASCII Default 0.34.11
-  - [09x12] Jolly Bastion 34.10v5
   - [12x12] Jolly Bastion 34.10v5
+  - [16x16] ASCII Default 0.34.11
   - [16x16] CLA v15
   - [16x16] Ironhand 0.73.4
   - [16x16] Mayday 0.34.11
-  - [16x16] Phoebus 34.11v01
   - [16x16] Obsidian 0.8a
+  - [16x16] Phoebus 34.11v01
   - [16x16] Spacefox 34.11v1.0
 
 
