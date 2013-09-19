@@ -8,7 +8,7 @@ graphicsPacks:
 -  name: '[12x12] Jolly Bastion 34.10v5'
    directory: '[12x12] Jolly Bastion 34.10v5'
 -  name: '[16x16] CLA v15'
-   directory: CLA
+   directory: '[16x16] CLA v15'
 -  name: '[16x16] Ironhand 0.73.4'
    directory: '[16x16] Ironhand 0.73.4'
 -  name: '[16x16] Mayday 0.34.11'

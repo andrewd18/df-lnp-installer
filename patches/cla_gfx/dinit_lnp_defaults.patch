@@ -1,0 +1,114 @@
+--- downloads/CLA_graphic_set_v15-STANDALONE/CLA/data/init/d_init.txt	2012-07-30 18:55:52.000000000 -0500
++++ lnp_gfx/[16x16] CLA v15/data/init/d_init.txt	2013-07-30 04:24:50.000000000 -0500
+@@ -2,11 +2,11 @@
+ 
+ [AUTOSAVE:SEASONAL]
+ [AUTOBACKUP:NO]
+-[AUTOSAVE_PAUSE:NO]
++[AUTOSAVE_PAUSE:YES]
+ 
+ Set this to YES if you want it to save the game when you start a new fortress.  If AUTOBACKUP above is set to YES, it will also create a copy of this new save.
+ 
+-[INITIAL_SAVE:NO]
++[INITIAL_SAVE:YES]
+ 
+ Set this to NO to make Dwarf Fortress remain in the saved pause state when you load an active game.
+ 
+@@ -14,17 +14,17 @@
+ 
+ Set this to YES if you want Dwarf Fortress to show the warning window on embark as a confirmation even if there are no issues.
+ 
+-[EMBARK_WARNING_ALWAYS:NO]
++[EMBARK_WARNING_ALWAYS:YES]
+ 
+ You can change these to ALWAYS and NO.  More restrictive world parameter settings override these.  ALWAYS lets you see the features in the Local view during embark, and NO stops you from looking for features in the site finder (though if you really want to stop the finder, it might be better for you to generate worlds that restrict the use of this feature completely, in which case you don't need to change the settings here).
+ 
+-[SHOW_EMBARK_TUNNEL:FINDER]
++[SHOW_EMBARK_TUNNEL:ALWAYS]
+ 
+ Use these options to remove features from the game.  Permitted values are YES and NO.  Removal might speed the game up in the case of temperature and weather.
+ 
+-[TEMPERATURE:YES]
++[TEMPERATURE:NO]
+ [WEATHER:YES]
+-[ECONOMY:YES]
++[ECONOMY:NO]
+ [INVADERS:YES]
+ [CAVEINS:YES]
+ [ARTIFACTS:YES]
+@@ -39,7 +39,7 @@
+ 
+ Change these numbers to make the embark rectangle start at a different size.  The format is (EMBARK_RECTANGLE:<width>:<height>).  Numbers may run from 2 to 16.  The map size warning message will go by these numbers.
+ 
+-[EMBARK_RECTANGLE:4:4]
++[EMBARK_RECTANGLE:3:3]
+ 
+ Change these numbers to set the default weights for traffic designations.  If you make the last numbers too large, pathfinding might lag.
+ The format is (PATH_COST:<high>:<normal>:<low>:<restricted>).
+@@ -56,7 +56,7 @@
+ 
+ Change this to YES to disallow pets from coffin burial as the default option.
+ 
+-[COFFIN_NO_PETS_DEFAULT:NO]
++[COFFIN_NO_PETS_DEFAULT:YES]
+ 
+ Use these to set the color of wounded body parts.  The format is <foreground color>:<background color>:<brightness>.
+ 
+@@ -69,22 +69,22 @@
+ 
+ This controls the display of areas that are far below outside.  The format is SKY:<character>:<foreground color>:<background color>:<brightness>.  The <character> can be either an ASCII tile number or a character in quotes, like '#'.
+ 
+-[SKY:39:2:1:0]
++[SKY:32:8:9:0]
+ 
+ As above, for inside/subterranean areas.
+ 
+-[CHASM:250:0:0:1]
++[CHASM:0:0:0:1]
+ 
+ Pillar tile, <character> as above.
+ 
+-[PILLAR_TILE:'O']
++[PILLAR_TILE:199]
+ 
+ Track tiles.  I at the end inverts the material colors.
+ 
+-[TRACK_N:210I]
+-[TRACK_S:208I]
+-[TRACK_E:181I]
+-[TRACK_W:198I]
++[TRACK_N:208]
++[TRACK_S:210]
++[TRACK_E:198]
++[TRACK_W:181]
+ [TRACK_NS:179I]
+ [TRACK_NE:192I]
+ [TRACK_NW:217I]
+@@ -95,7 +95,7 @@
+ [TRACK_NSW:180I]
+ [TRACK_NEW:193I]
+ [TRACK_SEW:194I]
+-[TRACK_NSEW:182I]
++[TRACK_NSEW:158I]
+ [TRACK_RAMP_N:30I]
+ [TRACK_RAMP_S:30I]
+ [TRACK_RAMP_E:30I]
+@@ -122,15 +122,15 @@
+ 
+ You can set the maximum population of your fortress here.  Keep in mind that your population must be at least 80 to get a king and 100 to obtain the current game features.
+ 
+-[POPULATION_CAP:200]
++[POPULATION_CAP:80]
+ 
+ This allows you to control the number of babies+children in your fortress.  The first number is an absolute cap on the number of babies+children.  The second is a percentage of the current number of adults in your fortress (the default is the essentially meaningless 1000% here).  The lower number is used as the cap.  The cap only prevents further pregancies, so migrant children, multiple births and existing pregnancies from old saves can still push you over the cap.  Setting either number to zero will disallow pregnancies in the fortress.
+ 
+-[BABY_CHILD_CAP:100:1000]
++[BABY_CHILD_CAP:10:20]
+ 
+ If you don't like the ,.`' ground, try setting this to NO.  The ground will turn into periods only.
+ 
+-[VARIED_GROUND_TILES:YES]
++[VARIED_GROUND_TILES:NO]
+ 
+ If you'd like your engravings to start off looking the same (you can toggle them on individual later), set this to YES.
+ 

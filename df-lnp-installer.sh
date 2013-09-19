@@ -55,6 +55,7 @@ build_dwarf_therapist () {
 # One-off bugfixes that either require multiple packages to be installed first
 # or have other non-trivial consequences.
 bugfix_all () {
+  fix_cla_missing_mouse_png
   fix_jolly_bastion_missing_graphics_dir
   fix_jolly_bastion_missing_mouse_png
   fix_phoebus_missing_mouse_png
@@ -333,6 +334,17 @@ exit_with_error () {
   exit 1
 }
 
+fix_cla_missing_mouse_png () {
+  local CLA_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] CLA v15"
+  local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/ASCII Default"
+  
+  cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$CLA_FOLDER/data/art/mouse.png"
+  
+  if [ "$?" != "0" ]; then
+	exit_with_error "Applying CLA Missing Mouse patch failed."
+  fi
+}
+
 fix_jolly_bastion_missing_graphics_dir () {
   local JB_FOLDER="$INSTALL_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
   
@@ -416,15 +428,12 @@ install_all () {
 }
 
 install_cla_graphics_pack () {
-  local CLA_GFX_RAR="$DOWNLOAD_DIR/CLA_graphic_set_v15-STANDALONE.rar"
-  local GFX_FOLDER="$INSTALL_DIR/LNP/graphics"
+  local GFX_PACK="$DOWNLOAD_DIR/CLA_graphic_set_v15-STANDALONE.rar"
+  local GFX_PREFIX="CLA"
+  local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] CLA v15"
+  local LNP_PATCH_DIR="./patches/cla_gfx"
   
-  unrar x "$CLA_GFX_RAR" "$GFX_FOLDER"
-  
-  # Quit if extracting failed.
-  if [ "$?" != "0" ]; then
-	exit_with_error "Unraring CLA graphics pack failed."
-  fi
+  install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
 }
 
 install_dfhack () {
@@ -509,9 +518,18 @@ install_gfx_pack () {
   
   local TEMP_UNZIP_DIR="./gfx_unzip"
   
-  
   mkdir -p "$TEMP_UNZIP_DIR"
-  unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK"
+  
+  # Run the graphics pack mimetype.
+  local MIMETYPE="$(file -b --mime-type "$GFX_PACK")"
+  
+  # Run the appropriate extraction app.
+  case "$MIMETYPE" in
+	'application/zip') unzip -d "$TEMP_UNZIP_DIR" "$GFX_PACK" ;;
+	'application/x-rar') unrar x "$GFX_PACK" "$TEMP_UNZIP_DIR" ;;
+	*) exit_with_error "install_gfx_pack: unknown mimetype $MIMETYPE for $GFX_PACK" ;;
+  esac
+  
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
