@@ -129,19 +129,19 @@ check_dependencies () {
   fi
   
   # Check for QT Libraries (required for Dwarf Therapist)
-  if [ -z "$(ldconfig -p | grep -P '^\tlibQtCore.so\s')" ]; then
+  if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtCore.so\s')" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libQtCore "
   fi
   
-  if [ -z "$(ldconfig -p | grep -P '^\tlibQtGui.so\s')" ]; then
+  if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtGui.so\s')" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libQtGui "
   fi
   
-  if [ -z "$(ldconfig -p | grep -P '^\tlibQtNetwork.so\s')" ]; then
+  if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtNetwork.so\s')" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libQtNetwork "
   fi
   
-  if [ -z "$(ldconfig -p | grep -P '^\tlibQtScript.so\s')" ]; then
+  if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtScript.so\s')" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libQtScript "
   fi
   
@@ -151,7 +151,7 @@ check_dependencies () {
   fi
   
   # Check for libSDL base; must be 32-bit.
-  local LIBSDL_BASE_SO="$(ldconfig -p | grep -P '^\tlibSDL-1.2.so.0\s' | sed 's/[^>]*> //')"
+  local LIBSDL_BASE_SO="$(/sbin/ldconfig -p | grep -P '^\tlibSDL-1.2.so.0\s' | sed 's/[^>]*> //')"
   local LIBSDL_32_BIT_FILENAME="$(file -L $LIBSDL_BASE_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$LIBSDL_32_BIT_FILENAME" ]; then
@@ -159,7 +159,7 @@ check_dependencies () {
   fi
   
   # Check for libSDL image; must be 32-bit.
-  local LIBSDL_IMAGE_SO="$(ldconfig -p | grep -P '^\tlibSDL_image-1.2.so.0\s' | sed 's/[^>]*> //')"
+  local LIBSDL_IMAGE_SO="$(/sbin/ldconfig -p | grep -P '^\tlibSDL_image-1.2.so.0\s' | sed 's/[^>]*> //')"
   local LIBSDL_IMAGE_32_BIT_FILENAME="$(file -L $LIBSDL_IMAGE_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$LIBSDL_IMAGE_32_BIT_FILENAME" ]; then
@@ -167,7 +167,7 @@ check_dependencies () {
   fi
   
   # Check for libSDL ttf; must be 32-bit.
-  local LIBSDL_TTF_SO="$(ldconfig -p | grep -P '^\tlibSDL_ttf-2.0.so.0\s' | sed 's/[^>]*> //')"
+  local LIBSDL_TTF_SO="$(/sbin/ldconfig -p | grep -P '^\tlibSDL_ttf-2.0.so.0\s' | sed 's/[^>]*> //')"
   local LIBSDL_TTF_32_BIT_FILENAME="$(file -L $LIBSDL_TTF_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$LIBSDL_TTF_32_BIT_FILENAME" ]; then
@@ -175,7 +175,7 @@ check_dependencies () {
   fi
   
   # Check for OpenAL; must be 32-bit.
-  local OPENAL_SO="$(ldconfig -p | grep -P '^\tlibopenal.so.1\s' | sed 's/^[>]*> //')"
+  local OPENAL_SO="$(/sbin/ldconfig -p | grep -P '^\tlibopenal.so.1\s' | sed 's/^[>]*> //')"
   local OPENAL_SO_32_BIT_FILENAME="$(file -L $OPENAL_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$OPENAL_SO_32_BIT_FILENAME" ]; then
@@ -183,7 +183,7 @@ check_dependencies () {
   fi
   
   # Check for libGLU; must be 32-bit.
-  local LIBGLU_SO="$(ldconfig -p | grep -P '^\tlibGLU.so.1\s' | sed 's/^[>]*> //')"
+  local LIBGLU_SO="$(/sbin/ldconfig -p | grep -P '^\tlibGLU.so.1\s' | sed 's/^[>]*> //')"
   local LIBGLU_SO_32_BIT_FILENAME="$(file -L $LIBGLU_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$LIBGLU_SO_32_BIT_FILENAME" ]; then
@@ -191,7 +191,7 @@ check_dependencies () {
   fi
   
   # Check for libgtk-x11; must be 32-bit.
-  local LIBGTK_SO="$(ldconfig -p | grep -P '^\tlibgtk-x11-2.0.so.0\s' | sed 's/^[>]*> //')"
+  local LIBGTK_SO="$(/sbin/ldconfig -p | grep -P '^\tlibgtk-x11-2.0.so.0\s' | sed 's/^[>]*> //')"
   local LIBGTK_SO_32_BIT_FILENAME="$(file -L $LIBGTK_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$LIBGTK_SO_32_BIT_FILENAME" ]; then
@@ -380,10 +380,10 @@ fix_vanilla_df_openal_issue () {
   
   # The filename variables will be empty strings if no file exists.
   # Otherwise they will contain the filename of the associated 32-bit library.
-  local OPENAL_SO="$(find /usr/lib -name libopenal.so.1)"
+  local OPENAL_SO="$(/sbin/ldconfig -p | grep -P '^\tlibopenal.so.1\s')"
   local OPENAL_SO_32_BIT_FILENAME="$(file -L $OPENAL_SO | grep "32-bit" | cut -d: -f1)"
   
-  local LIBSNDFILE_SO="$(find /usr/lib -name libsndfile.so.1)"
+  local LIBSNDFILE_SO="$(/sbin/ldconfig -p | grep -P '^\tlibsndfile.so.1\s')"
   local LIBSNDFILE_SO_32_BIT_FILENAME="$(file -L $LIBSNDFILE_SO | grep "32-bit" | cut -d: -f1)"
   
   local VANILLA_DF_LIBS_DIR="$INSTALL_DIR/df_linux/libs"
