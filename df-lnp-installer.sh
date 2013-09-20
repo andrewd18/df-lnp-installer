@@ -175,7 +175,7 @@ check_dependencies () {
   fi
   
   # Check for OpenAL; must be 32-bit.
-  local OPENAL_SO="$(find /usr/lib -name libopenal.so.1)"
+  local OPENAL_SO="$(ldconfig -p | grep -P '^\tlibopenal.so.1\s' | sed 's/^[>]*> //')"
   local OPENAL_SO_32_BIT_FILENAME="$(file -L $OPENAL_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$OPENAL_SO_32_BIT_FILENAME" ]; then
@@ -183,7 +183,7 @@ check_dependencies () {
   fi
   
   # Check for libGLU; must be 32-bit.
-  local LIBGLU_SO="$(find /usr/lib -name libGLU.so.1)"
+  local LIBGLU_SO="$(ldconfig -p | grep -P '^\tlibGLU.so.1\s' | sed 's/^[>]*> //')"
   local LIBGLU_SO_32_BIT_FILENAME="$(file -L $LIBGLU_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$LIBGLU_SO_32_BIT_FILENAME" ]; then
@@ -191,7 +191,7 @@ check_dependencies () {
   fi
   
   # Check for libgtk-x11; must be 32-bit.
-  local LIBGTK_SO="$(find /usr/lib -name libgtk-x11-2.0.so.0)"
+  local LIBGTK_SO="$(ldconfig -p | grep -P '^\tlibgtk-x11-2.0.so.0\s' | sed 's/^[>]*> //')"
   local LIBGTK_SO_32_BIT_FILENAME="$(file -L $LIBGTK_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$LIBGTK_SO_32_BIT_FILENAME" ]; then
