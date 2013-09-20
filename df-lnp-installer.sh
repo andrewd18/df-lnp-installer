@@ -129,19 +129,19 @@ check_dependencies () {
   fi
   
   # Check for QT Libraries (required for Dwarf Therapist)
-  if [ -z "$(find /usr/lib -name libQtCore.so)" ]; then
+  if [ -z "$(ldconfig -p | grep -P '^\tlibQtCore.so\s')" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libQtCore "
   fi
   
-  if [ -z "$(find /usr/lib -name libQtGui.so)" ]; then
+  if [ -z "$(ldconfig -p | grep -P '^\tlibQtGui.so\s')" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libQtGui "
   fi
   
-  if [ -z "$(find /usr/lib -name libQtNetwork.so)" ]; then
+  if [ -z "$(ldconfig -p | grep -P '^\tlibQtNetwork.so\s')" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libQtNetwork "
   fi
   
-  if [ -z "$(find /usr/lib -name libQtScript.so)" ]; then
+  if [ -z "$(ldconfig -p | grep -P '^\tlibQtScript.so\s')" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libQtScript "
   fi
   
@@ -151,7 +151,7 @@ check_dependencies () {
   fi
   
   # Check for libSDL base; must be 32-bit.
-  local LIBSDL_BASE_SO="$(find /usr/lib -name libSDL-1.2.so.0)"
+  local LIBSDL_BASE_SO="$(ldconfig -p | grep -P '^\tlibSDL-1.2.so.0\s' | sed 's/[^>]*> //')"
   local LIBSDL_32_BIT_FILENAME="$(file -L $LIBSDL_BASE_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$LIBSDL_32_BIT_FILENAME" ]; then
@@ -159,7 +159,7 @@ check_dependencies () {
   fi
   
   # Check for libSDL image; must be 32-bit.
-  local LIBSDL_IMAGE_SO="$(find /usr/lib -name libSDL_image-1.2.so.0)"
+  local LIBSDL_IMAGE_SO="$(ldconfig -p | grep -P '^\tlibSDL_image-1.2.so.0\s' | sed 's/[^>]*> //')"
   local LIBSDL_IMAGE_32_BIT_FILENAME="$(file -L $LIBSDL_IMAGE_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$LIBSDL_IMAGE_32_BIT_FILENAME" ]; then
@@ -167,7 +167,7 @@ check_dependencies () {
   fi
   
   # Check for libSDL ttf; must be 32-bit.
-  local LIBSDL_TTF_SO="$(find /usr/lib -name libSDL_ttf-2.0.so.0)"
+  local LIBSDL_TTF_SO="$(ldconfig -p | grep -P '^\tlibSDL_ttf-2.0.so.0\s' | sed 's/[^>]*> //')"
   local LIBSDL_TTF_32_BIT_FILENAME="$(file -L $LIBSDL_TTF_SO | grep "32-bit" | cut -d: -f1)"
   
   if [ -z "$LIBSDL_TTF_32_BIT_FILENAME" ]; then
