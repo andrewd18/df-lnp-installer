@@ -846,7 +846,7 @@ restore_save_files () {
 ##############
 
 # Globals.
-VERSION="0.2.1"
+VERSION="0.2.2"
 INSTALL_DIR="$HOME/bin/Dwarf Fortress"
 DOWNLOAD_DIR="./downloads"
 SKIP_DOWNLOAD=0
