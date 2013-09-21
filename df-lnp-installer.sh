@@ -321,7 +321,7 @@ download_dwarf_therapist () {
   if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
 	hg update --cwd "$DWARF_THERAPIST_HG_DIR"
   else
-	hg clone https://dwarftherapist.googlecode.com/hg/ "$DWARF_THERAPIST_HG_DIR"
+	hg clone https://code.google.com/r/splintermind-attributes/ "$DWARF_THERAPIST_HG_DIR"
   fi
   
   # Quit if downloading failed.
