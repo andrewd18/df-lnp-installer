@@ -197,7 +197,15 @@ check_dependencies () {
   if [ -z "$LIBGTK_SO_32_BIT_FILENAME" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libGTK-x11_(32-bit) "
   fi
+
+  # Check for libjpeg62; must be 32-bit (required for Stonesense).
+  local LIBJPEG62_SO="$(/sbin/ldconfig -p | grep -P '^\tlibjpeg.so.62\s' | sed 's/^[>]*> //')"
+  local LIBJPEG62_SO_32_BIT_FILENAME="$(file -L $LIBJPEG62_SO | grep "32-bit" | cut -d: -f1)"
   
+  if [ -z "$LIBJPEG62_SO_32_BIT_FILENAME" ]; then
+	  MISSING_DEPS="${MISSING_DEPS}libJPEG62_(32-bit) "
+  fi
+
   ######
   # Error if the $MISSING_DEPS string contains a value (aka there are missing dependencies).
   ######
