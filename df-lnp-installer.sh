@@ -271,7 +271,7 @@ download_all () {
   wget $WGET_OPTIONS "$DFHACK"
 
   # Download Falconne's DF Hack Plugins
-  local FALCONNE_PLUGINS="http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.35-Windows-0.34.11.r3.zip.zip"
+  local FALCONNE_PLUGINS="http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.36-Windows-0.34.11.r3.zip.zip"
   wget $DFFI_WGET_OPTIONS "$FALCONNE_PLUGINS"
 
   # Download SoundSense.
@@ -504,7 +504,7 @@ install_dwarf_therapist () {
 }
 
 install_falconne_dfhack_plugins () {
-  local FALCONNE_PLUGINS_ZIP="$DOWNLOAD_DIR/Utility_Plugins_v0.35-Windows-0.34.11.r3.zip.zip"
+  local FALCONNE_PLUGINS_ZIP="$DOWNLOAD_DIR/Utility_Plugins_v0.36-Windows-0.34.11.r3.zip.zip"
   local FALCONNE_TEMP_FOLDER="./falconne_unzip"
   mkdir -p "$FALCONNE_TEMP_FOLDER"
   
