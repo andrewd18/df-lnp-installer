@@ -232,6 +232,14 @@ check_install_dir_is_empty () {
   fi
 }
 
+check_ptrace_protection () {
+  local PTRACE_PROTECTION="$(cat /proc/sys/kernel/yama/ptrace_scope)"
+  
+  if [ "$PTRACE_PROTECTION" = "1" ]; then
+	exit_with_error "Your kernel has ptrace protection enabled. DwarfTherapist will not operate properly. Either run 'echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope' or use --skip-deps to override."
+  fi
+}
+
 checksum_all () {
   # Check for file validity.
   sha1sum -c sha1sums
@@ -890,6 +898,7 @@ fi
 
 if [ "$SKIP_DEPS" = "0" ]; then
   check_dependencies
+  check_ptrace_protection
 fi
 
 ask_for_preferred_install_dir
