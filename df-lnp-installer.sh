@@ -59,6 +59,7 @@ bugfix_all () {
   fix_jolly_bastion_missing_graphics_dir
   fix_jolly_bastion_missing_mouse_png
   fix_phoebus_missing_mouse_png
+  fix_soundsense_missing_gamelog
   fix_vanilla_df_openal_issue
   fix_vanilla_df_lnp_settings_not_applied_by_default
 }
@@ -397,6 +398,40 @@ fix_phoebus_missing_mouse_png () {
   
   if [ "$?" != "0" ]; then
 	exit_with_error "Applying Phoebus Missing Mouse patch failed."
+  fi
+}
+
+fix_soundsense_missing_gamelog () {
+  # SoundSense comes preconfigured to expect gamelog.txt to be in ../
+  # however this is not the case for the LNP.
+  # 
+  # This modifies the configuration.xml file so users don't get an annoying
+  # pop-up on start looking for gamelog.txt.
+  #
+  # NOTE: gamelog.txt doesn't exist until DF creates it, and due to LNP start order,
+  # DF often starts after soundsense does. So instead of reworking the LNP start order,
+  # I just manually create a blank one using touch.
+  
+  local GAMELOG_FILE="$INSTALL_DIR/df_linux/gamelog.txt"
+  
+  # Create the gamelog.txt file.
+  touch "$GAMELOG_FILE"
+  
+  # Get the XML configuration file.
+  local SS_CONFIG_FILE="$INSTALL_DIR/LNP/utilities/soundsense/configuration.xml"
+  local FIND_LINE_WITH="\<gamelog"
+  local TEXT_TO_REPLACE="path=\"../gamelog.txt\""
+  local REPLACE_WITH="path=\"$GAMELOG_FILE\""
+  
+  # substitute "foo" with "bar" ONLY for lines which contain "baz"
+  # sed '/baz/s/foo/bar/g'
+  # NOTE: Like in ask_for_preferred_install_dir, use custom ; delimeter so as not to
+  # screw up sed with file paths.
+  sed -ibak "/$FIND_LINE_WITH/s;$TEXT_TO_REPLACE;$REPLACE_WITH;g" "$SS_CONFIG_FILE"
+  
+  # Quit if replacement failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Modifying soundsense configuration.xml file failed."
   fi
 }
 
