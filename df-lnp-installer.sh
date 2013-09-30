@@ -33,6 +33,23 @@ backup_save_files () {
   fi
 }
 
+backup_soundsense_packs () {
+  local SAVE_DIR="$INSTALL_DIR/LNP/utilities/soundsense/packs"
+  local BACKUPS_DIR="./ss_pack_backups"
+  
+  # Check to see if they even have save files.
+  if [ -d "$SAVE_DIR" ]; then
+	mkdir -p "$BACKUPS_DIR"
+	
+	cp -r "$SAVE_DIR" "$BACKUPS_DIR"
+	
+	# Quit if backing up failed.
+	if [ "$?" != "0" ]; then
+	  exit_with_error "Backing up saved games failed."
+	fi
+  fi
+}
+
 build_dwarf_therapist () {
   if [ -z "$DOWNLOAD_DIR" ]; then
 	exit_with_error "Script failure. DOWNLOAD_DIR undefined."
@@ -893,7 +910,32 @@ restore_save_files () {
 	
 	# Quit if restoring failed.
 	if [ "$?" != "0" ]; then
-	  exit_with_error "Restoring saved games failed."
+	  exit_with_error "Restoring saved games failed. Your saves are stored in ./save_backups."
+	fi
+  fi
+  
+  # Delete the backups dir.
+  rmdir --ignore-fail-on-non-empty "$BACKUPS_DIR"
+}
+
+restore_soundsense_packs () {
+  local SS_DIR="$INSTALL_DIR/LNP/utilities/soundsense"
+  local BACKUPS_DIR="./ss_pack_backups"
+  
+  # Restore if a packs folder exists in $BACKUPS_DIR
+  if [ -d "$BACKUPS_DIR/packs" ]; then
+	
+	# We have files to restore, so delete whatever lives in the ss_dir now.
+	if [ -d "$SS_DIR/packs" ]; then
+	  rm -r "$SS_DIR/packs"
+	fi
+	
+	# Move what we have.
+	mv "$BACKUPS_DIR/packs" "$SS_DIR"
+	
+	# Quit if restoring failed.
+	if [ "$?" != "0" ]; then
+	  exit_with_error "Restoring saved sound packs failed. Your sound packs are stored in ./ss_pack_backups."
 	fi
   fi
   
@@ -941,6 +983,7 @@ ask_for_preferred_install_dir
 # If we are upgrading, backup the save files (if any) and then wipe the slate clean.
 if [ "$UPGRADE" = "1" ]; then
   backup_save_files
+  backup_soundsense_packs
   delete_install_dir
 fi
 
@@ -964,6 +1007,7 @@ bugfix_all
 # If we upgraded, restore the save files (if any).
 if [ "$UPGRADE" = "1" ]; then
   restore_save_files
+  restore_soundsense_packs
 fi
 
 # Strike the earth!
