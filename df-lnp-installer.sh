@@ -1208,6 +1208,7 @@ BACKUP_DIR="./df_backup"
 # Script execution preferences.
 SKIP_DOWNLOAD=0
 SKIP_DEPS=0
+SKIP_SHA=0
 UPGRADE=0
 
 # If the user passed in arguments, parse them, otherwise assume "do everything". 
@@ -1216,6 +1217,7 @@ if [ -n "$1" ]; then
 	case "$1" in
 	  '--skip-download') SKIP_DOWNLOAD=1 ;;
 	  '--skip-deps') SKIP_DEPS=1 ;;
+	  '--skip-sha') SKIP_SHA=1 ;;
 	  '--upgrade'|'-u') UPGRADE=1 ;;
 	  '--version'|'-v') print_version; exit 0 ;;
 	  '--help'|'--usage') print_usage; exit 0 ;;
@@ -1251,7 +1253,9 @@ if [ "$SKIP_DOWNLOAD" = "0" ]; then
 fi
 
 # Checksum all the things!
-checksum_all
+if [ "$SKIP_SHA" = "0" ]; then
+  checksum_all
+fi
 
 # Install all the things!
 install_all
