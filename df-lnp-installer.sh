@@ -159,6 +159,16 @@ check_dependencies () {
 	MISSING_DEPS="${MISSING_DEPS}make "
   fi
   
+  # g++ (required for DwarfTherapist)
+  if [ -z "$(which g++)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}g++ "
+  fi
+  
+  # gcc (required for DwarfTherapist)
+  if [ -z "$(which gcc)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}gcc "
+  fi
+  
   # Check for QT Libraries (required for Dwarf Therapist)
   if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtCore.so\s')" ]; then
 	MISSING_DEPS="${MISSING_DEPS}libQtCore "
