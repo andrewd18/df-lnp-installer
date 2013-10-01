@@ -260,6 +260,16 @@ check_install_dir_is_empty () {
   fi
 }
 
+check_install_dir_contains_df_install () {
+  if [ ! -d "$INSTALL_DIR/df_linux" ]; then
+	exit_with_error "Cannot upgrade. $INSTALL_DIR does not contain a df_linux folder."
+  fi
+
+  if [ ! -d "$INSTALL_DIR/LNP" ]; then
+	exit_with_error "Cannot upgrade. $INSTALL_DIR does not contain an LNP folder."
+  fi
+}
+
 check_ptrace_protection () {
   local PTRACE_PROTECTION="$(cat /proc/sys/kernel/yama/ptrace_scope)"
   
@@ -391,9 +401,15 @@ download_dwarf_therapist () {
 exit_with_error () {
   if [ "$UPGRADE" = "1" ]; then
 	# This was an upgrade.
-	restore_df_directory
 	
-	echo "df-lnp-installer.sh: Restored your original DF installation."
+	# Only restore if the backup directory exists.
+	if [ -d "$BACKUP_DIR" ]; then
+	  restore_df_directory
+	  
+	  echo "df-lnp-installer.sh: Restored your original DF installation."
+	fi
+	
+	echo ""
 	echo "df-lnp-installer.sh: $1 Exiting."
   else
 	# This was a clean install.
@@ -402,6 +418,7 @@ exit_with_error () {
 	  rm -r "$INSTALL_DIR"
 	fi
 	
+	echo ""
 	echo "df-lnp-installer.sh: $1 Exiting."
   fi
   
@@ -1117,12 +1134,19 @@ print_version () {
 restore_df_directory () {
   local FOLDER_NAME="$(basename $INSTALL_DIR)"
   local SOURCE="$BACKUP_DIR/$FOLDER_NAME"
+  local LS_OUTPUT="$(ls -A "$INSTALL_DIR")"
   
-  # Clean out broken $INSTALL_DIR.
-  rm -r "$INSTALL_DIR/"*
+  # If the $INSTALL_DIR isn't empty...
+  # then clean out the broken $INSTALL_DIR.
+  if [ -n "$LS_OUTPUT" ]; then
+	rm -r "$INSTALL_DIR/"*
+  fi
   
   # Copy the contents of source into $INSTALL_DIR
   cp -r "$SOURCE/"* "$INSTALL_DIR"
+  
+  # Now delete the backup directory.
+  delete_backup_dir
 }
 
 # Should only be called as part of an $UPGRADE.
@@ -1203,6 +1227,7 @@ ask_for_preferred_install_dir
 
 # If we are upgrading, backup the old DF installation (if any) and then wipe the slate clean.
 if [ "$UPGRADE" = "1" ]; then
+  check_install_dir_contains_df_install
   backup_df_directory
   delete_install_dir
 fi
