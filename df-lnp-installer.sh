@@ -286,7 +286,7 @@ check_ptrace_protection () {
   if [ "$PTRACE_PROTECTION" = "1" ]; then
 	# Clean up after ourself.
 	# Nothing to do.
-	exit_with_error "Your kernel has ptrace protection enabled. DwarfTherapist will not operate properly. Either run 'echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope' or use --skip-deps to override."
+	exit_with_error "Your system has ptrace protection enabled. DwarfTherapist will not operate properly. See https://github.com/andrewd18/df-lnp-installer/wiki/Dwarf-Therapist-Cannot-Connect-to-Dwarf-Fortress for more information."
   fi
 }
 
