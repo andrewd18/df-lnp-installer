@@ -1130,6 +1130,7 @@ print_usage () {
   echo "Options:"
   echo "--skip-download  # Install using the existing contents of the ./downloads folder."
   echo "--skip-deps      # Install without checking for dependencies."
+  echo "--skip-sha       # Install without checking file checksums."
   echo "--upgrade, -u    # Upgrade an existing DF installation."
   echo "--version, -v    # Print the df-lnp-installer version."
   echo "--help, --usage  # Print this message."

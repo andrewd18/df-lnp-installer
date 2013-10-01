@@ -62,6 +62,7 @@ Usage: df-lnp-installer.sh [OPTIONS]
 Options:
 --skip-download  # Install using the existing contents of the ./downloads folder.
 --skip-deps      # Install without checking for dependencies.
+--skip-sha       # Install without checking file checksums.
 --upgrade, -u    # Upgrade an existing DF installation.
 --version, -v    # Print the df-lnp-installer version.
 --help, --usage  # Print this message.
