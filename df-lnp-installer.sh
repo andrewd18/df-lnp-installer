@@ -2,6 +2,8 @@
 
 # Function declarations.
 ask_for_preferred_install_dir () {
+  INSTALL_DIR="$HOME/bin/Dwarf Fortress"
+
   echo ""
   echo -n "Where should Dwarf Fortress be installed? [$INSTALL_DIR]: "
   
@@ -16,37 +18,28 @@ ask_for_preferred_install_dir () {
   fi
 }
 
-backup_save_files () {
-  local SAVE_DIR="$INSTALL_DIR/df_linux/data/save"
-  local BACKUPS_DIR="./save_backups"
-  
-  # Check to see if they even have save files.
-  if [ -d "$SAVE_DIR" ]; then
-	mkdir -p "$BACKUPS_DIR"
-	
-	cp -r "$SAVE_DIR" "$BACKUPS_DIR"
-	
-	# Quit if backing up failed.
-	if [ "$?" != "0" ]; then
-	  exit_with_error "Backing up saved games failed."
-	fi
+backup_df_directory () {
+  if [ -z "$INSTALL_DIR" ]; then
+	exit_with_error "Script failure: INSTALL_DIR not defined."
   fi
-}
-
-backup_soundsense_packs () {
-  local SAVE_DIR="$INSTALL_DIR/LNP/utilities/soundsense/packs"
-  local BACKUPS_DIR="./ss_pack_backups"
   
-  # Check to see if they even have save files.
-  if [ -d "$SAVE_DIR" ]; then
-	mkdir -p "$BACKUPS_DIR"
+  mkdir -p "$BACKUP_DIR"
+  
+  if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	# Nothing to do.
 	
-	cp -r "$SAVE_DIR" "$BACKUPS_DIR"
+	exit_with_error "Creating $BACKUP_DIR failed."
+  fi
+  
+  # Copy the old install to the backup directory.
+  cp -r "$INSTALL_DIR" "$BACKUP_DIR"
+  
+  if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	rm -r "$BACKUP_DIR"
 	
-	# Quit if backing up failed.
-	if [ "$?" != "0" ]; then
-	  exit_with_error "Backing up saved games failed."
-	fi
+	exit_with_error "Backing up old DF installation failed."
   fi
 }
 
@@ -60,12 +53,23 @@ build_dwarf_therapist () {
   # Create the makefile.
   $(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
   
+  # Quit if qmake failed.
+  if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	# Nothing to do; that's qmake's job.
+	
+	exit_with_error "Compiling Dwarf Therapist failed. See QMake output above for details."
+  fi
+  
   # Build from the Makefile.
   make -C "$DWARF_THERAPIST_HG_DIR"
   
   # Quit if building failed.
   if [ "$?" != "0" ]; then
-	exit_with_error "Compiling Dwarf Therapist failed."
+	# Clean up after ourself.
+	# Nothing to do; that's Make's job.
+	
+	exit_with_error "Compiling Dwarf Therapist failed. See Make output above for details."
   fi
 }
 
@@ -237,6 +241,9 @@ check_dependencies () {
   # Error if the $MISSING_DEPS string contains a value (aka there are missing dependencies).
   ######
   if [ -n "$MISSING_DEPS" ]; then
+	# Clean up after ourself.
+	# Nothing to do.
+	
 	exit_with_error "Your computer is missing the following programs or libraries: $MISSING_DEPS. Install them using your distribution's package manager or use --skip-deps to override."
   fi
 }
@@ -246,6 +253,9 @@ check_install_dir_is_empty () {
   
   # Verify it's empty.
   if [ -n "$LS_OUTPUT" ]; then
+	# Clean up after ourself.
+	# Nothing to do.
+	
 	exit_with_error "Cannot install. $INSTALL_DIR must be an empty or nonexistant folder. If this is an existing DF installation, use --upgrade."
   fi
 }
@@ -254,6 +264,8 @@ check_ptrace_protection () {
   local PTRACE_PROTECTION="$(cat /proc/sys/kernel/yama/ptrace_scope)"
   
   if [ "$PTRACE_PROTECTION" = "1" ]; then
+	# Clean up after ourself.
+	# Nothing to do.
 	exit_with_error "Your kernel has ptrace protection enabled. DwarfTherapist will not operate properly. Either run 'echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope' or use --skip-deps to override."
   fi
 }
@@ -264,28 +276,28 @@ checksum_all () {
   
   # Quit if one or more of the files fails its checksum.
   if [ "$?" != "0" ]; then
-	exit_with_error "One or more file failed its checksum."
+	# Clean up after ourself.
+	# Nothing to do.
+	exit_with_error "One or more file failed its checksum. Delete the erroring file from the ./downloads directory and try again."
   fi
+}
+
+create_backup_dir () {
+  mkdir -p "$BACKUP_DIR"
 }
 
 create_install_dir () {
   mkdir -p "$INSTALL_DIR"
-  
-  # Quit if we couldn't make the install directory.
-  if [ "$?" != "0" ]; then
-	exit_with_error "You probably do not have write permission to $INSTALL_DIR."
-  fi
+}
+
+delete_backup_dir () {
+  rm -r "$BACKUP_DIR"
 }
 
 delete_install_dir () {
   rm -r "$INSTALL_DIR"
-  
-  # Quit if we couldn't make the install directory.
-  if [ "$?" != "0" ]; then
-	exit_with_error "You probably do not have write permission to $INSTALL_DIR."
-  fi
 }
-
+  
 download_all () {
   if [ -z "$DOWNLOAD_DIR" ]; then
 	exit_with_error "Script failure. DOWNLOAD_DIR undefined."
@@ -369,12 +381,30 @@ download_dwarf_therapist () {
   
   # Quit if downloading failed.
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	# Nothing to do; that's hg's job.
+	
 	exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
   fi
 }
 
 exit_with_error () {
-  echo "df-lnp-installer.sh: $1 Exiting."
+  if [ "$UPGRADE" = "1" ]; then
+	# This was an upgrade.
+	restore_df_directory
+	
+	echo "df-lnp-installer.sh: Restored your original DF installation."
+	echo "df-lnp-installer.sh: $1 Exiting."
+  else
+	# This was a clean install.
+	# Remove the install directory as it's probably broken.
+	if [ -e "$INSTALL_DIR" ]; then
+	  rm -r "$INSTALL_DIR"
+	fi
+	
+	echo "df-lnp-installer.sh: $1 Exiting."
+  fi
+  
   exit 1
 }
 
@@ -385,6 +415,11 @@ fix_cla_missing_mouse_png () {
   cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$CLA_FOLDER/data/art/mouse.png"
   
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$CLA_FOLDER/data/art/mouse.png" ]; then
+	  rm "$CLA_FOLDER/data/art/mouse.png"
+	fi
+	
 	exit_with_error "Applying CLA Missing Mouse patch failed."
   fi
 }
@@ -402,6 +437,11 @@ fix_jolly_bastion_missing_mouse_png () {
   cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$JB_FOLDER/data/art/mouse.png"
   
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$JB_FOLDER/data/art/mouse.png" ]; then
+	  rm "$JB_FOLDER/data/art/mouse.png"
+	fi
+	
 	exit_with_error "Applying Jolly Bastion Missing Mouse patch failed."
   fi
 }
@@ -414,6 +454,11 @@ fix_phoebus_missing_mouse_png () {
   cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$PHOEBUS_FOLDER/data/art/mouse.png"
   
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$PHOEBUS_FOLDER/data/art/mouse.png" ]; then
+	  rm "$PHOEBUS_FOLDER/data/art/mouse.png"
+	fi
+  
 	exit_with_error "Applying Phoebus Missing Mouse patch failed."
   fi
 }
@@ -448,6 +493,9 @@ fix_soundsense_missing_gamelog () {
   
   # Quit if replacement failed.
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	# TODO: Install a clean configuration.xml file from the downloads folder?
+	
 	exit_with_error "Modifying soundsense configuration.xml file failed."
   fi
 }
@@ -517,9 +565,6 @@ install_all () {
   
   # Must come after install_vanilla_df
   install_lnp_embark_profiles
-  
-  # TODO
-  # Make a decision about downloading/installing soundsense audio.
 }
 
 install_cla_graphics_pack () {
@@ -539,7 +584,30 @@ install_dfhack () {
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
-	exit_with_error "Untarring Vanilla DF failed."
+	# Clean up after ourself.
+	# Remove folders.
+	if [ -e "$INSTALL_DIR/df_linux/hack" ]; then
+	  rm -r "$INSTALL_DIR/df_linux/hack"
+	fi
+	
+	if [ -e "$INSTALL_DIR/df_linux/stonesense" ]; then
+	  rm -r "$INSTALL_DIR/df_linux/stonesense"
+	fi
+	
+	# Remove executables.
+	if [ -e "$INSTALL_DIR/df_linux/dfhack" ]; then
+	  rm "$INSTALL_DIR/df_linux/dfhack"
+	fi
+	
+	if [ -e "$INSTALL_DIR/df_linux/dfhack-run" ]; then
+	  rm "$INSTALL_DIR/df_linux/dfhack-run"
+	fi
+	
+	if [ -e "$INSTALL_DIR/df_linux/dfhack-init.example" ]; then
+	  rm "$INSTALL_DIR/df_linux/dfhack-init.example"
+	fi
+	
+	exit_with_error "Untarring DF Hack failed."
   fi
 }
 
@@ -564,6 +632,11 @@ install_dwarf_therapist () {
   
   # Quit if copying failed.
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$UTILITIES_FOLDER/dwarf_therapist/" ]; then
+	  rm -r "$UTILITIES_FOLDER/dwarf_therapist/"
+	fi
+	
 	exit_with_error "Copying Dwarf Therapist app failed."
   fi
   
@@ -576,6 +649,11 @@ install_dwarf_therapist () {
   
   # Quit if copying failed.
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$UTILITIES_FOLDER/dwarf_therapist/" ]; then
+	  rm -r "$UTILITIES_FOLDER/dwarf_therapist/"
+	fi
+	
 	exit_with_error "Copying Dwarf Therapist ancillary files failed."
   fi
 }
@@ -589,6 +667,11 @@ install_falconne_dfhack_plugins () {
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$FALCONNE_TEMP_FOLDER" ]; then
+	  rm -r "$FALCONNE_TEMP_FOLDER"
+	fi
+	
 	exit_with_error "Unzipping Falconne UI plugins failed."
   fi
   
@@ -599,6 +682,10 @@ install_falconne_dfhack_plugins () {
   
   # Quit if copying failed.
   if [ "$?" != "0" ]; then
+	# These are going to be a lot of work to clean up individually
+	# so as not to remove all of dfhack plugins. So instead I will rely on
+	# dfhack complaining if it can't load a file that got corrupted.
+	
 	exit_with_error "Copying Falconne UI plugins failed."
   fi
   
@@ -628,6 +715,11 @@ install_gfx_pack () {
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
 	exit_with_error "Unzipping "$GFX_PACK" failed."
   fi
   
@@ -636,6 +728,15 @@ install_gfx_pack () {
   cp "$TEMP_UNZIP_DIR/$GFX_PREFIX/data/art/"* "$INSTALL_GFX_DIR/data/art/"
   
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+	
 	exit_with_error "Installing $INSTALL_GFX_DIR/data/art failed."
   fi
   
@@ -644,6 +745,15 @@ install_gfx_pack () {
   cp "$TEMP_UNZIP_DIR/$GFX_PREFIX/data/init/"* "$INSTALL_GFX_DIR/data/init/"
   
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+	
 	exit_with_error "Installing $INSTALL_GFX_DIR/data/init failed."
   fi
   
@@ -652,6 +762,15 @@ install_gfx_pack () {
   patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
   
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+	
 	exit_with_error "Applying $LNP_PATCH_DIR patches failed."
   fi
   
@@ -667,6 +786,15 @@ install_gfx_pack () {
   fi
   
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+	
 	exit_with_error "Installing $INSTALL_GFX_DIR raws failed."
   fi
   
@@ -699,6 +827,11 @@ install_lnp () {
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$INSTALL_DIR/LNP" ]; then
+	  rm -r "$INSTALL_DIR/LNP"
+	fi
+	
 	exit_with_error "Untarring LNP failed."
   fi
 }
@@ -711,6 +844,8 @@ install_lnp_embark_profiles () {
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
+	# Let the install command handle the error cleanup here.
+	
 	exit_with_error "Copying LNP Embark Profiles failed."
   fi
 }
@@ -723,6 +858,8 @@ install_lnp_yaml () {
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
+	# Let the install command handle the error cleanup here.
+	
 	exit_with_error "Copying LNP Yaml file failed."
   fi
 }
@@ -757,7 +894,12 @@ install_phoebus_gfx_pack () {
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
-       exit_with_error "Unzipping Phoebus graphics pack failed."
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+    exit_with_error "Unzipping Phoebus graphics pack failed."
   fi
   
   # Install Art
@@ -765,7 +907,16 @@ install_phoebus_gfx_pack () {
   cp "$TEMP_UNZIP_DIR/data/art/"* "$INSTALL_GFX_DIR/data/art/"
   
   if [ "$?" != "0" ]; then
-       exit_with_error "Installing Phoebus art failed."
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+	
+	exit_with_error "Installing Phoebus art failed."
   fi
   
   # Install init
@@ -773,7 +924,16 @@ install_phoebus_gfx_pack () {
   cp "$TEMP_UNZIP_DIR/data/init/phoebus_nott/"* "$INSTALL_GFX_DIR/data/init/"
   
   if [ "$?" != "0" ]; then
-       exit_with_error "Installing Phoebus init failed."
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+    
+    exit_with_error "Installing Phoebus init failed."
   fi
   
   # Install Art
@@ -781,7 +941,16 @@ install_phoebus_gfx_pack () {
   cp "$TEMP_UNZIP_DIR/data/art/"* "$INSTALL_GFX_DIR/data/art/"
   
   if [ "$?" != "0" ]; then
-       exit_with_error "Installing Phoebus art failed."
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+	
+    exit_with_error "Installing Phoebus art failed."
   fi
   
   # Install init
@@ -789,7 +958,16 @@ install_phoebus_gfx_pack () {
   cp "$TEMP_UNZIP_DIR/data/init/phoebus_nott/"* "$INSTALL_GFX_DIR/data/init/"
   
   if [ "$?" != "0" ]; then
-       exit_with_error "Installing Phoebus init failed."
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+	
+    exit_with_error "Installing Phoebus init failed."
   fi
   
   # Apply LNP patches.
@@ -797,7 +975,16 @@ install_phoebus_gfx_pack () {
   patch -d "$INSTALL_GFX_DIR/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
   
   if [ "$?" != "0" ]; then
-       exit_with_error "Applying Phoebus LNP patches failed."
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+	
+    exit_with_error "Applying Phoebus LNP patches failed."
   fi
   
   # Install raws
@@ -806,7 +993,16 @@ install_phoebus_gfx_pack () {
   cp -r "$TEMP_UNZIP_DIR/raw/objects" "$INSTALL_GFX_DIR/raw"
   
   if [ "$?" != "0" ]; then
-       exit_with_error "Installing Phoebus raws failed."
+	# Clean up after ourself.
+	if [ -e "$TEMP_UNZIP_DIR" ]; then
+	  rm -r "$TEMP_UNZIP_DIR"
+	fi
+	
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+	
+    exit_with_error "Installing Phoebus raws failed."
   fi
   
   rm -r "$TEMP_UNZIP_DIR"
@@ -820,6 +1016,11 @@ install_soundsense_app () {
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	if [ -e "$UTILITIES_FOLDER/soundsense" ]; then
+	  rm -r "$UTILITIES_FOLDER/soundsense"
+	fi
+	
 	exit_with_error "Unzipping SoundSense application failed."
   fi
   
@@ -850,6 +1051,10 @@ install_vanilla_df () {
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
+	if [ -e "$INSTALL_DIR/df_linux" ]; then
+	  rm -r "$INSTALL_DIR/df_linux"
+	fi
+	
 	exit_with_error "Untarring Vanilla DF failed."
   fi
 }
@@ -871,6 +1076,10 @@ install_vanilla_df_gfx_pack () {
   
   # Quit if extracting failed.
   if [ "$?" != "0" ]; then
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+  
 	exit_with_error "Copying Vanilla DF graphics pack failed."
   fi
   
@@ -880,6 +1089,10 @@ install_vanilla_df_gfx_pack () {
   
   # Quit if patching failed.
   if [ "$?" != "0" ]; then
+	if [ -e "$INSTALL_GFX_DIR" ]; then
+	  rm -r "$INSTALL_GFX_DIR"
+	fi
+	
 	exit_with_error "Applying Vanilla DF graphics patches failed."
   fi
 }
@@ -900,47 +1113,53 @@ print_version () {
   echo "Version: $VERSION"
 }
 
-restore_save_files () {
-  local DATA_DIR="$INSTALL_DIR/df_linux/data"
-  local BACKUPS_DIR="./save_backups"
+# Should only be called as part of an exit_with_error when $UPGRADE was true.
+restore_df_directory () {
+  local FOLDER_NAME="$(basename $INSTALL_DIR)"
+  local SOURCE="$BACKUP_DIR/$FOLDER_NAME"
   
-  # Restore if a save folder exists in $BACKUPS_DIR
-  if [ -d "$BACKUPS_DIR/save" ]; then
-	mv "$BACKUPS_DIR/save" "$DATA_DIR"
-	
-	# Quit if restoring failed.
-	if [ "$?" != "0" ]; then
-	  exit_with_error "Restoring saved games failed. Your saves are stored in ./save_backups."
-	fi
-  fi
+  # Clean out broken $INSTALL_DIR.
+  rm -r "$INSTALL_DIR/"*
   
-  # Delete the backups dir.
-  rmdir --ignore-fail-on-non-empty "$BACKUPS_DIR"
+  # Copy the contents of source into $INSTALL_DIR
+  cp -r "$SOURCE/"* "$INSTALL_DIR"
 }
 
-restore_soundsense_packs () {
-  local SS_DIR="$INSTALL_DIR/LNP/utilities/soundsense"
-  local BACKUPS_DIR="./ss_pack_backups"
+# Should only be called as part of an $UPGRADE.
+restore_save_files () {
+  local DESTINATION="$INSTALL_DIR/df_linux/data"
+  local FOLDER_NAME="$(basename $INSTALL_DIR)"
   
-  # Restore if a packs folder exists in $BACKUPS_DIR
-  if [ -d "$BACKUPS_DIR/packs" ]; then
-	
-	# We have files to restore, so delete whatever lives in the ss_dir now.
-	if [ -d "$SS_DIR/packs" ]; then
-	  rm -r "$SS_DIR/packs"
-	fi
-	
-	# Move what we have.
-	mv "$BACKUPS_DIR/packs" "$SS_DIR"
+  local SOURCE="$BACKUP_DIR/$FOLDER_NAME/df_linux/data/save"
+  
+  # If it exists...
+  # Copy the save files from the backup location to the install location.
+  if [ -d "$SOURCE" ]; then
+	cp -r "$SOURCE" "$DESTINATION"
 	
 	# Quit if restoring failed.
 	if [ "$?" != "0" ]; then
-	  exit_with_error "Restoring saved sound packs failed. Your sound packs are stored in ./ss_pack_backups."
+	  exit_with_error "Restoring saved games failed."
 	fi
+  else
+	echo "No saved games found. Skipping restore."
   fi
+}
+
+# Should only be called as part of an $UPGRADE.
+restore_soundsense_packs () {
+  local DESTINATION="$INSTALL_DIR/LNP/utilities/soundsense/"
+  local FOLDER_NAME="$(basename $INSTALL_DIR)"
   
-  # Delete the backups dir.
-  rmdir --ignore-fail-on-non-empty "$BACKUPS_DIR"
+  local SOURCE="$BACKUP_DIR/$FOLDER_NAME/LNP/utilities/soundsense/packs"
+  
+  # Copy the save files from the backup location to the install location.
+  cp -r "$SOURCE" "$DESTINATION"
+  
+  # Quit if restoring failed.
+  if [ "$?" != "0" ]; then
+	exit_with_error "Restoring soundsense audio packs failed."
+  fi
 }
 
 ##############
@@ -949,8 +1168,10 @@ restore_soundsense_packs () {
 
 # Globals.
 VERSION="0.2.4"
-INSTALL_DIR="$HOME/bin/Dwarf Fortress"
 DOWNLOAD_DIR="./downloads"
+BACKUP_DIR="./df_backup"
+
+# Script execution preferences.
 SKIP_DOWNLOAD=0
 SKIP_DEPS=0
 UPGRADE=0
@@ -980,10 +1201,9 @@ fi
 
 ask_for_preferred_install_dir
 
-# If we are upgrading, backup the save files (if any) and then wipe the slate clean.
+# If we are upgrading, backup the old DF installation (if any) and then wipe the slate clean.
 if [ "$UPGRADE" = "1" ]; then
-  backup_save_files
-  backup_soundsense_packs
+  backup_df_directory
   delete_install_dir
 fi
 
@@ -1008,6 +1228,10 @@ bugfix_all
 if [ "$UPGRADE" = "1" ]; then
   restore_save_files
   restore_soundsense_packs
+  
+  # We've now restored everything we need to.
+  # We can delete the old install. Whew!
+  delete_backup_dir
 fi
 
 # Strike the earth!
