@@ -86,6 +86,10 @@ Upgrading an Existing Installation
 2. Run `./df-lnp-installer.sh --upgrade`. When asked, enter the directory you already installed DF into.
 3. Your save files and soundsense audio packs will be saved. If something goes wrong, the whole install will be reverted.
 
+Common Issues
+=============
+See [the WIKI](wiki).
+
 Tested On
 =========
 
