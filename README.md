@@ -88,7 +88,7 @@ Upgrading an Existing Installation
 
 Common Issues
 =============
-See [the WIKI](wiki).
+See [the WIKI](https://github.com/andrewd18/df-lnp-installer/wiki).
 
 Tested On
 =========
