@@ -8,7 +8,7 @@ Included Mods
 
 * Lazy Newb Pack for Linux 0.5.3-SNAPSHOT-20130822
 * DF Hack 0.34.11-r3
-* Falconne's DFHack UI Plugins v0.35
+* Falconne's DFHack UI Plugins v0.36
 * SoundSense r42 (app only)
 * Dwarf Therapist (splintermind, pulled and built from source)
 * Tilesets
@@ -70,15 +70,21 @@ Options:
 Full Installation
 =================
 
-0. Clone the git repository with "git clone https://github.com/andrewd18/df-lnp-installer.git"
-1. Run ./df-lnp-installer.sh and follow the prompts.
-2. Once DF is installed, enter the DF folder and run ./startlnp.
-3. Start the SoundSense r42 utility from the Utilities tab.
-4. Point SoundSense at the df_linux/gamelog.txt file.
+1. Clone the git repository with `git clone https://github.com/andrewd18/df-lnp-installer.git`
+2. Run `./df-lnp-installer.sh` and follow the prompts.
+3. Once DF is installed, enter the DF folder and run ./startlnp.
+4. Start the SoundSense r42 utility from the Utilities tab.
 5. Click the "Pack Update" tab.
 6. Click "Start Automatic Update".
 7. Get a Dwarven Ale; it's going to be a while.
 8. Once finished, close SoundSense, and muck about with LNP as normal.
+
+Upgrading an Existing Installation
+==================================
+
+1. Update your git repository with `git pull`
+2. Run `./df-lnp-installer.sh --upgrade`. When asked, enter the directory you already installed DF into.
+3. Your save files and soundsense audio packs will be saved. If something goes wrong, the whole install will be reverted.
 
 Tested On
 =========
