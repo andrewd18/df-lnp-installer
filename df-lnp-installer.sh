@@ -41,7 +41,7 @@ build_dwarf_therapist () {
   local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
   
   # Create the makefile.
-  qmake "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
+  $qmake "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
   
   # Build from the Makefile.
   make -C "$DWARF_THERAPIST_HG_DIR"
@@ -117,10 +117,18 @@ check_dependencies () {
   if [ -z "$(which hg)" ]; then
 	MISSING_DEPS="${MISSING_DEPS}hg "
   fi
-  
+
   # qmake (required for DwarfTherapist)
-  if [ -z "$(which hg)" ]; then
-	MISSING_DEPS="${MISSING_DEPS}qmake "
+  # Also store the name of the qt4 qmake binary for later
+  qmake=""
+  for name in "qmake" "qmake-qt4"; do
+	  if [ -n "$(which $name)" ] && $name -v | grep "Using Qt version 4" > /dev/null; then
+		  qmake=$name
+		  break
+	  fi
+  done
+  if [ -z $qmake ]; then
+	MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
   fi
   
   # make (required for DwarfTherapist)
