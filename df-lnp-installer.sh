@@ -41,7 +41,7 @@ build_dwarf_therapist () {
   local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
   
   # Create the makefile.
-  qmake "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
+  $(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
   
   # Build from the Makefile.
   make -C "$DWARF_THERAPIST_HG_DIR"
@@ -61,6 +61,15 @@ bugfix_all () {
   fix_phoebus_missing_mouse_png
   fix_vanilla_df_openal_issue
   fix_vanilla_df_lnp_settings_not_applied_by_default
+}
+
+find_qmake_qt4 () {
+  for name in "qmake" "qmake-qt4"; do
+	if [ -n "$(which $name)" ] && [ $($name -query QT_VERSION | cut -d . -f 1) -eq 4 ]; then
+		echo $name
+		break
+	fi
+  done
 }
 
 check_dependencies () {
@@ -117,10 +126,10 @@ check_dependencies () {
   if [ -z "$(which hg)" ]; then
 	MISSING_DEPS="${MISSING_DEPS}hg "
   fi
-  
+
   # qmake (required for DwarfTherapist)
-  if [ -z "$(which hg)" ]; then
-	MISSING_DEPS="${MISSING_DEPS}qmake "
+  if [ -z "$(find_qmake_qt4)" ]; then
+	MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
   fi
   
   # make (required for DwarfTherapist)
