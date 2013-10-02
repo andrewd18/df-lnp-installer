@@ -325,69 +325,74 @@ download_all () {
   
   # Set up the downloads folder if it doesn't already exist.
   mkdir -p "$DOWNLOAD_DIR"
+  
+  # Apps and utilities
+  download_file "http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
+  download_file "http://dethware.org/dfhack/download/dfhack-0.34.11-r3-Linux.tar.gz"
+  download_dffi_file "http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.36-Windows-0.34.11.r3.zip.zip"
+  download_file "http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
+  download_file "http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
+  
+  # Graphics packs.
+  download_dffi_file "http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
+  download_dffi_file "http://dffd.wimbli.com/download.php?id=5945&f=CLA_graphic_set_v15-STANDALONE.rar"
+  download_dffi_file "http://dffd.wimbli.com/download.php?id=7362&f=Ironhand16+upgrade+0.73.4.zip"
+  download_file "http://www.alexanderocias.com/jollybastion/JollyBastion34-10v5.zip"
+  download_dffi_file "http://dffd.wimbli.com/download.php?id=7025&f=Mayday+34.11.zip"
+  download_dffi_file "http://dffd.wimbli.com/download.php?id=7728&f=%5B16x16%5D+Obsidian+%28v.0.8%29.zip"
+  download_dffi_file "http://dffd.wimbli.com/download.php?id=7867&f=%5B16x16%5D+Spacefox+34.11v1.0.zip"
+  
+  # Special cases.
+  
+  # Download Splintermind Attributes HG repo
+  download_dwarf_therapist
+}
 
+download_dffi_file () {
+  if [ -z "$1" ]; then
+	exit_with_error "Script failure. download_dffi_file requires a URL argument."
+  fi
+  
   # -nc is "no clobber" for not overwriting files we already have.
   # --directory-prefix drops the files into the download folder.
   # --content-disposition asks DFFI for the actual name of the file, not the php link.
   #   Sadly, simply asking for the filename counts as a "download" so this script will be
   #   inflating people's DFFI download counts. Oh well.
+  local WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_DIR --content-disposition"
+  
+  # NOTE: When calling wget, don't wrap $WGET_OPTIONS in quotes; wget doesn't like it.
+  
+  wget $WGET_OPTIONS "$1"
+  
+  # Quit if downloading failed.
+  if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	# Nothing to do; wget will recover.
+	
+	exit_with_error "Downloading $1 failed."
+  fi
+}
+
+download_file () {
+  if [ -z "$1" ]; then
+	exit_with_error "Script failure. download_file requires a URL argument."
+  fi
+  
+  # -nc is "no clobber" for not overwriting files we already have.
+  # --directory-prefix drops the files into the download folder.
   local WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_DIR"
-  local DFFI_WGET_OPTIONS="$WGET_OPTIONS --content-disposition"
   
-  # NOTE
-  # Don't wrap $WGET_OPTIONS in quotes; wget doesn't like it.
-
-  # Download official DF.
-  local DF_FOR_LINUX="http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
-  wget $WGET_OPTIONS "$DF_FOR_LINUX"
-
-  # Download latest DFHack.
-  local DFHACK="http://dethware.org/dfhack/download/dfhack-0.34.11-r3-Linux.tar.gz"
-  wget $WGET_OPTIONS "$DFHACK"
-
-  # Download Falconne's DF Hack Plugins
-  local FALCONNE_PLUGINS="http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.36-Windows-0.34.11.r3.zip.zip"
-  wget $DFFI_WGET_OPTIONS "$FALCONNE_PLUGINS"
-
-  # Download SoundSense.
-  local SOUNDSENSE_APP="http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
-  wget $WGET_OPTIONS "$SOUNDSENSE_APP"
-
-  # Download latest LNP GUI.
-  local LNP_LINUX_SNAPSHOT="http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
-  wget $WGET_OPTIONS "$LNP_LINUX_SNAPSHOT"
+  # NOTE: When calling wget, don't wrap $WGET_OPTIONS in quotes; wget doesn't like it.
   
-  # GRAPHICS PACKS
-  # Download Phoebus.
-  local PHOEBUS_GFX_PACK="http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
-  wget $DFFI_WGET_OPTIONS "$PHOEBUS_GFX_PACK"
+  wget $WGET_OPTIONS "$1"
   
-  # Download CLA.
-  local CLA_GFX_PACK="http://dffd.wimbli.com/download.php?id=5945&f=CLA_graphic_set_v15-STANDALONE.rar"
-  wget $DFFI_WGET_OPTIONS "$CLA_GFX_PACK"
-  
-  # Download Ironhand16.
-  local IRONHAND_GFX_PACK="http://dffd.wimbli.com/download.php?id=7362&f=Ironhand16+upgrade+0.73.4.zip"
-  wget $DFFI_WGET_OPTIONS "$IRONHAND_GFX_PACK"
-  
-  # Download JollyBastion
-  local JOLLY_BASTION_GFX_PACK="http://www.alexanderocias.com/jollybastion/JollyBastion34-10v5.zip"
-  wget $WGET_OPTIONS "$JOLLY_BASTION_GFX_PACK"
-  
-  # Download Mayday
-  local MAYDAY_GFX_PACK="http://dffd.wimbli.com/download.php?id=7025&f=Mayday+34.11.zip"
-  wget $DFFI_WGET_OPTIONS "$MAYDAY_GFX_PACK"
-  
-  # Download Obsidian
-  local OBSIDIAN_GFX_PACK="http://dffd.wimbli.com/download.php?id=7728&f=%5B16x16%5D+Obsidian+%28v.0.8%29.zip"
-  wget $DFFI_WGET_OPTIONS "$OBSIDIAN_GFX_PACK"
-  
-  # Download Spacefox
-  local SPACEFOX_GFX_PACK="http://dffd.wimbli.com/download.php?id=7867&f=%5B16x16%5D+Spacefox+34.11v1.0.zip"
-  wget $DFFI_WGET_OPTIONS "$SPACEFOX_GFX_PACK"
-  
-  # Download Splintermind Attributes HG repo
-  download_dwarf_therapist
+  # Quit if downloading failed.
+  if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	# Nothing to do; wget will recover.
+	
+	exit_with_error "Downloading $1 failed."
+  fi
 }
 
 download_dwarf_therapist () {
