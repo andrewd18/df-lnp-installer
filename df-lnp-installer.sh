@@ -397,11 +397,26 @@ download_file () {
 
 download_dwarf_therapist () {
   local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
+  local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
   
-  if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
-	hg update --cwd "$DWARF_THERAPIST_HG_DIR"
+  # Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
+  # Get the current upstream url. If the directory doesn't exist the var will contain "".
+  local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
+  
+  if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
+	# Inform the user (assuming they're paying attention)
+	echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
+	
+	# Bomb the directory, if it even existed in the first place.
+	if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
+	  rm -r "$DWARF_THERAPIST_HG_DIR"
+	fi
+	
+	# Reclone.
+	hg clone "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
   else
-	hg clone https://code.google.com/r/splintermind-attributes/ "$DWARF_THERAPIST_HG_DIR"
+	# URL is good; just get the latest changes.
+	hg update --cwd "$DWARF_THERAPIST_HG_DIR"
   fi
   
   # Quit if downloading failed.
