@@ -122,7 +122,7 @@ check_dependencies () {
   # Also store the name of the qt4 qmake binary for later
   qmake=""
   for name in "qmake" "qmake-qt4"; do
-	  if [ -n "$(which $name)" ] && $name -v | grep "Using Qt version 4" > /dev/null; then
+	  if [ -n "$(which $name)" ] && [ $($name -query QT_VERSION | cut -d . -f 1) -eq 4 ]; then
 		  qmake=$name
 		  break
 	  fi
