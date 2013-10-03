@@ -614,6 +614,7 @@ install_all () {
   install_lnp_embark_profiles
   
   install_df_lnp_logo
+  install_df_lnp_desktop_file
 }
 
 install_cla_graphics_pack () {
@@ -635,6 +636,48 @@ install_df_lnp_logo () {
 	# Let the install command handle the error cleanup here.
 	
 	exit_with_error "Installing DF LNP Logo failed."
+  fi
+}
+
+install_df_lnp_desktop_file () {
+  local LAUNCHER_DIR="$HOME/.local/share/applications"
+  local LAUNCHER_FILENAME="dwarf_fortress_lazy_newb_pack.desktop"
+  local LAUNCHER_FULL_PATH="$LAUNCHER_DIR/$LAUNCHER_FILENAME"
+  
+  local STARTLNP="$INSTALL_DIR/startlnp"
+  local LOGO="$INSTALL_DIR/DF_LNP_Logo_128.png"
+  
+  # Delete any existing, out of date launcher.
+  if [ -e "$LAUNCHER_FULL_PATH" ]; then
+	rm "$LAUNCHER_FULL_PATH"
+  fi
+  
+  # Create the launcher directory if it doesn't exist.
+  mkdir -p "$LAUNCHER_DIR"
+  
+  # Install the unedited launcher file.
+  # Assume the desktop (KDE, Gnome, etc.) follows freedesktop.org guidelines
+  # and does not require a separate program (like kbuildsyscoca4) to detect a 
+  # new desktop file.
+  install --mode=644 "$LAUNCHER_FILENAME" "$LAUNCHER_DIR/"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	# Let the install command handle the error cleanup here.
+	
+	exit_with_error "Installing DF LNP menu item failed."
+  fi
+  
+  # Edit the dwarf_fortress_lazy_newb_pack.desktop file and replace the exec and icon lines.
+  sed -i "s;Exec=path_to_startlnp;Exec=$STARTLNP;g" "$LAUNCHER_FULL_PATH"
+  sed -i "s;Icon=path_to_icon;Icon=$LOGO;g" "$LAUNCHER_FULL_PATH"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	# Clean up after ourself.
+	rm "$LAUNCHER_FULL_PATH"
+	
+	exit_with_error "Updating DF LNP menu item paths failed."
   fi
 }
 

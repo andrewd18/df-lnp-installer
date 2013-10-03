@@ -1,0 +1,14 @@
+[Desktop Entry]
+Comment=Strike the Earth!
+Exec=path_to_startlnp
+GenericName=Dwarf Fortress LNP
+Icon=path_to_icon
+Name=Dwarf Fortress Lazy Newb Pack
+NoDisplay=false
+Path[$e]=
+StartupNotify=false
+Terminal=0
+TerminalOptions=
+Type=Application
+X-KDE-SubstituteUID=false
+X-KDE-Username=
