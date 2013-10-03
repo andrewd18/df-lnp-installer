@@ -1280,7 +1280,7 @@ restore_soundsense_packs () {
 ##############
 
 # Globals.
-VERSION="0.2.4"
+VERSION="0.3.0"
 DOWNLOAD_DIR="./downloads"
 BACKUP_DIR="./df_backup"
 
