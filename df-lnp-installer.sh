@@ -612,6 +612,8 @@ install_all () {
   
   # Must come after install_vanilla_df
   install_lnp_embark_profiles
+  
+  install_df_lnp_logo
 }
 
 install_cla_graphics_pack () {
@@ -621,6 +623,19 @@ install_cla_graphics_pack () {
   local LNP_PATCH_DIR="./patches/cla_gfx"
   
   install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
+}
+
+install_df_lnp_logo () {
+  local LOGO="./DF_LNP_Logo_128.png"
+  
+  install --mode=644 "$LOGO" "$INSTALL_DIR/"
+  
+  # Quit if extracting failed.
+  if [ "$?" != "0" ]; then
+	# Let the install command handle the error cleanup here.
+	
+	exit_with_error "Installing DF LNP Logo failed."
+  fi
 }
 
 install_dfhack () {
