@@ -399,6 +399,11 @@ download_dwarf_therapist () {
   local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
   local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
   
+  # WORKAROUND:
+  # Force a checkout of revision 20.5 because 20.6 uses Qt5.
+  # Resolves issue #23.
+  local REV_20_5="4ef8173a7a94"
+  
   # Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
   # Get the current upstream url. If the directory doesn't exist the var will contain "".
   local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
@@ -413,10 +418,10 @@ download_dwarf_therapist () {
 	fi
 	
 	# Reclone.
-	hg clone "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
+	hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
   else
 	# URL is good; just get the latest changes.
-	hg update --cwd "$DWARF_THERAPIST_HG_DIR"
+	hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
   fi
   
   # Quit if downloading failed.
@@ -1280,7 +1285,7 @@ restore_soundsense_packs () {
 ##############
 
 # Globals.
-VERSION="0.3.0"
+VERSION="0.3.1"
 DOWNLOAD_DIR="./downloads"
 BACKUP_DIR="./df_backup"
 
