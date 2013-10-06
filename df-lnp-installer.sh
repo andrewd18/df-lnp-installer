@@ -281,7 +281,12 @@ check_install_dir_contains_df_install () {
 }
 
 check_ptrace_protection () {
-  local PTRACE_PROTECTION="$(cat /proc/sys/kernel/yama/ptrace_scope)"
+  local PTRACE_PROTECTION_FILE="/proc/sys/kernel/yama/ptrace_scope"
+  if [ -e $PTRACE_PROTECTION_FILE ]; then
+	  local PTRACE_PROTECTION="$(cat $PTRACE_PROTECTION_FILE)"
+  else
+	  local PTRACE_PROTECTION="0"
+  fi
   
   if [ "$PTRACE_PROTECTION" = "1" ]; then
 	# Clean up after ourself.
