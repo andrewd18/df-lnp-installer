@@ -2,7 +2,20 @@
 
 # Function declarations.
 ask_for_preferred_install_dir () {
+  # Default location
   INSTALL_DIR="$HOME/bin/Dwarf Fortress"
+
+  # Find where the last install dir is saved
+  if [ -z "$XDG_CONFIG_HOME" ]; then
+	  local XDG_CONFIG_HOME="$HOME/.config"
+  fi
+  local CONFIG_DIR="$XDG_CONFIG_HOME/df-lnp-installer"
+  local CONFIG="$CONFIG_DIR/install_dir"
+
+  # Use it again if possible
+  if [ -e "$CONFIG" ]; then
+	  INSTALL_DIR=$(cat "$CONFIG")
+  fi
 
   echo ""
   echo -n "Where should Dwarf Fortress be installed? [$INSTALL_DIR]: "
@@ -16,6 +29,10 @@ ask_for_preferred_install_dir () {
 	# Use sed and custom ; delimeter to replace the first instance of ~ with the user's home directory.
 	INSTALL_DIR=$(echo "$PREFERRED_DIR" | sed "s;~;$HOME;")
   fi
+
+  # Save install dir
+  mkdir -p "$CONFIG_DIR"
+  echo -n $INSTALL_DIR > "$CONFIG"
 }
 
 backup_df_directory () {
