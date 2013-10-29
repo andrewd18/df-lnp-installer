@@ -104,7 +104,7 @@ bugfix_all () {
 
 find_qmake_qt4 () {
   for name in "qmake" "qmake-qt4"; do
-	if [ -n "$(which $name)" ] && [ $($name -query QT_VERSION | cut -d . -f 1) -eq 4 ]; then
+	if [ -n "$(which $name)" ] && [ $($name -query QT_VERSION | cut -d . -f 1) == 4 ]; then
 		echo $name
 		break
 	fi
