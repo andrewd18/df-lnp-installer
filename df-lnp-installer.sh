@@ -5,14 +5,17 @@ ask_for_preferred_install_dir () {
 	# Default location
 	INSTALL_DIR="$HOME/bin/Dwarf Fortress"
 
-	# Find where the last install dir is saved
+	# XDG_CONFIG_HOME is supposed to be defined as part of the freedesktop.org spec
+	# but not all distros support it. Define it as $HOME/.config/ if it doesn't already exist.
 	if [ -z "$XDG_CONFIG_HOME" ]; then
 		local XDG_CONFIG_HOME="$HOME/.config"
 	fi
+
+	# Set expected location for df-lnp-installer config file.
 	local CONFIG_DIR="$XDG_CONFIG_HOME/df-lnp-installer"
 	local CONFIG="$CONFIG_DIR/install_dir"
 
-	# Use it again if possible
+	# Propose previous install location (as per config file), if possible.
 	if [ -e "$CONFIG" ]; then
 		INSTALL_DIR=$(cat "$CONFIG")
 	fi
