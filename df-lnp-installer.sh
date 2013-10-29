@@ -169,11 +169,6 @@ check_dependencies () {
 		MISSING_DEPS="${MISSING_DEPS}hg "
 	fi
 
-	# qmake (required for DwarfTherapist)
-	if [ -z "$(find_qmake_qt4)" ]; then
-		MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
-	fi
-
 	# make (required for DwarfTherapist)
 	if [ -z "$(which make)" ]; then
 		MISSING_DEPS="${MISSING_DEPS}make "
@@ -204,6 +199,11 @@ check_dependencies () {
 
 	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtScript.so\s')" ]; then
 		MISSING_DEPS="${MISSING_DEPS}libQtScript "
+	fi
+
+	# qmake (required for DwarfTherapist)
+	if [ -z "$(find_qmake_qt4)" ]; then
+		MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
 	fi
 
 	# java runtime environment (required for LNP)
