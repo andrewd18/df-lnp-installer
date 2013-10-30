@@ -318,7 +318,7 @@ copy_dest_dir_to_install_dir () {
 	echo "Copying files from $DEST_DIR to $INSTALL_DIR."
 
 	# Perform the copy.
-	cp -r "$DEST_DIR/"* "$INSTALL_DIR/"
+	cp -r "$DEST_DIR/"* "$INSTALL_DIR"
 
 	if [ "$?" != "0" ]; then
 		# Multi-line equivalent of exit_with_error.
