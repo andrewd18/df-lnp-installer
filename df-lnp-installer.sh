@@ -2,24 +2,7 @@
 
 # Function declarations.
 ask_for_preferred_install_dir () {
-	# Default location
-	INSTALL_DIR="$HOME/bin/Dwarf Fortress"
-
-	# XDG_CONFIG_HOME is supposed to be defined as part of the freedesktop.org spec
-	# but not all distros support it. Define it as $HOME/.config/ if it doesn't already exist.
-	if [ -z "$XDG_CONFIG_HOME" ]; then
-		local XDG_CONFIG_HOME="$HOME/.config"
-	fi
-
-	# Set expected location for df-lnp-installer config file.
-	local CONFIG_DIR="$XDG_CONFIG_HOME/df-lnp-installer"
-	local CONFIG="$CONFIG_DIR/install_dir"
-
-	# Propose previous install location (as per config file), if possible.
-	if [ -e "$CONFIG" ]; then
-		INSTALL_DIR=$(cat "$CONFIG")
-	fi
-
+	# Suggest either the default INSTALL_DIR or a known installation location, as set in config file.
 	echo ""
 	echo -n "Where should Dwarf Fortress be installed? [$INSTALL_DIR]: "
 
@@ -32,10 +15,6 @@ ask_for_preferred_install_dir () {
 		# Use sed and custom ; delimeter to replace the first instance of ~ with the user's home directory.
 		INSTALL_DIR=$(echo "$PREFERRED_DIR" | sed "s;~;$HOME;")
 	fi
-
-	# Save install dir
-	mkdir -p "$CONFIG_DIR"
-	echo -n $INSTALL_DIR > "$CONFIG"
 }
 
 backup_df_directory () {
@@ -1249,6 +1228,22 @@ print_version () {
 	echo "Version: $VERSION"
 }
 
+read_config_file_or_set_defaults () {
+	# Source the variables from the config file into this script, if the conf file exists and is readable.
+	#
+	# Use "." instead of "source", as apparently "source" is a bashism.
+	# You know, because using a period is so much clearer. Thanks, POSIX. <_<
+	if [ -r "$INSTALLER_CONFIG_FILE" ]; then
+		. "$INSTALLER_CONFIG_FILE"
+
+	# Either file doesn't exist or isn't readable. Set up defaults.
+	else
+		INSTALL_DIR="$HOME/bin/Dwarf Fortress"
+		DOWNLOAD_DIR="./downloads"
+		BACKUP_DIR="./df_backup"
+	fi
+}
+
 # Should only be called as part of an exit_with_error when $UPGRADE was true.
 restore_df_directory () {
 	local FOLDER_NAME="$(basename $INSTALL_DIR)"
@@ -1305,16 +1300,44 @@ restore_soundsense_packs () {
 	fi
 }
 
+save_config_file () {
+	# Bomb the existing config file, if any.
+	if [ -e "$INSTALLER_CONFIG_FILE" ]; then
+		rm "$INSTALLER_CONFIG_FILE"
+	fi
+
+	# Create folder structure.
+	mkdir -p "$INSTALLER_CONFIG_DIR"
+
+	# Create an empty config file.
+	touch "$INSTALLER_CONFIG_FILE"
+
+	# Append each var we want to save to the file.
+	echo "INSTALL_DIR=$INSTALL_DIR" >> "$INSTALLER_CONFIG_FILE"
+	echo "DOWNLOAD_DIR=$DOWNLOAD_DIR" >> "$INSTALLER_CONFIG_FILE"
+	echo "BACKUP_DIR=$BACKUP_DIR" >> "$INSTALLER_CONFIG_FILE"
+}
+
 ##############
 # "Main"
 ##############
 
 # Globals.
 VERSION="0.4.0-dev"
-DOWNLOAD_DIR="./downloads"
-BACKUP_DIR="./df_backup"
 
-# Script execution preferences.
+# XDG_CONFIG_HOME is supposed to be defined as part of the freedesktop.org spec
+# but not all distros support it. Define it as $HOME/.config/ if it doesn't already exist.
+if [ -z "$XDG_CONFIG_HOME" ]; then
+	XDG_CONFIG_HOME="$HOME/.config"
+fi
+
+INSTALLER_CONFIG_DIR="$XDG_CONFIG_HOME/df-lnp-installer"
+INSTALLER_CONFIG_FILE="$INSTALLER_CONFIG_DIR/df_lnp_installer.conf"
+
+read_config_file_or_set_defaults
+
+# Globals that shouldn't be persisted in the config file but
+# rather are dependant on script arguments.
 SKIP_DOWNLOAD=0
 SKIP_DEPS=0
 SKIP_SHA=0
@@ -1381,6 +1404,8 @@ if [ "$UPGRADE" = "1" ]; then
 	# We can delete the old install. Whew!
 	delete_backup_dir
 fi
+
+save_config_file
 
 # Strike the earth!
 echo ""
