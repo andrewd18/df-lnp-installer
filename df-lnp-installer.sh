@@ -317,6 +317,9 @@ copy_dest_dir_to_install_dir () {
 
 	echo "Copying files from $DEST_DIR to $INSTALL_DIR."
 
+	# Make the $INSTALL_DIR if it doesn't exist.
+	mkdir -p "$INSTALL_DIR"
+
 	# Perform the copy.
 	cp -r "$DEST_DIR/"* "$INSTALL_DIR"
 
