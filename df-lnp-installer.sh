@@ -1255,7 +1255,10 @@ read_config_file_or_set_defaults () {
 	fi
 
 	# Use defaults if we didn't get a variable from the config file.
-	if [ -z "$INSTALL_DIR" ]; then
+
+	# If the install directory is undefined or the config file points to a
+	# directory that no longer exists, use the default.
+	if [ -z "$INSTALL_DIR" ] || [ ! -d "$INSTALL_DIR" ]; then
 		INSTALL_DIR="$HOME/bin/Dwarf Fortress"
 	fi
 
@@ -1325,10 +1328,10 @@ save_config_file () {
 	touch "$INSTALLER_CONFIG_FILE"
 
 	# Append each var we want to save to the file.
-	echo "INSTALL_DIR=$INSTALL_DIR" >> "$INSTALLER_CONFIG_FILE"
-	echo "DOWNLOAD_DIR=$DOWNLOAD_DIR" >> "$INSTALLER_CONFIG_FILE"
-	echo "BACKUP_DIR=$BACKUP_DIR" >> "$INSTALLER_CONFIG_FILE"
-	echo "DEST_DIR=$DEST_DIR" >> "$INSTALLER_CONFIG_FILE"
+	echo "INSTALL_DIR=\"$INSTALL_DIR\"" >> "$INSTALLER_CONFIG_FILE"
+	echo "DOWNLOAD_DIR=\"$DOWNLOAD_DIR\"" >> "$INSTALLER_CONFIG_FILE"
+	echo "BACKUP_DIR=\"$BACKUP_DIR\"" >> "$INSTALLER_CONFIG_FILE"
+	echo "DEST_DIR=\"$DEST_DIR\"" >> "$INSTALLER_CONFIG_FILE"
 }
 
 ##############
