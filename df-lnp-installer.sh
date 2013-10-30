@@ -319,7 +319,18 @@ copy_dest_dir_to_install_dir () {
 	cp -r "$DEST_DIR/"* "$INSTALL_DIR/"
 
 	if [ "$?" != "0" ]; then
-		exit_with_error "Copying contents of DEST_DIR to INSTALL_DIR failed."
+		# Multi-line equivalent of exit_with_error.
+
+		echo ""
+		echo "Woah, something went wrong while copying $DEST_DIR to $INSTALL_DIR."
+		echo ""
+		echo "It's likely that $INSTALL_DIR is now a giant mess. You will need to clean this up manually."
+
+		if [ "$UPGRADE" == "1" ]; then
+			echo "Your working DF install was backed up to $INSTALL_DIR."
+		fi
+
+		exit 1
 	fi
 }
 
@@ -329,10 +340,6 @@ create_backup_dir () {
 
 create_download_dir () {
 	mkdir -p "$DOWNLOAD_DIR"
-}
-
-create_install_dir () {
-	mkdir -p "$INSTALL_DIR"
 }
 
 create_dest_dir () {
@@ -387,10 +394,6 @@ delete_backup_dir () {
 
 delete_download_dir () {
 	rm -r "$DOWNLOAD_DIR"
-}
-
-delete_install_dir () {
-	rm -r "$INSTALL_DIR"
 }
 
 delete_dest_dir () {
@@ -1264,26 +1267,6 @@ read_config_file_or_set_defaults () {
 	fi
 }
 
-restore_df_directory () {
-	local FOLDER_NAME="$(basename $INSTALL_DIR)"
-	local SOURCE="$BACKUP_DIR/$FOLDER_NAME"
-	local LS_OUTPUT="$(ls -A "$INSTALL_DIR")"
-
-	# If the $INSTALL_DIR isn't empty...
-	# then clean out the broken $INSTALL_DIR.
-	if [ -n "$LS_OUTPUT" ]; then
-		rm -r "$INSTALL_DIR/"*
-	fi
-
-	# Copy the contents of source into $INSTALL_DIR
-	cp -r "$SOURCE/"* "$INSTALL_DIR"
-
-	# Now delete the backup directory.
-	delete_backup_dir
-
-	echo "df-lnp-installer.sh: Restored your original DF installation."
-}
-
 # Should only be called as part of an $UPGRADE.
 restore_save_files () {
 	local DESTINATION="$INSTALL_DIR/df_linux/data"
@@ -1400,19 +1383,6 @@ if [ "$UPGRADE" = "1" ]; then
 else
 	check_install_dir_is_empty
 fi
-
-#
-# OLD
-#
-# If we are upgrading, backup the old DF installation (if any) and then wipe the slate clean.
-#if [ "$UPGRADE" = "1" ]; then
-#	check_install_dir_contains_df_install
-#	backup_df_directory
-#	delete_install_dir
-#fi
-#
-#create_install_dir
-#check_install_dir_is_empty
 
 # Delete temporary destination directory if necessary.
 if [ -d "$DEST_DIR" ]; then
