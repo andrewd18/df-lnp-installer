@@ -315,6 +315,8 @@ copy_dest_dir_to_install_dir () {
 		exit_with_error "Script failure. INSTALL_DIR not defined."
 	fi
 
+	echo "Copying files from $DEST_DIR to $INSTALL_DIR."
+
 	# Perform the copy.
 	cp -r "$DEST_DIR/"* "$INSTALL_DIR/"
 
@@ -326,8 +328,8 @@ copy_dest_dir_to_install_dir () {
 		echo ""
 		echo "It's likely that $INSTALL_DIR is now a giant mess. You will need to clean this up manually."
 
-		if [ "$UPGRADE" == "1" ]; then
-			echo "Your working DF install was backed up to $INSTALL_DIR."
+		if [ "$UPGRADE" = "1" ]; then
+			echo "Your working DF install was backed up to $BACKUP_DIR."
 		fi
 
 		exit 1
@@ -1284,7 +1286,7 @@ restore_save_files () {
 			exit_with_error "Restoring saved games failed."
 		fi
 	else
-		echo "No saved games found. Skipping restore."
+		echo "No saved games found. Skipping save game restore."
 	fi
 }
 
@@ -1303,7 +1305,7 @@ restore_soundsense_packs () {
 			exit_with_error "Restoring soundsense audio packs failed."
 		fi
 	else
-		echo "No soundsense packs found. Skipping restore."
+		echo "No soundsense packs found. Skipping soundsense restore."
 	fi
 }
 
