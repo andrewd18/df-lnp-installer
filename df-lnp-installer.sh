@@ -306,29 +306,101 @@ checksum_all () {
 	fi
 }
 
+copy_dest_dir_to_install_dir () {
+	if [ -z "$DEST_DIR" ]; then
+		exit_with_error "Script failure. DEST_DIR not defined."
+	fi
+
+	if [ -z "$INSTALL_DIR" ]; then
+		exit_with_error "Script failure. INSTALL_DIR not defined."
+	fi
+
+	# Perform the copy.
+	cp -r "$DEST_DIR/"* "$INSTALL_DIR/"
+
+	if [ "$?" != "0" ]; then
+		exit_with_error "Copying contents of DEST_DIR to INSTALL_DIR failed."
+	fi
+}
+
 create_backup_dir () {
 	mkdir -p "$BACKUP_DIR"
+}
+
+create_download_dir () {
+	mkdir -p "$DOWNLOAD_DIR"
 }
 
 create_install_dir () {
 	mkdir -p "$INSTALL_DIR"
 }
 
+create_dest_dir () {
+	mkdir -p "$DEST_DIR"
+}
+
+create_df_lnp_desktop_file () {
+	local LAUNCHER_DIR="$HOME/.local/share/applications"
+	local LAUNCHER_FILENAME="dwarf_fortress_lazy_newb_pack.desktop"
+	local LAUNCHER_FULL_PATH="$LAUNCHER_DIR/$LAUNCHER_FILENAME"
+
+	local STARTLNP="$INSTALL_DIR/startlnp"
+	local LOGO="$INSTALL_DIR/DF_LNP_Logo_128.png"
+
+	# Delete any existing, out of date launcher.
+	if [ -e "$LAUNCHER_FULL_PATH" ]; then
+		rm "$LAUNCHER_FULL_PATH"
+	fi
+
+	# Create the launcher directory if it doesn't exist.
+	mkdir -p "$LAUNCHER_DIR"
+
+	# Install the unedited launcher file.
+	# Assume the desktop (KDE, Gnome, etc.) follows freedesktop.org guidelines
+	# and does not require a separate program (like kbuildsyscoca4) to detect a
+	# new desktop file.
+	install --mode=644 "$LAUNCHER_FILENAME" "$LAUNCHER_DIR/"
+
+	# Quit if extracting failed.
+	if [ "$?" != "0" ]; then
+		# Let the install command handle the error cleanup here.
+
+		exit_with_error "Installing DF LNP menu item failed."
+	fi
+
+	# Edit the dwarf_fortress_lazy_newb_pack.desktop file and replace the exec and icon lines.
+	sed -i "s;Exec=path_to_startlnp;Exec=$STARTLNP;g" "$LAUNCHER_FULL_PATH"
+	sed -i "s;Icon=path_to_icon;Icon=$LOGO;g" "$LAUNCHER_FULL_PATH"
+
+	# Quit if extracting failed.
+	if [ "$?" != "0" ]; then
+		# Clean up after ourself.
+		rm "$LAUNCHER_FULL_PATH"
+
+		exit_with_error "Updating DF LNP menu item paths failed."
+	fi
+}
+
 delete_backup_dir () {
 	rm -r "$BACKUP_DIR"
+}
+
+delete_download_dir () {
+	rm -r "$DOWNLOAD_DIR"
 }
 
 delete_install_dir () {
 	rm -r "$INSTALL_DIR"
 }
 
+delete_dest_dir () {
+	rm -r "$DEST_DIR"
+}
+
 download_all () {
 	if [ -z "$DOWNLOAD_DIR" ]; then
 		exit_with_error "Script failure. DOWNLOAD_DIR undefined."
 	fi
-
-	# Set up the downloads folder if it doesn't already exist.
-	mkdir -p "$DOWNLOAD_DIR"
 
 	# Apps and utilities
 	download_file "http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
@@ -445,8 +517,8 @@ exit_with_error () {
 }
 
 fix_cla_missing_mouse_png () {
-	local CLA_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] CLA v15"
-	local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
+	local CLA_FOLDER="$DEST_DIR/LNP/graphics/[16x16] CLA v15"
+	local VANILLA_GFX_FOLDER="$DEST_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
 
 	cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$CLA_FOLDER/data/art/mouse.png"
 
@@ -461,14 +533,14 @@ fix_cla_missing_mouse_png () {
 }
 
 fix_jolly_bastion_missing_graphics_dir () {
-	local JB_FOLDER="$INSTALL_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
+	local JB_FOLDER="$DEST_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
 
 	mkdir -p "$JB_FOLDER/raw/graphics"
 }
 
 fix_jolly_bastion_missing_mouse_png () {
-	local JB_FOLDER="$INSTALL_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
-	local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
+	local JB_FOLDER="$DEST_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
+	local VANILLA_GFX_FOLDER="$DEST_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
 
 	cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$JB_FOLDER/data/art/mouse.png"
 
@@ -484,8 +556,8 @@ fix_jolly_bastion_missing_mouse_png () {
 
 fix_phoebus_missing_mouse_png () {
 	# Resolves GitHub issue #6.
-	local PHOEBUS_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
-	local VANILLA_GFX_FOLDER="$INSTALL_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
+	local PHOEBUS_FOLDER="$DEST_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
+	local VANILLA_GFX_FOLDER="$DEST_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
 
 	cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$PHOEBUS_FOLDER/data/art/mouse.png"
 
@@ -510,13 +582,13 @@ fix_soundsense_missing_gamelog () {
 	# DF often starts after soundsense does. So instead of reworking the LNP start order,
 	# I just manually create a blank one using touch.
 
-	local GAMELOG_FILE="$INSTALL_DIR/df_linux/gamelog.txt"
+	local GAMELOG_FILE="$DEST_DIR/df_linux/gamelog.txt"
 
 	# Create the gamelog.txt file.
 	touch "$GAMELOG_FILE"
 
 	# Get the XML configuration file.
-	local SS_CONFIG_FILE="$INSTALL_DIR/LNP/utilities/soundsense/configuration.xml"
+	local SS_CONFIG_FILE="$DEST_DIR/LNP/utilities/soundsense/configuration.xml"
 	local FIND_LINE_WITH="\<gamelog"
 	local TEXT_TO_REPLACE="path=\"../gamelog.txt\""
 	local REPLACE_WITH="path=\"$GAMELOG_FILE\""
@@ -547,7 +619,7 @@ fix_vanilla_df_openal_issue () {
 	local LIBSNDFILE_SO="$(/sbin/ldconfig -p | grep -P '^\tlibsndfile.so.1\s')"
 	local LIBSNDFILE_SO_32_BIT_FILENAME="$(file -L $LIBSNDFILE_SO | grep "32-bit" | cut -d: -f1)"
 
-	local VANILLA_DF_LIBS_DIR="$INSTALL_DIR/df_linux/libs"
+	local VANILLA_DF_LIBS_DIR="$DEST_DIR/df_linux/libs"
 
 	# If the file given by the filename string exists, link it.
 	if [ -e "$OPENAL_SO_32_BIT_FILENAME" ]; then
@@ -567,15 +639,15 @@ fix_vanilla_df_lnp_settings_not_applied_by_default () {
 	# This method "fixes" that by applying the expected LNP settings to the df_linux folder right from the get-go.
 
 	local LNP_PATCH_DIR="./patches/ascii_default_gfx"
-	local DF_FOLDER="$INSTALL_DIR/df_linux"
+	local DF_FOLDER="$DEST_DIR/df_linux"
 
 	patch -d "$DF_FOLDER/data/init/" < "$LNP_PATCH_DIR/init_lnp_defaults.patch"
 	patch -d "$DF_FOLDER/data/init/" < "$LNP_PATCH_DIR/dinit_lnp_defaults.patch"
 }
 
 install_all () {
-	if [ -z "$INSTALL_DIR" ]; then
-		exit_with_error "Script failure. INSTALL_DIR undefined."
+	if [ -z "$DEST_DIR" ]; then
+		exit_with_error "Script failure. DEST_DIR undefined."
 	fi
 
 	# Install in dependency-fulfilling order.
@@ -603,13 +675,12 @@ install_all () {
 	install_lnp_embark_profiles
 
 	install_df_lnp_logo
-	install_df_lnp_desktop_file
 }
 
 install_cla_graphics_pack () {
 	local GFX_PACK="$DOWNLOAD_DIR/CLA_graphic_set_v15-STANDALONE.rar"
 	local GFX_PREFIX="CLA"
-	local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] CLA v15"
+	local INSTALL_GFX_DIR="$DEST_DIR/LNP/graphics/[16x16] CLA v15"
 	local LNP_PATCH_DIR="./patches/cla_gfx"
 
 	install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
@@ -618,7 +689,7 @@ install_cla_graphics_pack () {
 install_df_lnp_logo () {
 	local LOGO="./DF_LNP_Logo_128.png"
 
-	install --mode=644 "$LOGO" "$INSTALL_DIR/"
+	install --mode=644 "$LOGO" "$DEST_DIR/"
 
 	# Quit if extracting failed.
 	if [ "$?" != "0" ]; then
@@ -628,77 +699,35 @@ install_df_lnp_logo () {
 	fi
 }
 
-install_df_lnp_desktop_file () {
-	local LAUNCHER_DIR="$HOME/.local/share/applications"
-	local LAUNCHER_FILENAME="dwarf_fortress_lazy_newb_pack.desktop"
-	local LAUNCHER_FULL_PATH="$LAUNCHER_DIR/$LAUNCHER_FILENAME"
-
-	local STARTLNP="$INSTALL_DIR/startlnp"
-	local LOGO="$INSTALL_DIR/DF_LNP_Logo_128.png"
-
-	# Delete any existing, out of date launcher.
-	if [ -e "$LAUNCHER_FULL_PATH" ]; then
-		rm "$LAUNCHER_FULL_PATH"
-	fi
-
-	# Create the launcher directory if it doesn't exist.
-	mkdir -p "$LAUNCHER_DIR"
-
-	# Install the unedited launcher file.
-	# Assume the desktop (KDE, Gnome, etc.) follows freedesktop.org guidelines
-	# and does not require a separate program (like kbuildsyscoca4) to detect a
-	# new desktop file.
-	install --mode=644 "$LAUNCHER_FILENAME" "$LAUNCHER_DIR/"
-
-	# Quit if extracting failed.
-	if [ "$?" != "0" ]; then
-		# Let the install command handle the error cleanup here.
-
-		exit_with_error "Installing DF LNP menu item failed."
-	fi
-
-	# Edit the dwarf_fortress_lazy_newb_pack.desktop file and replace the exec and icon lines.
-	sed -i "s;Exec=path_to_startlnp;Exec=$STARTLNP;g" "$LAUNCHER_FULL_PATH"
-	sed -i "s;Icon=path_to_icon;Icon=$LOGO;g" "$LAUNCHER_FULL_PATH"
-
-	# Quit if extracting failed.
-	if [ "$?" != "0" ]; then
-		# Clean up after ourself.
-		rm "$LAUNCHER_FULL_PATH"
-
-		exit_with_error "Updating DF LNP menu item paths failed."
-	fi
-}
-
 install_dfhack () {
 	local DF_HACK_TARBALL="$DOWNLOAD_DIR/dfhack-0.34.11-r3-Linux.tar.gz"
 
 	# Extract to the installation/df_linux directory.
-	tar --directory "$INSTALL_DIR/df_linux" -xzvf "$DF_HACK_TARBALL"
+	tar --directory "$DEST_DIR/df_linux" -xzvf "$DF_HACK_TARBALL"
 
 	# Quit if extracting failed.
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		# Remove folders.
-		if [ -e "$INSTALL_DIR/df_linux/hack" ]; then
-			rm -r "$INSTALL_DIR/df_linux/hack"
+		if [ -d "$DEST_DIR/df_linux/hack" ]; then
+			rm -r "$DEST_DIR/df_linux/hack"
 		fi
 
-		if [ -e "$INSTALL_DIR/df_linux/stonesense" ]; then
-			rm -r "$INSTALL_DIR/df_linux/stonesense"
+		if [ -d "$DEST_DIR/df_linux/stonesense" ]; then
+			rm -r "$DEST_DIR/df_linux/stonesense"
 		fi
 
 		# Remove executables.
-		if [ -e "$INSTALL_DIR/df_linux/dfhack" ]; then
-			rm "$INSTALL_DIR/df_linux/dfhack"
+		if [ -e "$DEST_DIR/df_linux/dfhack" ]; then
+			rm "$DEST_DIR/df_linux/dfhack"
 		fi
 
-		if [ -e "$INSTALL_DIR/df_linux/dfhack-run" ]; then
-			rm "$INSTALL_DIR/df_linux/dfhack-run"
+		if [ -e "$DEST_DIR/df_linux/dfhack-run" ]; then
+			rm "$DEST_DIR/df_linux/dfhack-run"
 		fi
 
-		if [ -e "$INSTALL_DIR/df_linux/dfhack-init.example" ]; then
-			rm "$INSTALL_DIR/df_linux/dfhack-init.example"
+		if [ -e "$DEST_DIR/df_linux/dfhack-init.example" ]; then
+			rm "$DEST_DIR/df_linux/dfhack-init.example"
 		fi
 
 		exit_with_error "Untarring DF Hack failed."
@@ -710,14 +739,14 @@ install_dwarf_therapist () {
 		exit_with_error "Script failure. DOWNLOAD_DIR undefined."
 	fi
 
-	if [ -z "$INSTALL_DIR" ]; then
-		exit_with_error "Script failure. INSTALL_DIR undefined."
+	if [ -z "$DEST_DIR" ]; then
+		exit_with_error "Script failure. DEST_DIR undefined."
 	fi
 
 	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
 	local RELEASE_DIR="$DWARF_THERAPIST_HG_DIR/bin/release"
 
-	local UTILITIES_FOLDER="$INSTALL_DIR/LNP/utilities"
+	local UTILITIES_FOLDER="$DEST_DIR/LNP/utilities"
 
 	mkdir -p "$UTILITIES_FOLDER/dwarf_therapist"
 
@@ -769,7 +798,7 @@ install_falconne_dfhack_plugins () {
 		exit_with_error "Unzipping Falconne UI plugins failed."
 	fi
 
-	local PLUGINS_DIR="$INSTALL_DIR/df_linux/hack/plugins/"
+	local PLUGINS_DIR="$DEST_DIR/df_linux/hack/plugins/"
 
 	# Copy all files from Linux/ directory to DF Hack Plugins dir.
 	cp falconne_unzip/Linux/*.so "$PLUGINS_DIR"
@@ -898,7 +927,7 @@ install_gfx_pack () {
 install_ironhand_gfx_pack () {
 	local GFX_PACK="$DOWNLOAD_DIR/Ironhand16 upgrade 0.73.4.zip"
 	local GFX_PREFIX="Dwarf Fortress"
-	local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Ironhand 0.73.4"
+	local INSTALL_GFX_DIR="$DEST_DIR/LNP/graphics/[16x16] Ironhand 0.73.4"
 	local LNP_PATCH_DIR="./patches/ironhand_gfx"
 
 	install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
@@ -907,7 +936,7 @@ install_ironhand_gfx_pack () {
 install_jolly_bastion_gfx_pack () {
 	local GFX_PACK="$DOWNLOAD_DIR/JollyBastion34-10v5.zip"
 	local GFX_PREFIX="JollyBastion34-10v5/12x12"
-	local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
+	local INSTALL_GFX_DIR="$DEST_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
 	local LNP_PATCH_DIR="./patches/jolly_bastion_gfx"
 
 	install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
@@ -917,13 +946,13 @@ install_lnp () {
 	local LNP_TARBALL="$DOWNLOAD_DIR/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
 
 	# Extract to the installation directory.
-	tar --directory "$INSTALL_DIR" -xjvf "$LNP_TARBALL"
+	tar --directory "$DEST_DIR" -xjvf "$LNP_TARBALL"
 
 	# Quit if extracting failed.
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
-		if [ -e "$INSTALL_DIR/LNP" ]; then
-			rm -r "$INSTALL_DIR/LNP"
+		if [ -e "$DEST_DIR/LNP" ]; then
+			rm -r "$DEST_DIR/LNP"
 		fi
 
 		exit_with_error "Untarring LNP failed."
@@ -932,7 +961,7 @@ install_lnp () {
 
 install_lnp_embark_profiles () {
 	local EMBARK_PROFILES="./embark_profiles.txt"
-	local DF_INIT_DIR="$INSTALL_DIR/df_linux/data/init"
+	local DF_INIT_DIR="$DEST_DIR/df_linux/data/init"
 
 	install --mode=644 "$EMBARK_PROFILES" "$DF_INIT_DIR"
 
@@ -946,7 +975,7 @@ install_lnp_embark_profiles () {
 
 install_lnp_yaml () {
 	local LNP_YAML_FILE="./lnp.yaml"
-	local LNP_DIR="$INSTALL_DIR/LNP"
+	local LNP_DIR="$DEST_DIR/LNP"
 
 	install --mode=644 "$LNP_YAML_FILE" "$LNP_DIR"
 
@@ -961,7 +990,7 @@ install_lnp_yaml () {
 install_mayday_gfx_pack () {
 	local GFX_PACK="$DOWNLOAD_DIR/Mayday 34.11.zip"
 	local GFX_PREFIX="Mayday"
-	local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Mayday 0.34.11"
+	local INSTALL_GFX_DIR="$DEST_DIR/LNP/graphics/[16x16] Mayday 0.34.11"
 	local LNP_PATCH_DIR="./patches/mayday_gfx"
 
 	install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
@@ -970,7 +999,7 @@ install_mayday_gfx_pack () {
 install_obsidian_gfx_pack () {
 	local GFX_PACK="$DOWNLOAD_DIR/[16x16] Obsidian (v.0.8).zip"
 	local GFX_PREFIX="[16x16] Obsidian"
-	local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Obsidian 0.8a"
+	local INSTALL_GFX_DIR="$DEST_DIR/LNP/graphics/[16x16] Obsidian 0.8a"
 	local LNP_PATCH_DIR="./patches/obsidian_gfx"
 
 	install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
@@ -980,7 +1009,7 @@ install_phoebus_gfx_pack () {
 	# NOTE: Cannot use install_gfx_pack method because Phoebus data/init/ folder is packed weird.
 	local GFX_PACK="$DOWNLOAD_DIR/Phoebus_34_11v01.zip"
 	local TEMP_UNZIP_DIR="./phoebus_unzip"
-	local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
+	local INSTALL_GFX_DIR="$DEST_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
 	local LNP_PATCH_DIR="./patches/phoebus_gfx"
 
 	mkdir -p "$TEMP_UNZIP_DIR"
@@ -1104,7 +1133,7 @@ install_phoebus_gfx_pack () {
 
 install_soundsense_app () {
 	local SOUNDSENSE_ZIP="$DOWNLOAD_DIR/soundSense_42_186.zip"
-	local UTILITIES_FOLDER="$INSTALL_DIR/LNP/utilities"
+	local UTILITIES_FOLDER="$DEST_DIR/LNP/utilities"
 
 	unzip -d "$UTILITIES_FOLDER" "$SOUNDSENSE_ZIP"
 
@@ -1131,7 +1160,7 @@ install_soundsense_app () {
 install_spacefox_gfx_pack () {
 	local GFX_PACK="$DOWNLOAD_DIR/[16x16] Spacefox 34.11v1.0.zip"
 	local GFX_PREFIX="[16x16] Spacefox 34.11v1.0"
-	local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] Spacefox 34.11v1.0"
+	local INSTALL_GFX_DIR="$DEST_DIR/LNP/graphics/[16x16] Spacefox 34.11v1.0"
 	local LNP_PATCH_DIR="./patches/spacefox_gfx"
 
 	install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
@@ -1141,12 +1170,12 @@ install_vanilla_df () {
 	local VANILLA_DF_TARBALL="$DOWNLOAD_DIR/df_34_11_linux.tar.bz2"
 
 	# Extract to the installation directory.
-	tar --directory "$INSTALL_DIR" -xjvf "$VANILLA_DF_TARBALL"
+	tar --directory "$DEST_DIR" -xjvf "$VANILLA_DF_TARBALL"
 
 	# Quit if extracting failed.
 	if [ "$?" != "0" ]; then
-		if [ -e "$INSTALL_DIR/df_linux" ]; then
-			rm -r "$INSTALL_DIR/df_linux"
+		if [ -d "$DEST_DIR/df_linux" ]; then
+			rm -r "$DEST_DIR/df_linux"
 		fi
 
 		exit_with_error "Untarring Vanilla DF failed."
@@ -1155,10 +1184,10 @@ install_vanilla_df () {
 
 install_vanilla_df_gfx_pack () {
 	# NOTE: Cannot use install_gfx_pack because ascii default graphics aren't in a standalone .zip or .rar.
-	local DATA_FOLDER="$INSTALL_DIR/df_linux/data"
-	local RAW_FOLDER="$INSTALL_DIR/df_linux/raw"
+	local DATA_FOLDER="$DEST_DIR/df_linux/data"
+	local RAW_FOLDER="$DEST_DIR/df_linux/raw"
 
-	local INSTALL_GFX_DIR="$INSTALL_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
+	local INSTALL_GFX_DIR="$DEST_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
 	local LNP_PATCH_DIR="./patches/ascii_default_gfx"
 
 	mkdir -p "$INSTALL_GFX_DIR"
@@ -1221,6 +1250,7 @@ read_config_file_or_set_defaults () {
 		INSTALL_DIR="$HOME/bin/Dwarf Fortress"
 		DOWNLOAD_DIR="./downloads"
 		BACKUP_DIR="./df_backup"
+		DEST_DIR="./dest_dir"
 	fi
 }
 
@@ -1297,6 +1327,7 @@ save_config_file () {
 	echo "INSTALL_DIR=$INSTALL_DIR" >> "$INSTALLER_CONFIG_FILE"
 	echo "DOWNLOAD_DIR=$DOWNLOAD_DIR" >> "$INSTALLER_CONFIG_FILE"
 	echo "BACKUP_DIR=$BACKUP_DIR" >> "$INSTALLER_CONFIG_FILE"
+	echo "DEST_DIR=$DEST_DIR" >> "$INSTALLER_CONFIG_FILE"
 }
 
 ##############
@@ -1350,15 +1381,36 @@ fi
 
 ask_for_preferred_install_dir
 
-# If we are upgrading, backup the old DF installation (if any) and then wipe the slate clean.
+# Check the preferred location for validity.
 if [ "$UPGRADE" = "1" ]; then
 	check_install_dir_contains_df_install
-	backup_df_directory
-	delete_install_dir
+else
+	check_install_dir_is_empty
 fi
 
-create_install_dir
-check_install_dir_is_empty
+#
+# OLD
+#
+# If we are upgrading, backup the old DF installation (if any) and then wipe the slate clean.
+#if [ "$UPGRADE" = "1" ]; then
+#	check_install_dir_contains_df_install
+#	backup_df_directory
+#	delete_install_dir
+#fi
+#
+#create_install_dir
+#check_install_dir_is_empty
+
+# Delete temporary destination directory if necessary.
+if [ -d "$DEST_DIR" ]; then
+	delete_dest_dir
+fi
+
+# Create our temporary destination directory.
+create_dest_dir
+
+# Make sure the download directory exists.
+create_download_dir
 
 # Download all the things!
 if [ "$SKIP_DOWNLOAD" = "0" ]; then
@@ -1370,11 +1422,24 @@ if [ "$SKIP_SHA" = "0" ]; then
 	checksum_all
 fi
 
-# Install all the things!
+# Install everything to the $DEST_DIR.
 install_all
 
 # Apply all the bug fixes!
 bugfix_all
+
+#
+# $DEST_DIR should now contain a working DF install.
+#
+
+# If we are upgrading, backup their df install.
+if [ "$UPGRADE" = "1" ]; then
+	backup_df_directory
+fi
+
+copy_dest_dir_to_install_dir
+create_df_lnp_desktop_file
+
 
 # If we upgraded, restore the save files (if any).
 if [ "$UPGRADE" = "1" ]; then
