@@ -1244,12 +1244,22 @@ read_config_file_or_set_defaults () {
 	# You know, because using a period is so much clearer. Thanks, POSIX. <_<
 	if [ -r "$INSTALLER_CONFIG_FILE" ]; then
 		. "$INSTALLER_CONFIG_FILE"
+	fi
 
-	# Either file doesn't exist or isn't readable. Set up defaults.
-	else
+	# Use defaults if we didn't get a variable from the config file.
+	if [ -z "$INSTALL_DIR" ]; then
 		INSTALL_DIR="$HOME/bin/Dwarf Fortress"
+	fi
+
+	if [ -z "$DOWNLOAD_DIR" ]; then
 		DOWNLOAD_DIR="./downloads"
+	fi
+
+	if [ -z "$BACKUP_DIR" ]; then
 		BACKUP_DIR="./df_backup"
+	fi
+
+	if [ -z "$DEST_DIR" ]; then
 		DEST_DIR="./dest_dir"
 	fi
 }
