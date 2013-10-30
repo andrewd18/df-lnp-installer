@@ -1305,19 +1305,22 @@ restore_save_files () {
 	fi
 }
 
-# Should only be called as part of an $UPGRADE.
 restore_soundsense_packs () {
 	local DESTINATION="$INSTALL_DIR/LNP/utilities/soundsense/"
 	local FOLDER_NAME="$(basename $INSTALL_DIR)"
 
 	local SOURCE="$BACKUP_DIR/$FOLDER_NAME/LNP/utilities/soundsense/packs"
 
-	# Copy the save files from the backup location to the install location.
-	cp -r "$SOURCE" "$DESTINATION"
+	if [ -d "$SOURCE" ]; then
+		# Copy the save files from the backup location to the install location.
+		cp -r "$SOURCE" "$DESTINATION"
 
-	# Quit if restoring failed.
-	if [ "$?" != "0" ]; then
-		exit_with_error "Restoring soundsense audio packs failed."
+		# Quit if restoring failed.
+		if [ "$?" != "0" ]; then
+			exit_with_error "Restoring soundsense audio packs failed."
+		fi
+	else
+		echo "No soundsense packs found. Skipping restore."
 	fi
 }
 
