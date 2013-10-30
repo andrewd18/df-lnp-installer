@@ -438,28 +438,8 @@ download_dwarf_therapist () {
 }
 
 exit_with_error () {
-	if [ "$UPGRADE" = "1" ]; then
-		# This was an upgrade.
-
-		# Only restore if the backup directory exists.
-		if [ -d "$BACKUP_DIR" ]; then
-		restore_df_directory
-
-		echo "df-lnp-installer.sh: Restored your original DF installation."
-		fi
-
-		echo ""
-		echo "df-lnp-installer.sh: $1 Exiting."
-	else
-		# This was a clean install.
-		# Remove the install directory as it's probably broken.
-		if [ -e "$INSTALL_DIR" ]; then
-		rm -r "$INSTALL_DIR"
-		fi
-
-		echo ""
-		echo "df-lnp-installer.sh: $1 Exiting."
-	fi
+	echo ""
+	echo "df-lnp-installer.sh: $1 Exiting."
 
 	exit 1
 }
@@ -1244,7 +1224,6 @@ read_config_file_or_set_defaults () {
 	fi
 }
 
-# Should only be called as part of an exit_with_error when $UPGRADE was true.
 restore_df_directory () {
 	local FOLDER_NAME="$(basename $INSTALL_DIR)"
 	local SOURCE="$BACKUP_DIR/$FOLDER_NAME"
@@ -1261,6 +1240,8 @@ restore_df_directory () {
 
 	# Now delete the backup directory.
 	delete_backup_dir
+
+	echo "df-lnp-installer.sh: Restored your original DF installation."
 }
 
 # Should only be called as part of an $UPGRADE.
