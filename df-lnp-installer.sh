@@ -473,7 +473,7 @@ fix_cla_missing_mouse_png () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$CLA_FOLDER/data/art/mouse.png" ]; then
-		rm "$CLA_FOLDER/data/art/mouse.png"
+			rm "$CLA_FOLDER/data/art/mouse.png"
 		fi
 
 		exit_with_error "Applying CLA Missing Mouse patch failed."
@@ -495,7 +495,7 @@ fix_jolly_bastion_missing_mouse_png () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$JB_FOLDER/data/art/mouse.png" ]; then
-		rm "$JB_FOLDER/data/art/mouse.png"
+			rm "$JB_FOLDER/data/art/mouse.png"
 		fi
 
 		exit_with_error "Applying Jolly Bastion Missing Mouse patch failed."
@@ -512,7 +512,7 @@ fix_phoebus_missing_mouse_png () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$PHOEBUS_FOLDER/data/art/mouse.png" ]; then
-		rm "$PHOEBUS_FOLDER/data/art/mouse.png"
+			rm "$PHOEBUS_FOLDER/data/art/mouse.png"
 		fi
 
 		exit_with_error "Applying Phoebus Missing Mouse patch failed."
@@ -571,7 +571,7 @@ fix_vanilla_df_openal_issue () {
 
 	# If the file given by the filename string exists, link it.
 	if [ -e "$OPENAL_SO_32_BIT_FILENAME" ]; then
-	ln -s "$OPENAL_SO_32_BIT_FILENAME" "$VANILLA_DF_LIBS_DIR/libopenal.so"
+		ln -s "$OPENAL_SO_32_BIT_FILENAME" "$VANILLA_DF_LIBS_DIR/libopenal.so"
 	fi
 
 	if [ -e "$LIBSNDFILE_SO_32_BIT_FILENAME" ]; then
@@ -701,24 +701,24 @@ install_dfhack () {
 		# Clean up after ourself.
 		# Remove folders.
 		if [ -e "$INSTALL_DIR/df_linux/hack" ]; then
-		rm -r "$INSTALL_DIR/df_linux/hack"
+			rm -r "$INSTALL_DIR/df_linux/hack"
 		fi
 
 		if [ -e "$INSTALL_DIR/df_linux/stonesense" ]; then
-		rm -r "$INSTALL_DIR/df_linux/stonesense"
+			rm -r "$INSTALL_DIR/df_linux/stonesense"
 		fi
 
 		# Remove executables.
 		if [ -e "$INSTALL_DIR/df_linux/dfhack" ]; then
-		rm "$INSTALL_DIR/df_linux/dfhack"
+			rm "$INSTALL_DIR/df_linux/dfhack"
 		fi
 
 		if [ -e "$INSTALL_DIR/df_linux/dfhack-run" ]; then
-		rm "$INSTALL_DIR/df_linux/dfhack-run"
+			rm "$INSTALL_DIR/df_linux/dfhack-run"
 		fi
 
 		if [ -e "$INSTALL_DIR/df_linux/dfhack-init.example" ]; then
-		rm "$INSTALL_DIR/df_linux/dfhack-init.example"
+			rm "$INSTALL_DIR/df_linux/dfhack-init.example"
 		fi
 
 		exit_with_error "Untarring DF Hack failed."
@@ -748,7 +748,7 @@ install_dwarf_therapist () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$UTILITIES_FOLDER/dwarf_therapist/" ]; then
-		rm -r "$UTILITIES_FOLDER/dwarf_therapist/"
+			rm -r "$UTILITIES_FOLDER/dwarf_therapist/"
 		fi
 
 		exit_with_error "Copying Dwarf Therapist app failed."
@@ -765,7 +765,7 @@ install_dwarf_therapist () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$UTILITIES_FOLDER/dwarf_therapist/" ]; then
-		rm -r "$UTILITIES_FOLDER/dwarf_therapist/"
+			rm -r "$UTILITIES_FOLDER/dwarf_therapist/"
 		fi
 
 		exit_with_error "Copying Dwarf Therapist ancillary files failed."
@@ -783,7 +783,7 @@ install_falconne_dfhack_plugins () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$FALCONNE_TEMP_FOLDER" ]; then
-		rm -r "$FALCONNE_TEMP_FOLDER"
+			rm -r "$FALCONNE_TEMP_FOLDER"
 		fi
 
 		exit_with_error "Unzipping Falconne UI plugins failed."
@@ -831,7 +831,7 @@ install_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		exit_with_error "Unzipping "$GFX_PACK" failed."
@@ -844,11 +844,11 @@ install_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 		exit_with_error "Installing $INSTALL_GFX_DIR/data/art failed."
@@ -861,11 +861,11 @@ install_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 		exit_with_error "Installing $INSTALL_GFX_DIR/data/init failed."
@@ -878,11 +878,11 @@ install_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 		exit_with_error "Applying $LNP_PATCH_DIR patches failed."
@@ -902,11 +902,11 @@ install_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 		exit_with_error "Installing $INSTALL_GFX_DIR raws failed."
@@ -943,7 +943,7 @@ install_lnp () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$INSTALL_DIR/LNP" ]; then
-		rm -r "$INSTALL_DIR/LNP"
+			rm -r "$INSTALL_DIR/LNP"
 		fi
 
 		exit_with_error "Untarring LNP failed."
@@ -1010,7 +1010,7 @@ install_phoebus_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 	exit_with_error "Unzipping Phoebus graphics pack failed."
@@ -1023,11 +1023,11 @@ install_phoebus_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 		exit_with_error "Installing Phoebus art failed."
@@ -1040,11 +1040,11 @@ install_phoebus_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 	exit_with_error "Installing Phoebus init failed."
@@ -1057,11 +1057,11 @@ install_phoebus_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 	exit_with_error "Installing Phoebus art failed."
@@ -1074,11 +1074,11 @@ install_phoebus_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 	exit_with_error "Installing Phoebus init failed."
@@ -1091,11 +1091,11 @@ install_phoebus_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 	exit_with_error "Applying Phoebus LNP patches failed."
@@ -1109,11 +1109,11 @@ install_phoebus_gfx_pack () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$TEMP_UNZIP_DIR" ]; then
-		rm -r "$TEMP_UNZIP_DIR"
+			rm -r "$TEMP_UNZIP_DIR"
 		fi
 
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 	exit_with_error "Installing Phoebus raws failed."
@@ -1132,7 +1132,7 @@ install_soundsense_app () {
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		if [ -e "$UTILITIES_FOLDER/soundsense" ]; then
-		rm -r "$UTILITIES_FOLDER/soundsense"
+			rm -r "$UTILITIES_FOLDER/soundsense"
 		fi
 
 		exit_with_error "Unzipping SoundSense application failed."
@@ -1166,7 +1166,7 @@ install_vanilla_df () {
 	# Quit if extracting failed.
 	if [ "$?" != "0" ]; then
 		if [ -e "$INSTALL_DIR/df_linux" ]; then
-		rm -r "$INSTALL_DIR/df_linux"
+			rm -r "$INSTALL_DIR/df_linux"
 		fi
 
 		exit_with_error "Untarring Vanilla DF failed."
@@ -1191,7 +1191,7 @@ install_vanilla_df_gfx_pack () {
 	# Quit if extracting failed.
 	if [ "$?" != "0" ]; then
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 		exit_with_error "Copying Vanilla DF graphics pack failed."
@@ -1204,7 +1204,7 @@ install_vanilla_df_gfx_pack () {
 	# Quit if patching failed.
 	if [ "$?" != "0" ]; then
 		if [ -e "$INSTALL_GFX_DIR" ]; then
-		rm -r "$INSTALL_GFX_DIR"
+			rm -r "$INSTALL_GFX_DIR"
 		fi
 
 		exit_with_error "Applying Vanilla DF graphics patches failed."
@@ -1277,7 +1277,7 @@ restore_save_files () {
 
 		# Quit if restoring failed.
 		if [ "$?" != "0" ]; then
-		exit_with_error "Restoring saved games failed."
+			exit_with_error "Restoring saved games failed."
 		fi
 	else
 		echo "No saved games found. Skipping restore."
@@ -1347,13 +1347,13 @@ UPGRADE=0
 if [ -n "$1" ]; then
 	while [ "$1" ]; do
 		case "$1" in
-		'--skip-download') SKIP_DOWNLOAD=1 ;;
-		'--skip-deps') SKIP_DEPS=1 ;;
-		'--skip-sha') SKIP_SHA=1 ;;
-		'--upgrade'|'-u') UPGRADE=1 ;;
-		'--version'|'-v') print_version; exit 0 ;;
-		'--help'|'--usage') print_usage; exit 0 ;;
-		*) echo "Unknown argument: $1"; print_usage; exit 1 ;;
+			'--skip-download') SKIP_DOWNLOAD=1 ;;
+			'--skip-deps') SKIP_DEPS=1 ;;
+			'--skip-sha') SKIP_SHA=1 ;;
+			'--upgrade'|'-u') UPGRADE=1 ;;
+			'--version'|'-v') print_version; exit 0 ;;
+			'--help'|'--usage') print_usage; exit 0 ;;
+			*) echo "Unknown argument: $1"; print_usage; exit 1 ;;
 		esac
 
 		# Shift arguments left, dropping off $1.
