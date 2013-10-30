@@ -1436,6 +1436,8 @@ if [ "$UPGRADE" = "1" ]; then
 	delete_backup_dir
 fi
 
+# Successful install! Clean up after ourselves.
+delete_dest_dir
 save_config_file
 
 # Strike the earth!
