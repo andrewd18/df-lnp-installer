@@ -437,12 +437,19 @@ download_dffi_file () {
 		exit_with_error "Script failure. download_dffi_file requires a URL argument."
 	fi
 
+	# If the user passed in --override-user-agent, then use a recent Mozilla browser UA string.
+	# See https://developer.mozilla.org/en-US/docs/Gecko_user_agent_string_reference
+	# Otherwise fall back to wget default by using a blank value.
+	if [ "$OVERRIDE_USER_AGENT" = "1" ]; then
+		local USER_AGENT_STRING="-U Mozilla/5.0"
+	fi
+
 	# -nc is "no clobber" for not overwriting files we already have.
 	# --directory-prefix drops the files into the download folder.
 	# --content-disposition asks DFFI for the actual name of the file, not the php link.
 	#   Sadly, simply asking for the filename counts as a "download" so this script will be
 	#   inflating people's DFFI download counts. Oh well.
-	local WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_DIR --content-disposition"
+	local WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_DIR --content-disposition $USER_AGENT_STRING"
 
 	# NOTE: When calling wget, don't wrap $WGET_OPTIONS in quotes; wget doesn't like it.
 
@@ -453,7 +460,7 @@ download_dffi_file () {
 		# Clean up after ourself.
 		# Nothing to do; wget will recover.
 
-		exit_with_error "Downloading $1 failed."
+		exit_with_error "Downloading $1 failed. Consider using --override-user-agent."
 	fi
 }
 
@@ -462,9 +469,16 @@ download_file () {
 		exit_with_error "Script failure. download_file requires a URL argument."
 	fi
 
+	# If the user passed in --override-user-agent, then use a recent Mozilla browser UA string.
+	# See https://developer.mozilla.org/en-US/docs/Gecko_user_agent_string_reference
+	# Otherwise fall back to wget default by using a blank value.
+	if [ "$OVERRIDE_USER_AGENT" = "1" ]; then
+		local USER_AGENT_STRING="-U Mozilla/5.0"
+	fi
+
 	# -nc is "no clobber" for not overwriting files we already have.
 	# --directory-prefix drops the files into the download folder.
-	local WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_DIR"
+	local WGET_OPTIONS="-nc --directory-prefix=$DOWNLOAD_DIR $USER_AGENT_STRING"
 
 	# NOTE: When calling wget, don't wrap $WGET_OPTIONS in quotes; wget doesn't like it.
 
@@ -475,7 +489,7 @@ download_file () {
 		# Clean up after ourself.
 		# Nothing to do; wget will recover.
 
-		exit_with_error "Downloading $1 failed."
+		exit_with_error "Downloading $1 failed. Consider using --override-user-agent."
 	fi
 }
 
@@ -498,7 +512,7 @@ download_dwarf_therapist () {
 
 		# Bomb the directory, if it even existed in the first place.
 		if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
-		rm -r "$DWARF_THERAPIST_HG_DIR"
+			rm -r "$DWARF_THERAPIST_HG_DIR"
 		fi
 
 		# Reclone.
@@ -1232,12 +1246,13 @@ print_usage () {
 	echo "Usage: df-lnp-installer.sh [OPTIONS]"
 	echo ""
 	echo "Options:"
-	echo "--skip-download  # Install using the existing contents of the ./downloads folder."
-	echo "--skip-deps      # Install without checking for dependencies."
-	echo "--skip-sha       # Install without checking file checksums."
-	echo "--upgrade, -u    # Upgrade an existing DF installation."
-	echo "--version, -v    # Print the df-lnp-installer version."
-	echo "--help, --usage  # Print this message."
+	echo "--override-user-agent  # Download files as Mozilla user agent, not Wget user agent. Useful if you get 403 errors."
+	echo "--skip-download        # Install using the existing contents of the ./downloads folder."
+	echo "--skip-deps            # Install without checking for dependencies."
+	echo "--skip-sha             # Install without checking file checksums."
+	echo "--upgrade, -u          # Upgrade an existing DF installation."
+	echo "--version, -v          # Print the df-lnp-installer version."
+	echo "--help, --usage        # Print this message."
 }
 
 print_version () {
@@ -1354,6 +1369,7 @@ read_config_file_or_set_defaults
 
 # Globals that shouldn't be persisted in the config file but
 # rather are dependant on script arguments.
+OVERRIDE_USER_AGENT=0
 SKIP_DOWNLOAD=0
 SKIP_DEPS=0
 SKIP_SHA=0
@@ -1363,6 +1379,7 @@ UPGRADE=0
 if [ -n "$1" ]; then
 	while [ "$1" ]; do
 		case "$1" in
+			'--override-user-agent') OVERRIDE_USER_AGENT=1 ;;
 			'--skip-download') SKIP_DOWNLOAD=1 ;;
 			'--skip-deps') SKIP_DEPS=1 ;;
 			'--skip-sha') SKIP_SHA=1 ;;
