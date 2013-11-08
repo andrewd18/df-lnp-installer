@@ -11,6 +11,7 @@ Included Mods
 * Falconne's DFHack UI Plugins v0.36
 * SoundSense r42 (app only)
 * Dwarf Therapist v20.5 (splintermind, pulled and built from source)
+* Various embark profiles.
 * Tilesets
   - [12x12] Jolly Bastion 34.10v5
   - [16x16] ASCII Default 0.34.11
