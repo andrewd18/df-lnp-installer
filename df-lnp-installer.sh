@@ -1354,7 +1354,7 @@ save_config_file () {
 ##############
 
 # Globals.
-VERSION="0.4.0-dev"
+VERSION="0.4.0"
 
 # XDG_CONFIG_HOME is supposed to be defined as part of the freedesktop.org spec
 # but not all distros support it. Define it as $HOME/.config/ if it doesn't already exist.
