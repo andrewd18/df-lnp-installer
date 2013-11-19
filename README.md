@@ -11,6 +11,7 @@ Included Mods
 * Falconne's DFHack UI Plugins v0.36
 * SoundSense r42 (app only)
 * Dwarf Therapist v20.5 (splintermind, pulled and built from source)
+* Various embark profiles.
 * Tilesets
   - [12x12] Jolly Bastion 34.10v5
   - [16x16] ASCII Default 0.34.11
@@ -48,7 +49,7 @@ System Requirements
 
 The df-lnp-installer script will automatically check your system for the required libraries.
 
-The Debian (and possibly Ubuntu) command to install these dependencies is: 
+The Debian (and possibly Ubuntu) command to install these dependencies is:
 ```
 sudo apt-get install default-jre libsdl1.2debian:i386 libsdl-image1.2:i386 libsdl-ttf2.0-0:i386 libglu1-mesa:i386 libgtk2.0-0:i386 libopenal1:i386 libjpeg62:i386 git mercurial libqt4-dev qt4-qmake wget coreutils tar unzip unrar make g++ gcc patch xterm sed
 ```
@@ -65,12 +66,13 @@ Usage
 Usage: df-lnp-installer.sh [OPTIONS]
 
 Options:
---skip-download  # Install using the existing contents of the ./downloads folder.
---skip-deps      # Install without checking for dependencies.
---skip-sha       # Install without checking file checksums.
---upgrade, -u    # Upgrade an existing DF installation.
---version, -v    # Print the df-lnp-installer version.
---help, --usage  # Print this message.
+--override-user-agent  # Download files as Mozilla user agent, not Wget user agent. Useful if you get 403 errors.
+--skip-download        # Install using the existing contents of the ./downloads folder.
+--skip-deps            # Install without checking for dependencies.
+--skip-sha             # Install without checking file checksums.
+--upgrade, -u          # Upgrade an existing DF installation.
+--version, -v          # Print the df-lnp-installer version.
+--help, --usage        # Print this message.
 ```
 
 Full Installation

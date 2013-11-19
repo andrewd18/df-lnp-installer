@@ -2,7 +2,7 @@ customKeybindsFiles: []
 dfDirectory: df_linux
 dfExecutable: dfhack
 folders: []
-graphicsPacks: 
+graphicsPacks:
 -  name: '[12x12] Jolly Bastion 34.10v5'
    directory: '[12x12] Jolly Bastion 34.10v5'
 -  name: '[16x16] ASCII Default 0.34.11'
@@ -22,12 +22,12 @@ graphicsPacks:
 launchDfWithTerminal: true
 links: []
 terminalPath: xterm
-utilities: 
+utilities:
 -  name: Soundsense r42
    autostart: true
    directory: soundsense/
    executable: soundSense.sh
-   showTerminal: true
+   showTerminal: false
 -  name: Dwarf Therapist
    autostart: true
    directory: dwarf_therapist/
