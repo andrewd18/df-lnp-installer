@@ -10,7 +10,9 @@ Included Mods
 * DF Hack 0.34.11-r3
 * Falconne's DFHack UI Plugins v0.36
 * SoundSense r42 (app only)
-* Dwarf Therapist v20.5 (splintermind, pulled and built from source)
+* Dwarf Therapist v20.5 (splintermind, pulled and built from source) with manual
+* Quickfort 1.01
+* Chromafort 2010-04-25
 * Various embark profiles.
 * Tilesets
   - [12x12] Jolly Bastion 34.10v5
@@ -35,6 +37,7 @@ System Requirements
 * Git
 * Mercurial (hg)
 * Qt4 Development Libraries including qmake
+* Python 2.x (for Quickfort)
 * The following fairly standard Linux utilities:
   - wget
   - sha1sum
@@ -51,12 +54,12 @@ The df-lnp-installer script will automatically check your system for the require
 
 The Debian (and possibly Ubuntu) command to install these dependencies is:
 ```
-sudo apt-get install default-jre libsdl1.2debian:i386 libsdl-image1.2:i386 libsdl-ttf2.0-0:i386 libglu1-mesa:i386 libgtk2.0-0:i386 libopenal1:i386 libjpeg62:i386 git mercurial libqt4-dev qt4-qmake wget coreutils tar unzip unrar make g++ gcc patch xterm sed
+sudo apt-get install default-jre libsdl1.2debian:i386 libsdl-image1.2:i386 libsdl-ttf2.0-0:i386 libglu1-mesa:i386 libgtk2.0-0:i386 libopenal1:i386 libjpeg62:i386 git mercurial libqt4-dev qt4-qmake wget coreutils tar unzip unrar make g++ gcc patch xterm sed python
 ```
 
 The Fedora command to install these dependencies is:
 ```
-sudo yum install java-1.7.0-openjdk gcc gcc-c++ automake libgcc.i686 git cmake glibc-devel.i686 zlib-devel.i686 perl-XML-LibXSLT perl-XML-LibXML mercurial qt.i686 libgcc.i686 qt-devel SDL.i686 SDL_image.i686 SDL_ttf.i686 gtk2.i686 mesa-libGLU.i686 openal-soft.i686 libsndfile.i686 xterm unrar unzip
+sudo yum install java-1.7.0-openjdk gcc gcc-c++ automake libgcc.i686 git cmake glibc-devel.i686 zlib-devel.i686 perl-XML-LibXSLT perl-XML-LibXML mercurial qt.i686 libgcc.i686 qt-devel SDL.i686 SDL_image.i686 SDL_ttf.i686 gtk2.i686 mesa-libGLU.i686 openal-soft.i686 libsndfile.i686 xterm unrar unzip python
 ```
 
 Usage
@@ -92,7 +95,7 @@ Upgrading an Existing Installation
 
 1. Update your git repository with `git pull`
 2. Run `./df-lnp-installer.sh --upgrade`. When asked, enter the directory you already installed DF into.
-3. Your save files and soundsense audio packs will be saved. If something goes wrong, the whole install will be reverted.
+3. Your save files and soundsense audio packs will be backed up.
 
 Common Issues
 =============
