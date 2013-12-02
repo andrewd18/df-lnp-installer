@@ -448,7 +448,6 @@ download_all () {
 	download_file "http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2182&f=Chromafort.zip"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=7905&f=DFAnnouncementFilter.zip"
-	download_dffi_file "http://dffd.wimbli.com/download.php?id=7889&f=Dwarf+Therapist.pdf"
 
 	# Graphics packs.
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
@@ -458,6 +457,14 @@ download_all () {
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=7025&f=Mayday+34.11.zip"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=7728&f=%5B16x16%5D+Obsidian+%28v.0.8%29.zip"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=7867&f=%5B16x16%5D+Spacefox+34.11v1.0.zip"
+
+	# Manuals and reference guides.
+	download_dffi_file "http://dffd.wimbli.com/download.php?id=7889&f=Dwarf+Therapist.pdf"
+	download_file "https://www.dropbox.com/sh/8akafeuqfsxth7t/etLo5xNsQH/DF%20Cheatsheet%202.1.pdf"
+	download_file "https://www.dropbox.com/sh/8akafeuqfsxth7t/6HJ5DSSy8o/DF%20Cheatsheet%20Agriculture%201.0.pdf"
+	download_file "https://www.dropbox.com/sh/8akafeuqfsxth7t/DU92mifLs-/DF%20Cheatsheet%20Military%201.1.pdf"
+	download_file "https://www.dropbox.com/sh/8akafeuqfsxth7t/DMqNnqUSEy/DF%20Cheatsheet%20Stone%201.0.pdf"
+
 
 	# Special cases.
 
@@ -745,11 +752,34 @@ install_all () {
 	install_quickfort
 	install_chromafort
 	install_df_announcement_filter
+	install_cheatsheets
 
 	# Must come after install_vanilla_df
 	install_lnp_embark_profiles
 
 	install_df_lnp_logo
+}
+
+install_cheatsheets () {
+	local UTILITIES_FOLDER="$DEST_DIR/LNP/utilities"
+	local CHEATSHEETS_FOLDER="$UTILITIES_FOLDER/cheatsheets/"
+
+	mkdir -p "$CHEATSHEETS_FOLDER"
+
+	cp "$DOWNLOAD_DIR/DF Cheatsheet 2.1.pdf" "$CHEATSHEETS_FOLDER"
+	cp "$DOWNLOAD_DIR/DF Cheatsheet Agriculture 1.0.pdf" "$CHEATSHEETS_FOLDER"
+	cp "$DOWNLOAD_DIR/DF Cheatsheet Military 1.1.pdf" "$CHEATSHEETS_FOLDER"
+	cp "$DOWNLOAD_DIR/DF Cheatsheet Stone 1.0.pdf" "$CHEATSHEETS_FOLDER"
+
+	# Quit if extracting failed.
+	if [ "$?" != "0" ]; then
+		# Clean up after ourself.
+		if [ -e "$CHEATSHEETS_FOLDER" ]; then
+			rm -r "$CHEATSHEETS_FOLDER"
+		fi
+
+		exit_with_error "Copying Cheatsheets failed."
+	fi
 }
 
 install_chromafort () {
