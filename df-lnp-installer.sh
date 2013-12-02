@@ -446,6 +446,7 @@ download_all () {
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.36-Windows-0.34.11.r3.zip.zip"
 	download_file "http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
 	download_file "http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
+	download_dffi_file "http://dffd.wimbli.com/download.php?id=2182&f=Chromafort.zip"
 
 	# Graphics packs.
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
@@ -570,7 +571,7 @@ download_quickfort () {
 
 	if [ -d "$QUICKFORT_DIR" ]; then
 		# This needs to be one unified command or else git doesn't know where the working directory is.
-		cd "$QUICKFORT_DIR" && git pull
+		( cd "$QUICKFORT_DIR" && git pull )
 	else
 		mkdir -p "$QUICKFORT_DIR"
 		git clone "$QUICKFORT_REPO_URL" "$QUICKFORT_DIR"
@@ -740,11 +741,44 @@ install_all () {
 	install_dwarf_therapist
 
 	install_quickfort
+	install_chromafort
 
 	# Must come after install_vanilla_df
 	install_lnp_embark_profiles
 
 	install_df_lnp_logo
+}
+
+install_chromafort () {
+	local CHROMAFORT_ZIP="$DOWNLOAD_DIR/Chromafort.zip"
+	local CHROMAFORT_TEMP_FOLDER="./chromafort_unzip"
+	mkdir -p "$CHROMAFORT_TEMP_FOLDER"
+
+	unzip -d "$CHROMAFORT_TEMP_FOLDER" "$CHROMAFORT_ZIP"
+
+	# Quit if extracting failed.
+	if [ "$?" != "0" ]; then
+		# Clean up after ourself.
+		if [ -e "$CHROMAFORT_TEMP_FOLDER" ]; then
+			rm -r "$CHROMAFORT_TEMP_FOLDER"
+		fi
+
+		exit_with_error "Unzipping Chromafort failed."
+	fi
+
+	local UTILITIES_FOLDER="$DEST_DIR/LNP/utilities"
+
+	mkdir -p "$UTILITIES_FOLDER/chromafort"
+
+	# Copy program and all documentation.
+	cp "$CHROMAFORT_TEMP_FOLDER/Chromafort/"* "$UTILITIES_FOLDER/chromafort/"
+
+	# Quit if copying failed.
+	if [ "$?" != "0" ]; then
+		exit_with_error "Installing Chromafort failed."
+	fi
+
+	rm -r "$CHROMAFORT_TEMP_FOLDER"
 }
 
 install_cla_graphics_pack () {
@@ -899,7 +933,7 @@ install_falconne_dfhack_plugins () {
 	local PLUGINS_DIR="$DEST_DIR/df_linux/hack/plugins/"
 
 	# Copy all files from Linux/ directory to DF Hack Plugins dir.
-	cp falconne_unzip/Linux/*.so "$PLUGINS_DIR"
+	cp "$FALCONNE_TEMP_FOLDER/Linux/"*.so "$PLUGINS_DIR"
 
 	# Quit if copying failed.
 	if [ "$?" != "0" ]; then

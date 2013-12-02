@@ -36,5 +36,10 @@ utilities:
 -  name: qfconvert 2.04
    autostart: false
    directory: qfconvert/
-   executable: qfconvert.py
+   executable: "python ./qfconvert.py"
+   showTerminal: true
+-  name: chromafort 2010-04-25
+   autostart: false
+   directory: chromafort/
+   executable: "Chromafort.jar"
    showTerminal: false
