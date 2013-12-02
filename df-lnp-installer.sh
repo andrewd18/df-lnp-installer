@@ -448,6 +448,7 @@ download_all () {
 	download_file "http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2182&f=Chromafort.zip"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=7905&f=DFAnnouncementFilter.zip"
+	download_dffi_file "http://dffd.wimbli.com/download.php?id=7889&f=Dwarf+Therapist.pdf"
 
 	# Graphics packs.
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
@@ -917,6 +918,10 @@ install_dwarf_therapist () {
 
 		exit_with_error "Copying Dwarf Therapist ancillary files failed."
 	fi
+
+	# Copy the manual.
+	local MANUAL="$DOWNLOAD_DIR/Dwarf Therapist.pdf"
+	cp "$MANUAL" "$UTILITIES_FOLDER/dwarf_therapist/"
 }
 
 install_quickfort () {
