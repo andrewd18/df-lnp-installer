@@ -200,7 +200,7 @@ check_dependencies () {
 		MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
 	fi
 
-	# java runtime environment (required for LNP and Chromafort)
+	# java runtime environment (required for LNP, Chromafort, and DF Announcement Filter)
 	if [ -z "$(which java)" ]; then
 		MISSING_DEPS="${MISSING_DEPS}java "
 	fi
@@ -447,6 +447,7 @@ download_all () {
 	download_file "http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
 	download_file "http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2182&f=Chromafort.zip"
+	download_dffi_file "http://dffd.wimbli.com/download.php?id=7905&f=DFAnnouncementFilter.zip"
 
 	# Graphics packs.
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
@@ -742,6 +743,7 @@ install_all () {
 
 	install_quickfort
 	install_chromafort
+	install_df_announcement_filter
 
 	# Must come after install_vanilla_df
 	install_lnp_embark_profiles
@@ -788,6 +790,38 @@ install_cla_graphics_pack () {
 	local LNP_PATCH_DIR="./patches/cla_gfx"
 
 	install_gfx_pack "$GFX_PACK" "$GFX_PREFIX" "$INSTALL_GFX_DIR" "$LNP_PATCH_DIR"
+}
+
+install_df_announcement_filter () {
+	local DFAF_ZIP="$DOWNLOAD_DIR/DFAnnouncementFilter.zip"
+	local DFAF_TEMP_FOLDER="./df_announcement_filter_unzip"
+	mkdir -p "$DFAF_TEMP_FOLDER"
+
+	unzip -d "$DFAF_TEMP_FOLDER" "$DFAF_ZIP"
+
+	# Quit if extracting failed.
+	if [ "$?" != "0" ]; then
+		# Clean up after ourself.
+		if [ -e "$DFAF_TEMP_FOLDER" ]; then
+			rm -r "$DFAF_TEMP_FOLDER"
+		fi
+
+		exit_with_error "Unzipping DF Announcement Filter failed."
+	fi
+
+	local UTILITIES_FOLDER="$DEST_DIR/LNP/utilities"
+
+	mkdir -p "$UTILITIES_FOLDER/df_announcement_filter"
+
+	# Copy program and all documentation.
+	cp "$DFAF_TEMP_FOLDER/"* "$UTILITIES_FOLDER/df_announcement_filter/"
+
+	# Quit if copying failed.
+	if [ "$?" != "0" ]; then
+		exit_with_error "Installing DF Announcement Filter failed."
+	fi
+
+	rm -r "$DFAF_TEMP_FOLDER"
 }
 
 install_df_lnp_logo () {

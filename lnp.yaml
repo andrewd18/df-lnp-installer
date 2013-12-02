@@ -43,3 +43,8 @@ utilities:
    directory: chromafort/
    executable: "Chromafort.jar"
    showTerminal: false
+-  name: DF Announcement Filter 1.01
+   autostart: false
+   directory: df_announcement_filter/
+   executable: "DFAnnouncementFilter.jar"
+   showTerminal: false
