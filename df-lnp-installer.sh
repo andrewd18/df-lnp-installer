@@ -266,6 +266,11 @@ check_dependencies () {
 		MISSING_DEPS="${MISSING_DEPS}python2.x "
 	fi
 
+	# git (required for Quickfort)
+	if [ -z "$(which git)" ]; then
+		MISSING_DEPS="${MISSING_DEPS}git "
+	fi
+
 	######
 	# Error if the $MISSING_DEPS string contains a value (aka there are missing dependencies).
 	######
