@@ -200,7 +200,7 @@ check_dependencies () {
 		MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
 	fi
 
-	# java runtime environment (required for LNP)
+	# java runtime environment (required for LNP and Chromafort)
 	if [ -z "$(which java)" ]; then
 		MISSING_DEPS="${MISSING_DEPS}java "
 	fi
