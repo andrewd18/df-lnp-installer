@@ -33,3 +33,8 @@ utilities:
    directory: dwarf_therapist/
    executable: DwarfTherapist
    showTerminal: false
+-  name: qfconvert 2.04
+   autostart: false
+   directory: qfconvert/
+   executable: qfconvert.py
+   showTerminal: false

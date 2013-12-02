@@ -460,6 +460,9 @@ download_all () {
 
 	# Download Splintermind Attributes HG repo
 	download_dwarf_therapist
+
+	# Download quickfort repo.
+	download_quickfort
 }
 
 download_dffi_file () {
@@ -558,6 +561,19 @@ download_dwarf_therapist () {
 		# Nothing to do; that's hg's job.
 
 		exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
+	fi
+}
+
+download_quickfort () {
+	local QUICKFORT_DIR="$DOWNLOAD_DIR/quickfort"
+	local QUICKFORT_REPO_URL="https://github.com/joelpt/quickfort.git"
+
+	if [ -d "$QUICKFORT_DIR" ]; then
+		# This needs to be one unified command or else git doesn't know where the working directory is.
+		cd "$QUICKFORT_DIR" && git pull
+	else
+		mkdir -p "$QUICKFORT_DIR"
+		git clone "$QUICKFORT_REPO_URL" "$QUICKFORT_DIR"
 	fi
 }
 
@@ -723,6 +739,8 @@ install_all () {
 	build_dwarf_therapist
 	install_dwarf_therapist
 
+	install_quickfort
+
 	# Must come after install_vanilla_df
 	install_lnp_embark_profiles
 
@@ -830,6 +848,34 @@ install_dwarf_therapist () {
 		fi
 
 		exit_with_error "Copying Dwarf Therapist ancillary files failed."
+	fi
+}
+
+install_quickfort () {
+	if [ -z "$DOWNLOAD_DIR" ]; then
+		exit_with_error "Script failure. DOWNLOAD_DIR undefined."
+	fi
+
+	if [ -z "$DEST_DIR" ]; then
+		exit_with_error "Script failure. DEST_DIR undefined."
+	fi
+
+	local QFCONVERT_DIR="$DOWNLOAD_DIR/quickfort/qfconvert"
+	local UTILITIES_FOLDER="$DEST_DIR/LNP/utilities"
+
+	mkdir -p "$UTILITIES_FOLDER/qfconvert"
+
+	# Copy files.
+	cp -r "$QFCONVERT_DIR/"* "$UTILITIES_FOLDER/qfconvert/"
+
+	# Quit if copying failed.
+	if [ "$?" != "0" ]; then
+		# Clean up after ourself.
+		if [ -e "$UTILITIES_FOLDER/qfconvert/" ]; then
+			rm -r "$UTILITIES_FOLDER/qfconvert/"
+		fi
+
+		exit_with_error "Copying qfconvert scripts failed."
 	fi
 }
 
