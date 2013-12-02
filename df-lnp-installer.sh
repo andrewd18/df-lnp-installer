@@ -84,8 +84,23 @@ bugfix_all () {
 	fix_vanilla_df_lnp_settings_not_applied_by_default
 }
 
+find_python2 () {
+	for name in "python" "python2"; do
+		# If the executable exists...
+		# and its -V output is "Python 2.x.x"...
+		# then return that executable name.
+		if [ -n "$(which $name)" ] && [ "$($name -V 2<&1 | cut -d' ' -f 2 | cut -d . -f 1)" = "2" ]; then
+			echo $name
+			break
+		fi
+	done
+}
+
 find_qmake_qt4 () {
 	for name in "qmake" "qmake-qt4"; do
+		# If the executable exists...
+		# and its -query QT_VERSION output is "4"...
+		# then return that executable name.
 		if [ -n "$(which $name)" ] && [ "$($name -query QT_VERSION | cut -d . -f 1)" = "4" ]; then
 			echo $name
 			break
@@ -244,6 +259,11 @@ check_dependencies () {
 
 	if [ -z "$LIBJPEG62_SO_32_BIT_FILENAME" ]; then
 		MISSING_DEPS="${MISSING_DEPS}libJPEG62_(32-bit) "
+	fi
+
+	# python2 (required for Quickfort)
+	if [ -z "$(find_python2)" ]; then
+		MISSING_DEPS="${MISSING_DEPS}python2.x "
 	fi
 
 	######
