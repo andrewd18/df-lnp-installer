@@ -281,6 +281,8 @@ check_install_dir_contains_df_install () {
 
 check_ptrace_protection () {
 	local PTRACE_PROTECTION_FILE="/proc/sys/kernel/yama/ptrace_scope"
+
+	# Determine if the kernel has ptrace protection compiled in.
 	if [ -e $PTRACE_PROTECTION_FILE ]; then
 		local PTRACE_PROTECTION="$(cat $PTRACE_PROTECTION_FILE)"
 	else
@@ -288,9 +290,12 @@ check_ptrace_protection () {
 	fi
 
 	if [ "$PTRACE_PROTECTION" = "1" ]; then
-		# Clean up after ourself.
-		# Nothing to do.
-		exit_with_error "Your system has ptrace protection enabled. DwarfTherapist will not operate properly. See https://github.com/andrewd18/df-lnp-installer/wiki/Dwarf-Therapist-Cannot-Connect-to-Dwarf-Fortress for more information."
+		echo ""
+		echo "Your system has ptrace protection enabled. DwarfTherapist will not operate properly."
+		echo "After installation has completed, run:"
+		echo "sudo setcap cap_sys_ptrace=ep $INSTALL_DIR/LNP/utilities/dwarf_therapist/DwarfTherapist"
+		echo ""
+		echo "See https://github.com/andrewd18/df-lnp-installer/wiki/Dwarf-Therapist-Cannot-Connect-to-Dwarf-Fortress for more information."
 	fi
 }
 
@@ -1397,7 +1402,6 @@ fi
 
 if [ "$SKIP_DEPS" = "0" ]; then
 	check_dependencies
-	check_ptrace_protection
 fi
 
 ask_for_preferred_install_dir
@@ -1458,6 +1462,9 @@ if [ "$UPGRADE" = "1" ]; then
 	# We can delete the old install. Whew!
 	delete_backup_dir
 fi
+
+# Check to see if ptrace is enabled, and complain if it is.
+check_ptrace_protection
 
 # Successful install! Clean up after ourselves.
 delete_dest_dir
