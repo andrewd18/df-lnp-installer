@@ -386,7 +386,7 @@ create_df_lnp_desktop_file () {
 	local LAUNCHER_FILENAME="dwarf_fortress_lazy_newb_pack.desktop"
 	local LAUNCHER_FULL_PATH="$LAUNCHER_DIR/$LAUNCHER_FILENAME"
 
-	local STARTLNP="$INSTALL_DIR/startlnp"
+	local STARTLNP="\"$INSTALL_DIR/startlnp\""
 	local LOGO="$INSTALL_DIR/DF_LNP_Logo_128.png"
 
 	# Delete any existing, out of date launcher.
