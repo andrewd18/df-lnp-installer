@@ -443,7 +443,7 @@ download_all () {
 	# Apps and utilities
 	download_file "http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
 	download_file "http://dethware.org/dfhack/download/dfhack-0.34.11-r3-Linux.tar.gz"
-	download_dffi_file "http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.41-Windows-0.34.11.r3.zip.zip"
+	download_dffi_file "http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.42-Windows-0.34.11.r4.zip.zip"
 	download_file "http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
 	download_file "http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2182&f=Chromafort.zip"
@@ -953,7 +953,7 @@ install_quickfort () {
 }
 
 install_falconne_dfhack_plugins () {
-	local FALCONNE_PLUGINS_ZIP="$DOWNLOAD_DIR/Utility_Plugins_v0.41-Windows-0.34.11.r3.zip.zip"
+	local FALCONNE_PLUGINS_ZIP="$DOWNLOAD_DIR/Utility_Plugins_v0.42-Windows-0.34.11.r4.zip.zip"
 	local FALCONNE_TEMP_FOLDER="./falconne_unzip"
 	mkdir -p "$FALCONNE_TEMP_FOLDER"
 
