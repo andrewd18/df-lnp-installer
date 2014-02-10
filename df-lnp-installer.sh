@@ -685,10 +685,10 @@ fix_vanilla_df_openal_issue () {
 
 	# The filename variables will be empty strings if no file exists.
 	# Otherwise they will contain the filename of the associated 32-bit library.
-	local OPENAL_SO="$(/sbin/ldconfig -p | grep -P '^\tlibopenal.so.1\s')"
+	local OPENAL_SO="$(/sbin/ldconfig -p | grep -P '^\tlibopenal.so.1')"
 	local OPENAL_SO_32_BIT_FILENAME="$(file -L $OPENAL_SO | grep "32-bit" | cut -d: -f1)"
 
-	local LIBSNDFILE_SO="$(/sbin/ldconfig -p | grep -P '^\tlibsndfile.so.1\s')"
+	local LIBSNDFILE_SO="$(/sbin/ldconfig -p | grep -P '^\tlibsndfile.so.1')"
 	local LIBSNDFILE_SO_32_BIT_FILENAME="$(file -L $LIBSNDFILE_SO | grep "32-bit" | cut -d: -f1)"
 
 	local VANILLA_DF_LIBS_DIR="$DEST_DIR/df_linux/libs"
