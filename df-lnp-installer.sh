@@ -81,6 +81,7 @@ bugfix_all () {
 	fix_phoebus_missing_mouse_png
 	fix_soundsense_missing_gamelog
 	fix_vanilla_df_openal_issue
+	fix_vanilla_df_ancient_libstdcpp
 	fix_vanilla_df_lnp_settings_not_applied_by_default
 }
 
@@ -699,6 +700,19 @@ fix_vanilla_df_openal_issue () {
 
 	if [ -e "$LIBSNDFILE_SO_32_BIT_FILENAME" ]; then
 		ln -s "$LIBSNDFILE_SO_32_BIT_FILENAME" "$VANILLA_DF_LIBS_DIR/libsndfile.so"
+	fi
+}
+
+fix_vanilla_df_ancient_libstdcpp () {
+	# There are cases, particularly on newer distros (see Arch Linux), where libstdc++ 3.4 isn't available.
+	# This function simply renames the static libstdc++ included with DF to .old,
+	# thus forcing DF to use the system library.
+
+	local VANILLA_DF_LIBS_DIR="$DEST_DIR/df_linux/libs"
+
+	# If the file given by the filename string exists and is a normal file (not a symlink), rename it.
+	if [ -f "$VANILLA_DF_LIBS_DIR/libstdc++.so" ]; then
+		mv "$VANILLA_DF_LIBS_DIR/libstdc++.so.6" "$VANILLA_DF_LIBS_DIR/libstdc++.so.6.old"
 	fi
 }
 
