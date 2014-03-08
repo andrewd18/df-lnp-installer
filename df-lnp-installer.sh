@@ -17,6 +17,31 @@ ask_for_preferred_install_dir () {
 	fi
 }
 
+ask_for_qt5 () {
+        # Check if Qt5 is installed. If not, the problem is solved.
+        if [ -n "$(find_qmake_qt5)" ]; then
+                # Ask if the user want to use Qt5
+                echo ""
+                echo -n "Do you want to use Qt5 for DwarfTherapist (necessary to use the latest version)? [Y/n]: "
+
+                read QT5
+
+                # If the user entered a answer, and this answer is no,
+                # don't use Qt5
+                if [ -n "$QT5" ] && [ "$Qt5" = "n" ]; then
+                        USE_QT5=0
+                
+                else 
+                        USE_QT5=1
+                fi
+
+        else
+                USE_QT5=0
+
+        fi
+
+}
+
 backup_df_directory () {
 	if [ -z "$INSTALL_DIR" ]; then
 		exit_with_error "Script failure: INSTALL_DIR not defined."
@@ -49,8 +74,19 @@ build_dwarf_therapist () {
 
 	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
 
-	# Create the makefile.
-	$(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
+        # Choose the good qmake version depending of the Qt version used
+        if [ "$USE_QT5" = "1" ]; then
+                QMAKE=$(find_qmake_qt5)
+        else
+                QMAKE=$(find_qmake_qt4)
+        fi
+
+        # qmake-qt5 seems to don't work if we are not in the source directory
+        # This is the only way I found to solve it
+        cd "$DWARF_THERAPIST_HG_DIR"
+
+        # Create the makefile.
+        $QMAKE 
 
 	# Quit if qmake failed.
 	if [ "$?" != "0" ]; then
@@ -58,10 +94,11 @@ build_dwarf_therapist () {
 		# Nothing to do; that's qmake's job.
 
 		exit_with_error "Compiling Dwarf Therapist failed. See QMake output above for details."
+
 	fi
 
 	# Build from the Makefile.
-	make -C "$DWARF_THERAPIST_HG_DIR"
+	make 
 
 	# Quit if building failed.
 	if [ "$?" != "0" ]; then
@@ -70,6 +107,8 @@ build_dwarf_therapist () {
 
 		exit_with_error "Compiling Dwarf Therapist failed. See Make output above for details."
 	fi
+
+        cd -
 }
 
 # One-off bugfixes that either require multiple packages to be installed first
@@ -108,6 +147,21 @@ find_qmake_qt4 () {
 		fi
 	done
 }
+
+find_qmake_qt5 () {
+	for name in "qmake" "qmake-qt5"; do
+		# If the executable exists...
+		# and its -query QT_VERSION output is "5"...
+		# then return that executable name.
+		if [ -n "$(which $name)" ] && [ "$($name -query QT_VERSION | cut -d . -f 1)" = "5" ]; then
+			#echo $name
+                        echo "qmake-qt5"
+			break
+		fi
+	done
+}
+
+
 
 check_dependencies () {
 	echo "Checking for dependencies..."
@@ -531,33 +585,55 @@ download_file () {
 }
 
 download_dwarf_therapist () {
-	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
-	local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
+        if [ "$USE_QT5" = "0"]; then
+                # If the user doesn't want the Qt5 version of DwarfTherapist,
+                # use the old version from the hg repository
 
-	# WORKAROUND:
-	# Force a checkout of revision 20.5 because 20.6 uses Qt5.
-	# Resolves issue #23.
-	local REV_20_5="4ef8173a7a94"
+                local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
+                local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
 
-	# Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
-	# Get the current upstream url. If the directory doesn't exist the var will contain "".
-	local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
+                # WORKAROUND:
+                # Force a checkout of revision 20.5 because 20.6 uses Qt5.
+                # Resolves issue #23.
+                local REV_20_5="4ef8173a7a94"
 
-	if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
-		# Inform the user (assuming they're paying attention)
-		echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
+                # Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
+                # Get the current upstream url. If the directory doesn't exist the var will contain "".
+                local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
 
-		# Bomb the directory, if it even existed in the first place.
-		if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
-			rm -r "$DWARF_THERAPIST_HG_DIR"
-		fi
+                if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
+                        # Inform the user (assuming they're paying attention)
+                        echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
 
-		# Reclone.
-		hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
-	else
-		# URL is good; just get the latest changes.
-		hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
-	fi
+                        # Bomb the directory, if it even existed in the first place.
+                        if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
+                                rm -r "$DWARF_THERAPIST_HG_DIR"
+                        fi
+
+                        # Reclone.
+                        hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
+                else
+                        # URL is good; just get the latest changes.
+                        hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
+                fi
+
+        else
+                # If the latest version can be used, use the new git repository
+                
+                local DWARF_THERAPIST_DIR="$DOWNLOAD_DIR/dwarftherapist"
+                local SPLINTERMIND_REPO_URL="https://github.com/splintermind/Dwarf-Therapist"
+
+                if [ -d "$DWARF_THERAPIST_DIR" ]; then
+                        (cd "$DWARF_THERAPIST_DIR" && git pull)
+                else
+                        mkdir -p "$DWARF_THERAPIST_DIR"
+                        git clone "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_DIR"
+                fi
+
+
+
+
+        fi
 
 	# Quit if downloading failed.
 	if [ "$?" != "0" ]; then
@@ -1510,6 +1586,7 @@ save_config_file () {
 	echo "DOWNLOAD_DIR=\"$DOWNLOAD_DIR\"" >> "$INSTALLER_CONFIG_FILE"
 	echo "BACKUP_DIR=\"$BACKUP_DIR\"" >> "$INSTALLER_CONFIG_FILE"
 	echo "DEST_DIR=\"$DEST_DIR\"" >> "$INSTALLER_CONFIG_FILE"
+        echo "USE_QT5=$USE_QT5" >> "$INSTALLER_CONFIG_FILE"
 }
 
 ##############
@@ -1534,7 +1611,7 @@ read_config_file_or_set_defaults
 # rather are dependant on script arguments.
 OVERRIDE_USER_AGENT=0
 SKIP_DOWNLOAD=0
-SKIP_DEPS=0
+SKIP_DEPS=1
 SKIP_SHA=0
 UPGRADE=0
 
@@ -1581,6 +1658,11 @@ create_dest_dir
 
 # Make sure the download directory exists.
 create_download_dir
+
+# Ask for qt5 (for Dwarf Therapist) if it is the first time.
+if [ -z "$USE_QT5"]; then
+        ask_for_qt5
+fi
 
 # Download all the things!
 if [ "$SKIP_DOWNLOAD" = "0" ]; then
@@ -1634,3 +1716,5 @@ echo "Installation successful!"
 echo "Run $INSTALL_DIR/startlnp to run the Lazy Newb Pack."
 
 exit 0
+
+# vim: sw=8:foldmethod=indent
