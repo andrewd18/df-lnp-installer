@@ -49,8 +49,9 @@ build_dwarf_therapist () {
 
 	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
 
-	# Create the makefile.
-	$(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
+        # Create the makefile
+        $(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
+
 
 	# Quit if qmake failed.
 	if [ "$?" != "0" ]; then
@@ -58,6 +59,7 @@ build_dwarf_therapist () {
 		# Nothing to do; that's qmake's job.
 
 		exit_with_error "Compiling Dwarf Therapist failed. See QMake output above for details."
+
 	fi
 
 	# Build from the Makefile.
@@ -69,6 +71,23 @@ build_dwarf_therapist () {
 		# Nothing to do; that's Make's job.
 
 		exit_with_error "Compiling Dwarf Therapist failed. See Make output above for details."
+	fi
+}
+
+build_dwarf_fortress_unfunck () {
+	if [ -z "$DOWNLOAD_DIR" ]; then
+		exit_with_error "Script failure. DOWNLOAD_DIR undefined."
+	fi
+
+	local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
+
+        make -C "$DF_UNFUNCK_DIR"
+
+	if [ "$?" != "0" ]; then
+		# Clean up after ourself.
+		# Nothing to do; that's Make's job.
+
+		exit_with_error "Compiling dwarf_fortress_unfunck failed. See Make output above for details."
 	fi
 }
 
@@ -283,6 +302,20 @@ check_dependencies () {
 
 		exit_with_error "Your computer is missing the following programs or libraries: $MISSING_DEPS. Install them using your distribution's package manager or use --skip-deps to override."
 	fi
+
+}
+
+check_libpng_version () {
+        # Check for libpng version 1.5; must be 32 bit
+	local LIBPNG15_SO="$(/sbin/ldconfig -p | grep -P '^\tlibpng15.so' | sed 's/^[>]*> //')"
+        # Don't print the errors (if the file doesn't exist)
+	local LIBPNG15_SO_32_BIT="$(file -L $LIBPNG15_SO 2> /dev/null | grep "32-bit" | cut -d: -f1)"
+
+        # If libpng15 is not installed (for example if libpng16 is used), we have to recompile the libgraphics of DF
+	if [ -z "$LIBPNG15_SO_32_BIT" ]; then
+		USE_FREE_LIBS=1
+	fi
+
 }
 
 check_install_dir_is_empty () {
@@ -304,7 +337,7 @@ check_install_dir_contains_df_install () {
 
 	if [ ! -d "$INSTALL_DIR/LNP" ]; then
 		exit_with_error "Cannot upgrade. $INSTALL_DIR does not contain an LNP folder."
-	fi
+        fi
 }
 
 check_ptrace_protection () {
@@ -324,7 +357,7 @@ check_ptrace_protection () {
 		echo "sudo setcap cap_sys_ptrace=ep $INSTALL_DIR/LNP/utilities/dwarf_therapist/DwarfTherapist"
 		echo ""
 		echo "See https://github.com/andrewd18/df-lnp-installer/wiki/Dwarf-Therapist-Cannot-Connect-to-Dwarf-Fortress for more information."
-	fi
+        fi
 }
 
 checksum_all () {
@@ -469,6 +502,10 @@ download_all () {
 
 	# Download quickfort repo.
 	download_quickfort
+
+        if [ "$USE_FREE_LIBS" = "1" ]; then
+                download_dwarf_fortress_unfunck
+        fi
 }
 
 download_dffi_file () {
@@ -533,83 +570,98 @@ download_file () {
 }
 
 download_dwarf_therapist () {
-	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
-	local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
+        local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
+        local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
 
-	# WORKAROUND:
-	# Force a checkout of revision 20.5 because 20.6 uses Qt5.
-	# Resolves issue #23.
-	local REV_20_5="4ef8173a7a94"
+        # WORKAROUND:
+        # Force a checkout of revision 20.5 because 20.6 uses Qt5.
+        # Resolves issue #23.
+        local REV_20_5="4ef8173a7a94"
 
-	# Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
-	# Get the current upstream url. If the directory doesn't exist the var will contain "".
-	local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
+        # Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
+        # Get the current upstream url. If the directory doesn't exist the var will contain "".
+        local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
 
-	if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
-		# Inform the user (assuming they're paying attention)
-		echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
+        if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
+                # Inform the user (assuming they're paying attention)
+                echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
 
-		# Bomb the directory, if it even existed in the first place.
-		if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
-			rm -r "$DWARF_THERAPIST_HG_DIR"
-		fi
+                # Bomb the directory, if it even existed in the first place.
+                if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
+                        rm -r "$DWARF_THERAPIST_HG_DIR"
+                fi
 
-		# Reclone.
-		hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
-	else
-		# URL is good; just get the latest changes.
-		hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
-	fi
+                # Reclone.
+                hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
+        else
+                # URL is good; just get the latest changes.
+                hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
+        fi
 
-	# Quit if downloading failed.
-	if [ "$?" != "0" ]; then
-		# Clean up after ourself.
-		# Nothing to do; that's hg's job.
 
-		exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
-	fi
+        # Quit if downloading failed.
+        if [ "$?" != "0" ]; then
+                # Clean up after ourself.
+                # Nothing to do; that's hg's job.
+
+                exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
+        fi
+}
+
+download_dwarf_fortress_unfunck () {
+        local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
+        local DF_UNFUNCK_REPO_URL="https://github.com/svenstaro/dwarf_fortress_unfuck"
+
+        if [ -d "$DF_UNFUNCK_DIR" ]; then
+                # This needs to be one unified command or else git doesn't know where the working directory is.
+                ( cd "$DF_UNFUNCK_DIR" && git pull )
+        else
+                mkdir -p "$DF_UNFUNCK_DIR"
+                git clone "$DF_UNFUNCK_REPO_URL" "$DF_UNFUNCK_DIR"
+
+        fi
 }
 
 download_quickfort () {
-	local QUICKFORT_DIR="$DOWNLOAD_DIR/quickfort"
-	local QUICKFORT_REPO_URL="https://github.com/joelpt/quickfort.git"
+        local QUICKFORT_DIR="$DOWNLOAD_DIR/quickfort"
+        local QUICKFORT_REPO_URL="https://github.com/joelpt/quickfort.git"
 
-	if [ -d "$QUICKFORT_DIR" ]; then
-		# This needs to be one unified command or else git doesn't know where the working directory is.
-		( cd "$QUICKFORT_DIR" && git pull )
-	else
-		mkdir -p "$QUICKFORT_DIR"
-		git clone "$QUICKFORT_REPO_URL" "$QUICKFORT_DIR"
-	fi
+        if [ -d "$QUICKFORT_DIR" ]; then
+                # This needs to be one unified command or else git doesn't know where the working directory is.
+                ( cd "$QUICKFORT_DIR" && git pull )
+        else
+                mkdir -p "$QUICKFORT_DIR"
+                git clone "$QUICKFORT_REPO_URL" "$QUICKFORT_DIR"
+        fi
 }
 
 exit_with_error () {
-	echo ""
-	echo "df-lnp-installer.sh: $1 Exiting."
+        echo ""
+        echo "df-lnp-installer.sh: $1 Exiting."
 
-	exit 1
+        exit 1
 }
 
 fix_cla_missing_mouse_png () {
-	local CLA_FOLDER="$DEST_DIR/LNP/graphics/[16x16] CLA v15"
-	local VANILLA_GFX_FOLDER="$DEST_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
+        local CLA_FOLDER="$DEST_DIR/LNP/graphics/[16x16] CLA v15"
+        local VANILLA_GFX_FOLDER="$DEST_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
 
-	cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$CLA_FOLDER/data/art/mouse.png"
+        cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$CLA_FOLDER/data/art/mouse.png"
 
-	if [ "$?" != "0" ]; then
-		# Clean up after ourself.
-		if [ -e "$CLA_FOLDER/data/art/mouse.png" ]; then
-			rm "$CLA_FOLDER/data/art/mouse.png"
-		fi
+        if [ "$?" != "0" ]; then
+                # Clean up after ourself.
+                if [ -e "$CLA_FOLDER/data/art/mouse.png" ]; then
+                        rm "$CLA_FOLDER/data/art/mouse.png"
+                fi
 
-		exit_with_error "Applying CLA Missing Mouse patch failed."
-	fi
+                exit_with_error "Applying CLA Missing Mouse patch failed."
+        fi
 }
 
 fix_jolly_bastion_missing_graphics_dir () {
-	local JB_FOLDER="$DEST_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
+        local JB_FOLDER="$DEST_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
 
-	mkdir -p "$JB_FOLDER/raw/graphics"
+        mkdir -p "$JB_FOLDER/raw/graphics"
 }
 
 fix_jolly_bastion_missing_mouse_png () {
@@ -780,6 +832,12 @@ install_all () {
 
 	# Must come after install_vanilla_df
 	install_lnp_embark_profiles
+
+        # Idem
+        if [ "$USE_FREE_LIBS" = "1" ]; then
+                build_dwarf_fortress_unfunck
+                install_dwarf_fortress_unfunck
+        fi
 
 	install_df_lnp_logo
 }
@@ -954,6 +1012,38 @@ install_dwarf_therapist () {
 	# Copy the manual.
 	local MANUAL="$DOWNLOAD_DIR/Dwarf Therapist.pdf"
 	cp "$MANUAL" "$UTILITIES_FOLDER/dwarf_therapist/"
+}
+
+install_dwarf_fortress_unfunck () {
+	if [ -z "$DOWNLOAD_DIR" ]; then
+		exit_with_error "Script failure. DOWNLOAD_DIR undefined."
+	fi
+
+	if [ -z "$DEST_DIR" ]; then
+		exit_with_error "Script failure. DEST_DIR undefined."
+	fi
+
+	local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
+        
+        local LIBS_DIR="$DEST_DIR/df_linux/libs/"
+
+        # Copy libgraphics.so
+        echo "Installing libgraphics.so"
+        cp "$DF_UNFUNCK_DIR/libs/libgraphics.so" "$LIBS_DIR/libgraphics.so"
+
+	# Quit if copying failed.
+	if [ "$?" != "0" ]; then
+		exit_with_error "Replacing libgraphics.so failed."
+	fi
+
+        rm "$LIBS_DIR/libstdc++.so.6"
+
+	# Quit if deleting failed.
+	if [ "$?" != "0" ]; then
+		exit_with_error "Deleting libgraphics.so failed."
+	fi
+
+
 }
 
 install_quickfort () {
@@ -1432,6 +1522,7 @@ print_usage () {
 	echo "--skip-deps            # Install without checking for dependencies."
 	echo "--skip-sha             # Install without checking file checksums."
 	echo "--upgrade, -u          # Upgrade an existing DF installation."
+        echo "--use-free-libs        # Force to use free graphic libs to solve \"Not found\" errors of DF"
 	echo "--version, -v          # Print the df-lnp-installer version."
 	echo "--help, --usage        # Print this message."
 }
@@ -1555,6 +1646,7 @@ SKIP_DOWNLOAD=0
 SKIP_DEPS=0
 SKIP_SHA=0
 UPGRADE=0
+USE_FREE_LIBS=0
 
 # If the user passed in arguments, parse them, otherwise assume "do everything".
 if [ -n "$1" ]; then
@@ -1565,6 +1657,7 @@ if [ -n "$1" ]; then
 			'--skip-deps') SKIP_DEPS=1 ;;
 			'--skip-sha') SKIP_SHA=1 ;;
 			'--upgrade'|'-u') UPGRADE=1 ;;
+                        '--use-free-libs') USE_FREE_LIBS=1 ;;
 			'--version'|'-v') print_version; exit 0 ;;
 			'--help'|'--usage') print_usage; exit 0 ;;
 			*) echo "Unknown argument: $1"; print_usage; exit 1 ;;
@@ -1579,6 +1672,8 @@ fi
 if [ "$SKIP_DEPS" = "0" ]; then
 	check_dependencies
 fi
+
+check_libpng_version
 
 ask_for_preferred_install_dir
 
