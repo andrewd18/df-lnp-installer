@@ -585,7 +585,7 @@ download_file () {
 }
 
 download_dwarf_therapist () {
-        if [ "$USE_QT5" = "0"]; then
+        if [ "$USE_QT5" = "0" ]; then
                 # If the user doesn't want the Qt5 version of DwarfTherapist,
                 # use the old version from the hg repository
 
@@ -1660,7 +1660,7 @@ create_dest_dir
 create_download_dir
 
 # Ask for qt5 (for Dwarf Therapist) if it is the first time.
-if [ -z "$USE_QT5"]; then
+if [ -z "$USE_QT5" ]; then
         ask_for_qt5
 fi
 
