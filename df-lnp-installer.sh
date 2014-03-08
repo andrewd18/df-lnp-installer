@@ -1611,7 +1611,7 @@ read_config_file_or_set_defaults
 # rather are dependant on script arguments.
 OVERRIDE_USER_AGENT=0
 SKIP_DOWNLOAD=0
-SKIP_DEPS=1
+SKIP_DEPS=0
 SKIP_SHA=0
 UPGRADE=0
 
@@ -1717,4 +1717,3 @@ echo "Run $INSTALL_DIR/startlnp to run the Lazy Newb Pack."
 
 exit 0
 
-# vim: sw=8:foldmethod=indent
