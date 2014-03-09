@@ -18,28 +18,27 @@ ask_for_preferred_install_dir () {
 }
 
 ask_for_qt5 () {
-        # Check if Qt5 is installed. If not, the problem is solved.
-        if [ -n "$(find_qmake_qt5)" ]; then
-                # Ask if the user want to use Qt5
-                echo ""
-                echo -n "Do you want to use Qt5 for DwarfTherapist (necessary to use the latest version)? [Y/n]: "
+	# Check if Qt5 is installed. If not, the problem is solved.
+	if [ -n "$(find_qmake_qt5)" ]; then
+		# Ask if the user want to use Qt5
+		echo ""
+		echo -n "Do you want to use Qt5 for DwarfTherapist (necessary to use the latest version)? [Y/n]: "
 
-                read QT5
+		read QT5
 
-                # If the user entered a answer, and this answer is no,
-                # don't use Qt5
-                if [ -n "$QT5" ] && [ "$Qt5" = "n" ]; then
-                        USE_QT5=0
-                
-                else 
-                        USE_QT5=1
-                fi
+		# If the user entered a answer, and this answer is no,
+		# don't use Qt5
+		if [ -n "$QT5" ] && [ "$Qt5" = "n" ]; then
+			USE_QT5=0
+		
+		else 
+			USE_QT5=1
+		fi
 
-        else
-                USE_QT5=0
+	else
+		USE_QT5=0
 
-        fi
-
+	fi
 }
 
 backup_df_directory () {
@@ -74,19 +73,19 @@ build_dwarf_therapist () {
 
 	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
 
-        # Choose the good qmake version depending of the Qt version used
-        if [ "$USE_QT5" = "1" ]; then
-                QMAKE=$(find_qmake_qt5)
-        else
-                QMAKE=$(find_qmake_qt4)
-        fi
+	# Choose the good qmake version depending of the Qt version used
+	if [ "$USE_QT5" = "1" ]; then
+		QMAKE=$(find_qmake_qt5)
+	else
+		QMAKE=$(find_qmake_qt4)
+	fi
 
-        # qmake-qt5 seems to don't work if we are not in the source directory
-        # This is the only way I found to solve it
-        cd "$DWARF_THERAPIST_HG_DIR"
+	# qmake-qt5 seems to don't work if we are not in the source directory
+	# This is the only way I found to solve it
+	cd "$DWARF_THERAPIST_HG_DIR"
 
-        # Create the makefile.
-        $QMAKE 
+	# Create the makefile.
+	$QMAKE 
 
 	# Quit if qmake failed.
 	if [ "$?" != "0" ]; then
@@ -94,7 +93,6 @@ build_dwarf_therapist () {
 		# Nothing to do; that's qmake's job.
 
 		exit_with_error "Compiling Dwarf Therapist failed. See QMake output above for details."
-
 	fi
 
 	# Build from the Makefile.
@@ -108,7 +106,7 @@ build_dwarf_therapist () {
 		exit_with_error "Compiling Dwarf Therapist failed. See Make output above for details."
 	fi
 
-        cd -
+	cd -
 }
 
 # One-off bugfixes that either require multiple packages to be installed first
@@ -155,7 +153,7 @@ find_qmake_qt5 () {
 		# then return that executable name.
 		if [ -n "$(which $name)" ] && [ "$($name -query QT_VERSION | cut -d . -f 1)" = "5" ]; then
 			#echo $name
-                        echo "qmake-qt5"
+			echo "qmake-qt5"
 			break
 		fi
 	done
@@ -585,55 +583,55 @@ download_file () {
 }
 
 download_dwarf_therapist () {
-        if [ "$USE_QT5" = "0" ]; then
-                # If the user doesn't want the Qt5 version of DwarfTherapist,
-                # use the old version from the hg repository
+	if [ "$USE_QT5" = "0" ]; then
+		# If the user doesn't want the Qt5 version of DwarfTherapist,
+		# use the old version from the hg repository
 
-                local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
-                local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
+		local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
+		local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
 
-                # WORKAROUND:
-                # Force a checkout of revision 20.5 because 20.6 uses Qt5.
-                # Resolves issue #23.
-                local REV_20_5="4ef8173a7a94"
+		# WORKAROUND:
+		# Force a checkout of revision 20.5 because 20.6 uses Qt5.
+		# Resolves issue #23.
+		local REV_20_5="4ef8173a7a94"
 
-                # Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
-                # Get the current upstream url. If the directory doesn't exist the var will contain "".
-                local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
+		# Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
+		# Get the current upstream url. If the directory doesn't exist the var will contain "".
+		local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
 
-                if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
-                        # Inform the user (assuming they're paying attention)
-                        echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
+		if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
+			# Inform the user (assuming they're paying attention)
+			echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
 
-                        # Bomb the directory, if it even existed in the first place.
-                        if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
-                                rm -r "$DWARF_THERAPIST_HG_DIR"
-                        fi
+			# Bomb the directory, if it even existed in the first place.
+			if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
+				rm -r "$DWARF_THERAPIST_HG_DIR"
+			fi
 
-                        # Reclone.
-                        hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
-                else
-                        # URL is good; just get the latest changes.
-                        hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
-                fi
+			# Reclone.
+			hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
+		else
+			# URL is good; just get the latest changes.
+			hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
+		fi
 
-        else
-                # If the latest version can be used, use the new git repository
-                
-                local DWARF_THERAPIST_DIR="$DOWNLOAD_DIR/dwarftherapist"
-                local SPLINTERMIND_REPO_URL="https://github.com/splintermind/Dwarf-Therapist"
+	else
+		# If the latest version can be used, use the new git repository
+		
+		local DWARF_THERAPIST_DIR="$DOWNLOAD_DIR/dwarftherapist"
+		local SPLINTERMIND_REPO_URL="https://github.com/splintermind/Dwarf-Therapist"
 
-                if [ -d "$DWARF_THERAPIST_DIR" ]; then
-                        (cd "$DWARF_THERAPIST_DIR" && git pull)
-                else
-                        mkdir -p "$DWARF_THERAPIST_DIR"
-                        git clone "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_DIR"
-                fi
-
-
+		if [ -d "$DWARF_THERAPIST_DIR" ]; then
+			(cd "$DWARF_THERAPIST_DIR" && git pull)
+		else
+			mkdir -p "$DWARF_THERAPIST_DIR"
+			git clone "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_DIR"
+		fi
 
 
-        fi
+
+
+	fi
 
 	# Quit if downloading failed.
 	if [ "$?" != "0" ]; then
@@ -642,9 +640,9 @@ download_dwarf_therapist () {
 
 		exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
 	fi
-}
+	}
 
-download_quickfort () {
+	download_quickfort () {
 	local QUICKFORT_DIR="$DOWNLOAD_DIR/quickfort"
 	local QUICKFORT_REPO_URL="https://github.com/joelpt/quickfort.git"
 
@@ -1486,12 +1484,12 @@ print_usage () {
 	echo ""
 	echo "Options:"
 	echo "--override-user-agent  # Download files as Mozilla user agent, not Wget user agent. Useful if you get 403 errors."
-	echo "--skip-download        # Install using the existing contents of the ./downloads folder."
-	echo "--skip-deps            # Install without checking for dependencies."
-	echo "--skip-sha             # Install without checking file checksums."
-	echo "--upgrade, -u          # Upgrade an existing DF installation."
-	echo "--version, -v          # Print the df-lnp-installer version."
-	echo "--help, --usage        # Print this message."
+	echo "--skip-download	     # Install using the existing contents of the ./downloads folder."
+	echo "--skip-deps	     # Install without checking for dependencies."
+	echo "--skip-sha	     # Install without checking file checksums."
+	echo "--upgrade, -u	     # Upgrade an existing DF installation."
+	echo "--version, -v	     # Print the df-lnp-installer version."
+	echo "--help, --usage	     # Print this message."
 }
 
 print_version () {
@@ -1586,7 +1584,7 @@ save_config_file () {
 	echo "DOWNLOAD_DIR=\"$DOWNLOAD_DIR\"" >> "$INSTALLER_CONFIG_FILE"
 	echo "BACKUP_DIR=\"$BACKUP_DIR\"" >> "$INSTALLER_CONFIG_FILE"
 	echo "DEST_DIR=\"$DEST_DIR\"" >> "$INSTALLER_CONFIG_FILE"
-        echo "USE_QT5=$USE_QT5" >> "$INSTALLER_CONFIG_FILE"
+	echo "USE_QT5=\"$USE_QT5\"" >> "$INSTALLER_CONFIG_FILE"
 }
 
 ##############
@@ -1661,7 +1659,7 @@ create_download_dir
 
 # Ask for qt5 (for Dwarf Therapist) if it is the first time.
 if [ -z "$USE_QT5" ]; then
-        ask_for_qt5
+	ask_for_qt5
 fi
 
 # Download all the things!
@@ -1716,4 +1714,3 @@ echo "Installation successful!"
 echo "Run $INSTALL_DIR/startlnp to run the Lazy Newb Pack."
 
 exit 0
-
