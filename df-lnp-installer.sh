@@ -49,9 +49,8 @@ build_dwarf_therapist () {
 
 	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
 
-        # Create the makefile
-        $(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
-
+	# Create the makefile
+	$(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
 
 	# Quit if qmake failed.
 	if [ "$?" != "0" ]; then
@@ -59,7 +58,6 @@ build_dwarf_therapist () {
 		# Nothing to do; that's qmake's job.
 
 		exit_with_error "Compiling Dwarf Therapist failed. See QMake output above for details."
-
 	fi
 
 	# Build from the Makefile.
@@ -300,7 +298,6 @@ check_dependencies () {
 
 		exit_with_error "Your computer is missing the following programs or libraries: $MISSING_DEPS. Install them using your distribution's package manager or use --skip-deps to override."
 	fi
-
 }
 
 check_libpng_version () {
@@ -335,7 +332,7 @@ check_install_dir_contains_df_install () {
 
 	if [ ! -d "$INSTALL_DIR/LNP" ]; then
 		exit_with_error "Cannot upgrade. $INSTALL_DIR does not contain an LNP folder."
-        fi
+	fi
 }
 
 check_ptrace_protection () {
@@ -355,7 +352,7 @@ check_ptrace_protection () {
 		echo "sudo setcap cap_sys_ptrace=ep $INSTALL_DIR/LNP/utilities/dwarf_therapist/DwarfTherapist"
 		echo ""
 		echo "See https://github.com/andrewd18/df-lnp-installer/wiki/Dwarf-Therapist-Cannot-Connect-to-Dwarf-Fortress for more information."
-        fi
+	fi
 }
 
 checksum_all () {
@@ -568,98 +565,98 @@ download_file () {
 }
 
 download_dwarf_therapist () {
-        local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
-        local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
+	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
+	local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
 
-        # WORKAROUND:
-        # Force a checkout of revision 20.5 because 20.6 uses Qt5.
-        # Resolves issue #23.
-        local REV_20_5="4ef8173a7a94"
+	# WORKAROUND:
+	# Force a checkout of revision 20.5 because 20.6 uses Qt5.
+	# Resolves issue #23.
+	local REV_20_5="4ef8173a7a94"
 
-        # Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
-        # Get the current upstream url. If the directory doesn't exist the var will contain "".
-        local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
+	# Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
+	# Get the current upstream url. If the directory doesn't exist the var will contain "".
+	local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
 
-        if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
-                # Inform the user (assuming they're paying attention)
-                echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
+	if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
+		# Inform the user (assuming they're paying attention)
+		echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
 
-                # Bomb the directory, if it even existed in the first place.
-                if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
-                        rm -r "$DWARF_THERAPIST_HG_DIR"
-                fi
+		# Bomb the directory, if it even existed in the first place.
+		if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
+			rm -r "$DWARF_THERAPIST_HG_DIR"
+		fi
 
-                # Reclone.
-                hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
-        else
-                # URL is good; just get the latest changes.
-                hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
-        fi
+		# Reclone.
+		hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
+	else
+		# URL is good; just get the latest changes.
+		hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
+	fi
 
 
-        # Quit if downloading failed.
-        if [ "$?" != "0" ]; then
-                # Clean up after ourself.
-                # Nothing to do; that's hg's job.
+	# Quit if downloading failed.
+	if [ "$?" != "0" ]; then
+		# Clean up after ourself.
+		# Nothing to do; that's hg's job.
 
-                exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
-        fi
+		exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
+	fi
 }
 
 download_dwarf_fortress_unfunck () {
-        local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
-        local DF_UNFUNCK_REPO_URL="https://github.com/svenstaro/dwarf_fortress_unfuck"
+	local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
+	local DF_UNFUNCK_REPO_URL="https://github.com/svenstaro/dwarf_fortress_unfuck"
 
-        if [ -d "$DF_UNFUNCK_DIR" ]; then
-                # This needs to be one unified command or else git doesn't know where the working directory is.
-                ( cd "$DF_UNFUNCK_DIR" && git pull )
-        else
-                mkdir -p "$DF_UNFUNCK_DIR"
-                git clone "$DF_UNFUNCK_REPO_URL" "$DF_UNFUNCK_DIR"
+	if [ -d "$DF_UNFUNCK_DIR" ]; then
+		# This needs to be one unified command or else git doesn't know where the working directory is.
+		( cd "$DF_UNFUNCK_DIR" && git pull )
+	else
+		mkdir -p "$DF_UNFUNCK_DIR"
+		git clone "$DF_UNFUNCK_REPO_URL" "$DF_UNFUNCK_DIR"
 
-        fi
+	fi
 }
 
 download_quickfort () {
-        local QUICKFORT_DIR="$DOWNLOAD_DIR/quickfort"
-        local QUICKFORT_REPO_URL="https://github.com/joelpt/quickfort.git"
+	local QUICKFORT_DIR="$DOWNLOAD_DIR/quickfort"
+	local QUICKFORT_REPO_URL="https://github.com/joelpt/quickfort.git"
 
-        if [ -d "$QUICKFORT_DIR" ]; then
-                # This needs to be one unified command or else git doesn't know where the working directory is.
-                ( cd "$QUICKFORT_DIR" && git pull )
-        else
-                mkdir -p "$QUICKFORT_DIR"
-                git clone "$QUICKFORT_REPO_URL" "$QUICKFORT_DIR"
-        fi
+	if [ -d "$QUICKFORT_DIR" ]; then
+		# This needs to be one unified command or else git doesn't know where the working directory is.
+		( cd "$QUICKFORT_DIR" && git pull )
+	else
+		mkdir -p "$QUICKFORT_DIR"
+		git clone "$QUICKFORT_REPO_URL" "$QUICKFORT_DIR"
+	fi
 }
 
 exit_with_error () {
-        echo ""
-        echo "df-lnp-installer.sh: $1 Exiting."
+	echo ""
+	echo "df-lnp-installer.sh: $1 Exiting."
 
-        exit 1
+	exit 1
 }
 
 fix_cla_missing_mouse_png () {
-        local CLA_FOLDER="$DEST_DIR/LNP/graphics/[16x16] CLA v15"
-        local VANILLA_GFX_FOLDER="$DEST_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
+	local CLA_FOLDER="$DEST_DIR/LNP/graphics/[16x16] CLA v15"
+	local VANILLA_GFX_FOLDER="$DEST_DIR/LNP/graphics/[16x16] ASCII Default 0.34.11"
 
-        cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$CLA_FOLDER/data/art/mouse.png"
+	cp "$VANILLA_GFX_FOLDER/data/art/mouse.png" "$CLA_FOLDER/data/art/mouse.png"
 
-        if [ "$?" != "0" ]; then
-                # Clean up after ourself.
-                if [ -e "$CLA_FOLDER/data/art/mouse.png" ]; then
-                        rm "$CLA_FOLDER/data/art/mouse.png"
-                fi
+	if [ "$?" != "0" ]; then
+		# Clean up after ourself.
+		if [ -e "$CLA_FOLDER/data/art/mouse.png" ]; then
+			rm "$CLA_FOLDER/data/art/mouse.png"
+		fi
 
-                exit_with_error "Applying CLA Missing Mouse patch failed."
-        fi
+		exit_with_error "Applying CLA Missing Mouse patch failed."
+	fi
 }
 
 fix_jolly_bastion_missing_graphics_dir () {
-        local JB_FOLDER="$DEST_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
+	local JB_FOLDER="$DEST_DIR/LNP/graphics/[12x12] Jolly Bastion 34.10v5"
 
-        mkdir -p "$JB_FOLDER/raw/graphics"
+	mkdir -p "$JB_FOLDER/raw/graphics"
 }
 
 fix_jolly_bastion_missing_mouse_png () {
