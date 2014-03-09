@@ -49,7 +49,7 @@ build_dwarf_therapist () {
 
 	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
 
-	# Create the makefile
+	# Create the makefile.
 	$(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
 
 	# Quit if qmake failed.
@@ -301,12 +301,12 @@ check_dependencies () {
 }
 
 check_libpng_version () {
-        # Check for libpng version 1.5; must be 32 bit
+        # Check for libpng version 1.5; must be 32 bit.
 	local LIBPNG15_SO="$(/sbin/ldconfig -p | grep -P '^\tlibpng15.so' | sed 's/^[>]*> //')"
         # Don't print the errors (if the file doesn't exist)
 	local LIBPNG15_SO_32_BIT="$(file -L $LIBPNG15_SO 2> /dev/null | grep "32-bit" | cut -d: -f1)"
 
-        # If libpng15 is not installed (for example if libpng16 is used), we have to recompile the libgraphics of DF
+        # If libpng15 is not installed (for example if libpng16 is used), we have to recompile the libgraphics of DF.
 	if [ -z "$LIBPNG15_SO_32_BIT" ]; then
 		USE_FREE_LIBS=1
 	fi
@@ -1501,7 +1501,7 @@ print_usage () {
 	echo "--skip-deps            # Install without checking for dependencies."
 	echo "--skip-sha             # Install without checking file checksums."
 	echo "--upgrade, -u          # Upgrade an existing DF installation."
-        echo "--use-free-libs        # Force to use free graphic libs to solve \"Not found\" errors of DF"
+        echo "--use-free-libs        # Force to use free graphic libs to solve \"Not found\" errors of DF."
 	echo "--version, -v          # Print the df-lnp-installer version."
 	echo "--help, --usage        # Print this message."
 }
