@@ -49,8 +49,8 @@ build_dwarf_therapist () {
 
 	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
 
-        # Create the makefile
-        $(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
+	# Create the makefile
+	$(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
 
 	# Quit if qmake failed.
 	if [ "$?" != "0" ]; then
