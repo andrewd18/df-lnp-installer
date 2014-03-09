@@ -1519,7 +1519,7 @@ print_usage () {
 	echo "--skip-deps            # Install without checking for dependencies."
 	echo "--skip-sha             # Install without checking file checksums."
 	echo "--upgrade, -u          # Upgrade an existing DF installation."
-        echo "--use-free-libs        # Force to use free graphic libs to solve \"Not found\" errors of DF."
+	echo "--use-free-libs        # Force to use free graphic libs to solve \"Not found\" errors of DF."
 	echo "--version, -v          # Print the df-lnp-installer version."
 	echo "--help, --usage        # Print this message."
 }
