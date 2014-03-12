@@ -79,6 +79,8 @@ bugfix_all () {
 	fix_jolly_bastion_missing_graphics_dir
 	fix_jolly_bastion_missing_mouse_png
 	fix_phoebus_missing_mouse_png
+	fix_phoebus_gfx_font_ttf_name
+	fix_obsidian_gfx_font_ttf_name
 	fix_soundsense_missing_gamelog
 	fix_vanilla_df_openal_issue
 	fix_vanilla_df_ancient_libstdcpp
@@ -626,6 +628,14 @@ fix_jolly_bastion_missing_mouse_png () {
 	fi
 }
 
+fix_obsidian_gfx_font_ttf_name () {
+	local OBSIDIAN_FOLDER="$DEST_DIR/LNP/graphics/[16x16] Obsidian 0.8a"
+	
+	if [ -e "$OBSIDIAN_FOLDER/data/art/font.TTF" ]; then
+		mv "$OBSIDIAN_FOLDER/data/art/font.TTF" "$OBSIDIAN_FOLDER/data/art/font.ttf"
+	fi
+}
+
 fix_phoebus_missing_mouse_png () {
 	# Resolves GitHub issue #6.
 	local PHOEBUS_FOLDER="$DEST_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
@@ -640,6 +650,14 @@ fix_phoebus_missing_mouse_png () {
 		fi
 
 		exit_with_error "Applying Phoebus Missing Mouse patch failed."
+	fi
+}
+
+fix_phoebus_gfx_font_ttf_name () {
+	local PHOEBUS_FOLDER="$DEST_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
+	
+	if [ -e "$PHOEBUS_FOLDER/data/art/font.TTF" ]; then
+		mv "$PHOEBUS_FOLDER/data/art/font.TTF" "$PHOEBUS_FOLDER/data/art/font.ttf"
 	fi
 }
 
