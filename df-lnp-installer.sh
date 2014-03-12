@@ -17,30 +17,6 @@ ask_for_preferred_install_dir () {
 	fi
 }
 
-ask_for_qt5 () {
-	# Check if Qt5 is installed. If not, the problem is solved.
-	if [ -n "$(find_qmake_qt5)" ]; then
-		# Ask if the user want to use Qt5
-		echo ""
-		echo -n "Do you want to use Qt5 for DwarfTherapist (necessary to use the latest version)? [Y/n]: "
-
-		read QT5
-
-		# If the user entered a answer, and this answer is no,
-		# don't use Qt5
-		if [ -n "$QT5" ] && [ "$Qt5" = "n" ]; then
-			USE_QT5=0
-		
-		else 
-			USE_QT5=1
-		fi
-
-	else
-		USE_QT5=0
-
-	fi
-}
-
 backup_df_directory () {
 	if [ -z "$INSTALL_DIR" ]; then
 		exit_with_error "Script failure: INSTALL_DIR not defined."
@@ -232,25 +208,51 @@ check_dependencies () {
 	fi
 
 	# Check for QT Libraries (required for Dwarf Therapist)
-	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtCore.so')" ]; then
-		MISSING_DEPS="${MISSING_DEPS}libQtCore "
+	
+	# First Qt5 libraries.
+	if [ -z "$(which qtchooser)" ]; then
+		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}qtchooser "
 	fi
 
-	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtGui.so')" ]; then
-		MISSING_DEPS="${MISSING_DEPS}libQtGui "
+	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQt5Core.so')" ]; then
+		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}libQt5Core "
 	fi
 
-	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtNetwork.so')" ]; then
-		MISSING_DEPS="${MISSING_DEPS}libQtNetwork "
+	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQt5Gui.so')" ]; then
+		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}libQt5Gui "
 	fi
 
-	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtScript.so')" ]; then
-		MISSING_DEPS="${MISSING_DEPS}libQtScript "
+	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQt5Script.so')" ]; then
+		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}libQt5Script "
 	fi
 
 	# qmake (required for DwarfTherapist)
-	if [ -z "$(find_qmake_qt4)" ]; then
-		MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
+	if [ -z "$(find_qmake_qt5)" ]; then
+		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}qmake_qt5 "
+	fi
+
+	# If Qt5 libraries are missing, check Qt4
+	if [ -n $MISSING_DEPS_QT5 ]; then
+		if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtCore.so')" ]; then
+			MISSING_DEPS="${MISSING_DEPS}libQtCore "
+		fi
+
+		if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtGui.so')" ]; then
+			MISSING_DEPS="${MISSING_DEPS}libQtGui "
+		fi
+
+		if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtNetwork.so')" ]; then
+			MISSING_DEPS="${MISSING_DEPS}libQtNetwork "
+		fi
+
+		if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtScript.so')" ]; then
+			MISSING_DEPS="${MISSING_DEPS}libQtScript "
+		fi
+
+		# qmake (required for DwarfTherapist)
+		if [ -z "$(find_qmake_qt4)" ]; then
+			MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
+		fi
 	fi
 
 	# java runtime environment (required for LNP, Chromafort, and DF Announcement Filter)
@@ -324,6 +326,21 @@ check_dependencies () {
 		MISSING_DEPS="${MISSING_DEPS}git "
 	fi
 
+
+	######
+	# Warning if MISSING_DEPS_QT5 are missing (if Qt5 libraries are missing).
+	######
+	if [ -n "$MISSING_DEPS_QT5" ]; then
+		echo " Your computer is missing the following programs or libraries to be able to run the Qt5 version of Dwarf Therapist : $MISSING_DEPS_QT5"
+		echo "If yo want to use the latest version of Dwarf Therapist, please install these missing libraries"
+		echo "Continuing with Qt4 version of Dwarf Therapist"
+
+		USE_QT5=0
+	else
+		# We can use Qt5
+		USE_QT5=1
+	fi
+	
 	######
 	# Error if the $MISSING_DEPS string contains a value (aka there are missing dependencies).
 	######
@@ -1584,7 +1601,6 @@ save_config_file () {
 	echo "DOWNLOAD_DIR=\"$DOWNLOAD_DIR\"" >> "$INSTALLER_CONFIG_FILE"
 	echo "BACKUP_DIR=\"$BACKUP_DIR\"" >> "$INSTALLER_CONFIG_FILE"
 	echo "DEST_DIR=\"$DEST_DIR\"" >> "$INSTALLER_CONFIG_FILE"
-	echo "USE_QT5=\"$USE_QT5\"" >> "$INSTALLER_CONFIG_FILE"
 }
 
 ##############
@@ -1656,11 +1672,6 @@ create_dest_dir
 
 # Make sure the download directory exists.
 create_download_dir
-
-# Ask for qt5 (for Dwarf Therapist) if it is the first time.
-if [ -z "$USE_QT5" ]; then
-	ask_for_qt5
-fi
 
 # Download all the things!
 if [ "$SKIP_DOWNLOAD" = "0" ]; then
