@@ -452,6 +452,7 @@ download_all () {
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2182&f=Chromafort.zip"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=7905&f=DFAnnouncementFilter.zip"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=7889&f=Dwarf+Therapist.pdf"
+    download_dffi_file "http://dffd.wimbli.com/download.php?id=8185&f=blueprints.zip"
 
 	# Graphics packs.
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
@@ -957,31 +958,56 @@ install_dwarf_therapist () {
 }
 
 install_quickfort () {
-	if [ -z "$DOWNLOAD_DIR" ]; then
-		exit_with_error "Script failure. DOWNLOAD_DIR undefined."
-	fi
+    if [ -z "$DOWNLOAD_DIR" ]; then
+        exit_with_error "Script failure. DOWNLOAD_DIR undefined."
+    fi
 
-	if [ -z "$DEST_DIR" ]; then
-		exit_with_error "Script failure. DEST_DIR undefined."
-	fi
+    if [ -z "$DEST_DIR" ]; then
+        exit_with_error "Script failure. DEST_DIR undefined."
+    fi
 
-	local QFCONVERT_DIR="$DOWNLOAD_DIR/quickfort/qfconvert"
-	local UTILITIES_FOLDER="$DEST_DIR/LNP/utilities"
+    local QF_BLUEPRINTS_ZIP="$DOWNLOAD_DIR/blueprints.zip"
+    local QF_BLUEPRINTS_TEMP_FOLDER="./blueprints_unzip"
+    local QF_BLUEPRINTS_DIR="$DEST_DIR/df_linux/blueprints"
+    local QFCONVERT_DIR="$DOWNLOAD_DIR/quickfort/qfconvert"
+    local UTILITIES_FOLDER="$DEST_DIR/LNP/utilities"
 
-	mkdir -p "$UTILITIES_FOLDER/qfconvert"
+    unzip -d "$QF_BLUEPRINTS_TEMP_FOLDER" "$QF_BLUEPRINTS_ZIP"
+    # Quit if extracting failed.
+    if [ "$?" != "0" ]; then
+        # Clean up after ourself.
+        if [ -e "$QF_BLUEPRINTS_TEMP_FOLDER" ]; then
+            rm -r "$QF_BLUEPRINTS_TEMP_FOLDER"
+        fi
 
-	# Copy files.
-	cp -r "$QFCONVERT_DIR/"* "$UTILITIES_FOLDER/qfconvert/"
+        exit_with_error "Unzipping Quickfort blueprints failed."
+    fi
 
-	# Quit if copying failed.
-	if [ "$?" != "0" ]; then
-		# Clean up after ourself.
-		if [ -e "$UTILITIES_FOLDER/qfconvert/" ]; then
-			rm -r "$UTILITIES_FOLDER/qfconvert/"
-		fi
+    mkdir -p "$QF_BLUEPRINTS_DIR"
+    cp -nufr "$QF_BLUEPRINTS_TEMP_FOLDER/blueprints/"* "$QF_BLUEPRINTS_DIR"
 
-		exit_with_error "Copying qfconvert scripts failed."
-	fi
+    # Quit if copying failed.
+    if [ "$?" != "0" ]; then
+        # We don't want to delete the user's custom blueprints,
+        # so we leave df_linux/blueprints alone
+
+        exit_with_error "Copying quickfort blueprints failed."
+    fi
+
+    mkdir -p "$UTILITIES_FOLDER/qfconvert"
+
+    # Copy files.
+    cp -r "$QFCONVERT_DIR/"* "$UTILITIES_FOLDER/qfconvert/"
+
+    # Quit if copying failed.
+    if [ "$?" != "0" ]; then
+        # Clean up after ourself.
+        if [ -e "$UTILITIES_FOLDER/qfconvert/" ]; then
+            rm -r "$UTILITIES_FOLDER/qfconvert/"
+        fi
+
+        exit_with_error "Copying qfconvert scripts failed."
+    fi
 }
 
 install_falconne_dfhack_plugins () {
