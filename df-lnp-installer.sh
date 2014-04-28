@@ -79,7 +79,7 @@ build_dwarf_fortress_unfunck () {
 
 	local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
 
-        make -C "$DF_UNFUNCK_DIR"
+    ( cd "$DF_UNFUNCK_DIR/build" && cmake ..  && make -j2 )
 
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
@@ -608,6 +608,7 @@ download_dwarf_therapist () {
 download_dwarf_fortress_unfunck () {
 	local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
 	local DF_UNFUNCK_REPO_URL="https://github.com/svenstaro/dwarf_fortress_unfuck"
+	local DF_UNFUNCK_REPO_URL="https://github.com/ramblurr/dwarf_fortress_unfuck"
 
 	if [ -d "$DF_UNFUNCK_DIR" ]; then
 		# This needs to be one unified command or else git doesn't know where the working directory is.
@@ -1021,19 +1022,19 @@ install_dwarf_fortress_unfunck () {
 	fi
 
 	local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
-        
-        local LIBS_DIR="$DEST_DIR/df_linux/libs/"
 
-        # Copy libgraphics.so
-        echo "Installing libgraphics.so"
-        cp "$DF_UNFUNCK_DIR/libs/libgraphics.so" "$LIBS_DIR/libgraphics.so"
+    local LIBS_DIR="$DEST_DIR/df_linux/libs/"
+
+    # Copy libgraphics.so
+    echo "Installing libgraphics.so"
+    cp "$DF_UNFUNCK_DIR/build/libgraphics.so" "$LIBS_DIR/libgraphics.so"
 
 	# Quit if copying failed.
 	if [ "$?" != "0" ]; then
 		exit_with_error "Replacing libgraphics.so failed."
 	fi
 
-        rm "$LIBS_DIR/libstdc++.so.6"
+    rm "$LIBS_DIR/libstdc++.so.6"
 
 	# Quit if deleting failed.
 	if [ "$?" != "0" ]; then
