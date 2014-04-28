@@ -104,7 +104,7 @@ find_qmake_qt4 () {
 		# If the executable exists...
 		# and its -query QT_VERSION output is "4"...
 		# then return that executable name.
-		if [ -n "$(which $name)" ] && [ "$($name -query QT_VERSION | cut -d . -f 1)" = "4" ]; then
+		if [ -n "$(which $name 2> /dev/null)" ] && [ "$($name -query QT_VERSION | cut -d . -f 1)" = "4" ]; then
 			echo $name
 			break
 		fi
