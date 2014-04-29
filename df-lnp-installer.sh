@@ -984,7 +984,7 @@ install_quickfort () {
     fi
 
     mkdir -p "$QF_BLUEPRINTS_DIR"
-    cp -nufr "$QF_BLUEPRINTS_TEMP_FOLDER/blueprints/"* "$QF_BLUEPRINTS_DIR"
+    cp -nufr "$QF_BLUEPRINTS_TEMP_FOLDER/Community Quickfort Blueprints v2.1/"* "$QF_BLUEPRINTS_DIR"
 
     # Quit if copying failed.
     if [ "$?" != "0" ]; then
@@ -1008,6 +1008,8 @@ install_quickfort () {
 
         exit_with_error "Copying qfconvert scripts failed."
     fi
+
+    rm -rf "$QF_BLUEPRINTS_TEMP_FOLDER"
 }
 
 install_falconne_dfhack_plugins () {
