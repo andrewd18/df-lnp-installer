@@ -672,16 +672,17 @@ fix_soundsense_missing_gamelog () {
 	# DF often starts after soundsense does. So instead of reworking the LNP start order,
 	# I just manually create a blank one using touch.
 
-	local GAMELOG_FILE="$DEST_DIR/df_linux/gamelog.txt"
+	local GAMELOG_FILE_TMP="$DEST_DIR/df_linux/gamelog.txt"
+	local GAMELOG_FILE_INSTALLED="$INSTALL_DIR/df_linux/gamelog.txt"
 
 	# Create the gamelog.txt file.
-	touch "$GAMELOG_FILE"
+	touch "$GAMELOG_FILE_TMP"
 
 	# Get the XML configuration file.
 	local SS_CONFIG_FILE="$DEST_DIR/LNP/utilities/soundsense/configuration.xml"
 	local FIND_LINE_WITH="\<gamelog"
 	local TEXT_TO_REPLACE="path=\"../gamelog.txt\""
-	local REPLACE_WITH="path=\"$GAMELOG_FILE\""
+	local REPLACE_WITH="path=\"$GAMELOG_FILE_INSTALLED\""
 
 	# substitute "foo" with "bar" ONLY for lines which contain "baz"
 	# sed '/baz/s/foo/bar/g'
