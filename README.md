@@ -8,11 +8,12 @@ Included Mods
 
 * Lazy Newb Pack for Linux 0.5.3-SNAPSHOT-20130822
 * DF Hack 0.34.11-r3
-* Falconne's DFHack UI Plugins v0.43
+* Falconne's DFHack UI Plugins v0.44
 * SoundSense r42 (app only)
 * Dwarf Therapist v20.5 (splintermind, pulled and built from source) with manual
 * Quickfort 1.01
 * Chromafort 2010-04-25
+* A series of blueprints for Quickfort.
 * Various embark profiles.
 * Tilesets
   - [12x12] Jolly Bastion 34.10v5
