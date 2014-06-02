@@ -56,32 +56,33 @@ build_dwarf_therapist () {
 		QMAKE=$(find_qmake_qt4)
 	fi
 
-	# qmake-qt5 seems to don't work if we are not in the source directory
-	# This is the only way I found to solve it
+	# qmake-qt5 requires that the working directory is the same as the 
+	# hg source directory. Change directories into that location.
 	cd "$DWARF_THERAPIST_HG_DIR"
 
 	# Create the makefile.
-	$QMAKE 
+	$QMAKE
 
 	# Quit if qmake failed.
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		# Nothing to do; that's qmake's job.
-
+		
 		exit_with_error "Compiling Dwarf Therapist failed. See QMake output above for details."
 	fi
 
-	# Build from the Makefile.
-	make 
+	# Build from the new Makefile.
+	make
 
 	# Quit if building failed.
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		# Nothing to do; that's Make's job.
-
+		
 		exit_with_error "Compiling Dwarf Therapist failed. See Make output above for details."
 	fi
-
+	
+	# Back up to the previously used working directory (which should be the df-lnp-installer dir).
 	cd -
 }
 
@@ -234,7 +235,7 @@ check_dependencies () {
 	fi
 
 	# If Qt5 libraries are missing, check Qt4
-	if [ -n $MISSING_DEPS_QT5 ]; then
+	if [ -n "$MISSING_DEPS_QT5" ]; then
 		if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtCore.so')" ]; then
 			MISSING_DEPS="${MISSING_DEPS}libQtCore "
 		fi
@@ -333,9 +334,12 @@ check_dependencies () {
 	# Warning if MISSING_DEPS_QT5 are missing (if Qt5 libraries are missing).
 	######
 	if [ -n "$MISSING_DEPS_QT5" ]; then
-		echo " Your computer is missing the following programs or libraries to be able to run the Qt5 version of Dwarf Therapist : $MISSING_DEPS_QT5"
-		echo "If yo want to use the latest version of Dwarf Therapist, please install these missing libraries"
-		echo "Continuing with Qt4 version of Dwarf Therapist"
+		echo ""
+		echo "Your computer is missing the following Qt5 development programs and libraries required for the latest version of Dwarf Therapist:"
+		echo "\t$MISSING_DEPS_QT5"
+		echo ""
+		echo "If you want to use the latest version of Dwarf Therapist, please install these missing libraries."
+		echo "Continuing with older, Qt4 version of Dwarf Therapist.,,"
 
 		USE_QT5=0
 	else
@@ -660,9 +664,9 @@ download_dwarf_therapist () {
 
 		exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
 	fi
-	}
+}
 
-	download_quickfort () {
+download_quickfort () {
 	local QUICKFORT_DIR="$DOWNLOAD_DIR/quickfort"
 	local QUICKFORT_REPO_URL="https://github.com/joelpt/quickfort.git"
 
@@ -1548,12 +1552,12 @@ print_usage () {
 	echo ""
 	echo "Options:"
 	echo "--override-user-agent  # Download files as Mozilla user agent, not Wget user agent. Useful if you get 403 errors."
-	echo "--skip-download	     # Install using the existing contents of the ./downloads folder."
-	echo "--skip-deps	     # Install without checking for dependencies."
-	echo "--skip-sha	     # Install without checking file checksums."
-	echo "--upgrade, -u	     # Upgrade an existing DF installation."
-	echo "--version, -v	     # Print the df-lnp-installer version."
-	echo "--help, --usage	     # Print this message."
+	echo "--skip-download        # Install using the existing contents of the ./downloads folder."
+	echo "--skip-deps            # Install without checking for dependencies."
+	echo "--skip-sha             # Install without checking file checksums."
+	echo "--upgrade, -u          # Upgrade an existing DF installation."
+	echo "--version, -v          # Print the df-lnp-installer version."
+	echo "--help, --usage        # Print this message."
 }
 
 print_version () {
