@@ -49,8 +49,19 @@ build_dwarf_therapist () {
 
 	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
 
+	# Choose the good qmake version depending of the Qt version used
+	if [ "$USE_QT5" = "1" ]; then
+		QMAKE=$(find_qmake_qt5)
+	else
+		QMAKE=$(find_qmake_qt4)
+	fi
+
+	# qmake-qt5 seems to don't work if we are not in the source directory
+	# This is the only way I found to solve it
+	cd "$DWARF_THERAPIST_HG_DIR"
+
 	# Create the makefile.
-	$(find_qmake_qt4) "$DWARF_THERAPIST_HG_DIR" -o "$DWARF_THERAPIST_HG_DIR/Makefile"
+	$QMAKE 
 
 	# Quit if qmake failed.
 	if [ "$?" != "0" ]; then
@@ -61,7 +72,7 @@ build_dwarf_therapist () {
 	fi
 
 	# Build from the Makefile.
-	make -C "$DWARF_THERAPIST_HG_DIR"
+	make 
 
 	# Quit if building failed.
 	if [ "$?" != "0" ]; then
@@ -70,6 +81,8 @@ build_dwarf_therapist () {
 
 		exit_with_error "Compiling Dwarf Therapist failed. See Make output above for details."
 	fi
+
+	cd -
 }
 
 # One-off bugfixes that either require multiple packages to be installed first
@@ -110,6 +123,21 @@ find_qmake_qt4 () {
 		fi
 	done
 }
+
+find_qmake_qt5 () {
+	for name in "qmake" "qmake-qt5"; do
+		# If the executable exists...
+		# and its -query QT_VERSION output is "5"...
+		# then return that executable name.
+		if [ -n "$(which $name)" ] && [ "$($name -query QT_VERSION | cut -d . -f 1)" = "5" ]; then
+			#echo $name
+			echo "qmake-qt5"
+			break
+		fi
+	done
+}
+
+
 
 check_dependencies () {
 	echo "Checking for dependencies..."
@@ -182,25 +210,51 @@ check_dependencies () {
 	fi
 
 	# Check for QT Libraries (required for Dwarf Therapist)
-	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtCore.so')" ]; then
-		MISSING_DEPS="${MISSING_DEPS}libQtCore "
+	
+	# First Qt5 libraries.
+	if [ -z "$(which qtchooser)" ]; then
+		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}qtchooser "
 	fi
 
-	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtGui.so')" ]; then
-		MISSING_DEPS="${MISSING_DEPS}libQtGui "
+	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQt5Core.so')" ]; then
+		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}libQt5Core "
 	fi
 
-	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtNetwork.so')" ]; then
-		MISSING_DEPS="${MISSING_DEPS}libQtNetwork "
+	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQt5Gui.so')" ]; then
+		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}libQt5Gui "
 	fi
 
-	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtScript.so')" ]; then
-		MISSING_DEPS="${MISSING_DEPS}libQtScript "
+	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQt5Script.so')" ]; then
+		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}libQt5Script "
 	fi
 
 	# qmake (required for DwarfTherapist)
-	if [ -z "$(find_qmake_qt4)" ]; then
-		MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
+	if [ -z "$(find_qmake_qt5)" ]; then
+		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}qmake_qt5 "
+	fi
+
+	# If Qt5 libraries are missing, check Qt4
+	if [ -n $MISSING_DEPS_QT5 ]; then
+		if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtCore.so')" ]; then
+			MISSING_DEPS="${MISSING_DEPS}libQtCore "
+		fi
+
+		if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtGui.so')" ]; then
+			MISSING_DEPS="${MISSING_DEPS}libQtGui "
+		fi
+
+		if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtNetwork.so')" ]; then
+			MISSING_DEPS="${MISSING_DEPS}libQtNetwork "
+		fi
+
+		if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtScript.so')" ]; then
+			MISSING_DEPS="${MISSING_DEPS}libQtScript "
+		fi
+
+		# qmake (required for DwarfTherapist)
+		if [ -z "$(find_qmake_qt4)" ]; then
+			MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
+		fi
 	fi
 
 	# java runtime environment (required for LNP, Chromafort, and DF Announcement Filter)
@@ -274,6 +328,21 @@ check_dependencies () {
 		MISSING_DEPS="${MISSING_DEPS}git "
 	fi
 
+
+	######
+	# Warning if MISSING_DEPS_QT5 are missing (if Qt5 libraries are missing).
+	######
+	if [ -n "$MISSING_DEPS_QT5" ]; then
+		echo " Your computer is missing the following programs or libraries to be able to run the Qt5 version of Dwarf Therapist : $MISSING_DEPS_QT5"
+		echo "If yo want to use the latest version of Dwarf Therapist, please install these missing libraries"
+		echo "Continuing with Qt4 version of Dwarf Therapist"
+
+		USE_QT5=0
+	else
+		# We can use Qt5
+		USE_QT5=1
+	fi
+	
 	######
 	# Error if the $MISSING_DEPS string contains a value (aka there are missing dependencies).
 	######
@@ -534,32 +603,54 @@ download_file () {
 }
 
 download_dwarf_therapist () {
-	local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
-	local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
+	if [ "$USE_QT5" = "0" ]; then
+		# If the user doesn't want the Qt5 version of DwarfTherapist,
+		# use the old version from the hg repository
 
-	# WORKAROUND:
-	# Force a checkout of revision 20.5 because 20.6 uses Qt5.
-	# Resolves issue #23.
-	local REV_20_5="4ef8173a7a94"
+		local DWARF_THERAPIST_HG_DIR="$DOWNLOAD_DIR/dwarftherapist"
+		local SPLINTERMIND_REPO_URL="https://code.google.com/r/splintermind-attributes/"
 
-	# Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
-	# Get the current upstream url. If the directory doesn't exist the var will contain "".
-	local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
+		# WORKAROUND:
+		# Force a checkout of revision 20.5 because 20.6 uses Qt5.
+		# Resolves issue #23.
+		local REV_20_5="4ef8173a7a94"
 
-	if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
-		# Inform the user (assuming they're paying attention)
-		echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
+		# Check for and fix the issue I had in 0.2.0 where I used the wrong upstream URL.
+		# Get the current upstream url. If the directory doesn't exist the var will contain "".
+		local CURRENT_UPSTREAM_URL="$(hg paths --cwd $DWARF_THERAPIST_HG_DIR | grep default | cut -d" " -f3)"
 
-		# Bomb the directory, if it even existed in the first place.
-		if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
-			rm -r "$DWARF_THERAPIST_HG_DIR"
+		if [ "$CURRENT_UPSTREAM_URL" != "$SPLINTERMIND_REPO_URL" ]; then
+			# Inform the user (assuming they're paying attention)
+			echo "Dwarf Therapist repo is missing or has wrong upstream URL; recloning."
+
+			# Bomb the directory, if it even existed in the first place.
+			if [ -d "$DWARF_THERAPIST_HG_DIR" ]; then
+				rm -r "$DWARF_THERAPIST_HG_DIR"
+			fi
+
+			# Reclone.
+			hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
+		else
+			# URL is good; just get the latest changes.
+			hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
 		fi
 
-		# Reclone.
-		hg clone -r "$REV_20_5" "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_HG_DIR"
 	else
-		# URL is good; just get the latest changes.
-		hg update -r "$REV_20_5" --cwd "$DWARF_THERAPIST_HG_DIR"
+		# If the latest version can be used, use the new git repository
+		
+		local DWARF_THERAPIST_DIR="$DOWNLOAD_DIR/dwarftherapist"
+		local SPLINTERMIND_REPO_URL="https://github.com/splintermind/Dwarf-Therapist"
+
+		if [ -d "$DWARF_THERAPIST_DIR" ]; then
+			(cd "$DWARF_THERAPIST_DIR" && git pull)
+		else
+			mkdir -p "$DWARF_THERAPIST_DIR"
+			git clone "$SPLINTERMIND_REPO_URL" "$DWARF_THERAPIST_DIR"
+		fi
+
+
+
+
 	fi
 
 	# Quit if downloading failed.
@@ -569,9 +660,9 @@ download_dwarf_therapist () {
 
 		exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
 	fi
-}
+	}
 
-download_quickfort () {
+	download_quickfort () {
 	local QUICKFORT_DIR="$DOWNLOAD_DIR/quickfort"
 	local QUICKFORT_REPO_URL="https://github.com/joelpt/quickfort.git"
 
@@ -1457,12 +1548,12 @@ print_usage () {
 	echo ""
 	echo "Options:"
 	echo "--override-user-agent  # Download files as Mozilla user agent, not Wget user agent. Useful if you get 403 errors."
-	echo "--skip-download        # Install using the existing contents of the ./downloads folder."
-	echo "--skip-deps            # Install without checking for dependencies."
-	echo "--skip-sha             # Install without checking file checksums."
-	echo "--upgrade, -u          # Upgrade an existing DF installation."
-	echo "--version, -v          # Print the df-lnp-installer version."
-	echo "--help, --usage        # Print this message."
+	echo "--skip-download	     # Install using the existing contents of the ./downloads folder."
+	echo "--skip-deps	     # Install without checking for dependencies."
+	echo "--skip-sha	     # Install without checking file checksums."
+	echo "--upgrade, -u	     # Upgrade an existing DF installation."
+	echo "--version, -v	     # Print the df-lnp-installer version."
+	echo "--help, --usage	     # Print this message."
 }
 
 print_version () {
