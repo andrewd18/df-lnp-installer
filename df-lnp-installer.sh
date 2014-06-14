@@ -126,7 +126,7 @@ find_qmake_qt4 () {
 }
 
 find_qmake_qt5 () {
-	for name in "qmake" "qmake-qt5"; do
+	for name in "qmake" "qmake-qt5" "qmake -qt5"; do
 		# If the executable exists...
 		# and its -query QT_VERSION output is "5"...
 		# then return that executable name.
