@@ -56,32 +56,33 @@ build_dwarf_therapist () {
 		QMAKE=$(find_qmake_qt4)
 	fi
 
-	# qmake-qt5 seems to don't work if we are not in the source directory
-	# This is the only way I found to solve it
+	# qmake-qt5 requires that the working directory is the same as the 
+	# hg source directory. Change directories into that location.
 	cd "$DWARF_THERAPIST_HG_DIR"
 
 	# Create the makefile.
-	$QMAKE 
+	$QMAKE
 
 	# Quit if qmake failed.
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		# Nothing to do; that's qmake's job.
-
+		
 		exit_with_error "Compiling Dwarf Therapist failed. See QMake output above for details."
 	fi
 
-	# Build from the Makefile.
-	make 
+	# Build from the new Makefile.
+	make
 
 	# Quit if building failed.
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		# Nothing to do; that's Make's job.
-
+		
 		exit_with_error "Compiling Dwarf Therapist failed. See Make output above for details."
 	fi
-
+	
+	# Back up to the previously used working directory (which should be the df-lnp-installer dir).
 	cd -
 }
 
@@ -92,6 +93,8 @@ bugfix_all () {
 	fix_jolly_bastion_missing_graphics_dir
 	fix_jolly_bastion_missing_mouse_png
 	fix_phoebus_missing_mouse_png
+	fix_phoebus_gfx_font_ttf_name
+	fix_obsidian_gfx_font_ttf_name
 	fix_soundsense_missing_gamelog
 	fix_vanilla_df_openal_issue
 	fix_vanilla_df_ancient_libstdcpp
@@ -115,7 +118,7 @@ find_qmake_qt4 () {
 		# If the executable exists...
 		# and its -query QT_VERSION output is "4"...
 		# then return that executable name.
-		if [ -n "$(which $name)" ] && [ "$($name -query QT_VERSION | cut -d . -f 1)" = "4" ]; then
+		if [ -n "$(which $name 2> /dev/null)" ] && [ "$($name -query QT_VERSION | cut -d . -f 1)" = "4" ]; then
 			echo $name
 			break
 		fi
@@ -232,7 +235,7 @@ check_dependencies () {
 	fi
 
 	# If Qt5 libraries are missing, check Qt4
-	if [ -n $MISSING_DEPS_QT5 ]; then
+	if [ -n "$MISSING_DEPS_QT5" ]; then
 		if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQtCore.so')" ]; then
 			MISSING_DEPS="${MISSING_DEPS}libQtCore "
 		fi
@@ -331,9 +334,12 @@ check_dependencies () {
 	# Warning if MISSING_DEPS_QT5 are missing (if Qt5 libraries are missing).
 	######
 	if [ -n "$MISSING_DEPS_QT5" ]; then
-		echo " Your computer is missing the following programs or libraries to be able to run the Qt5 version of Dwarf Therapist : $MISSING_DEPS_QT5"
-		echo "If yo want to use the latest version of Dwarf Therapist, please install these missing libraries"
-		echo "Continuing with Qt4 version of Dwarf Therapist"
+		echo ""
+		echo "Your computer is missing the following Qt5 development programs and libraries required for the latest version of Dwarf Therapist:"
+		echo "\t$MISSING_DEPS_QT5"
+		echo ""
+		echo "If you want to use the latest version of Dwarf Therapist, please install these missing libraries."
+		echo "Continuing with older, Qt4 version of Dwarf Therapist.,,"
 
 		USE_QT5=0
 	else
@@ -513,12 +519,13 @@ download_all () {
 	# Apps and utilities
 	download_file "http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
 	download_file "http://dethware.org/dfhack/download/dfhack-0.34.11-r3-Linux.tar.gz"
-	download_dffi_file "http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.43-Windows-0.34.11.r3.zip.zip"
+	download_dffi_file "http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.44-Windows-0.34.11.r3.zip.zip"
 	download_file "http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
 	download_file "http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2182&f=Chromafort.zip"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=7905&f=DFAnnouncementFilter.zip"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=7889&f=Dwarf+Therapist.pdf"
+    download_dffi_file "http://dffd.wimbli.com/download.php?id=8185&f=blueprints.zip"
 
 	# Graphics packs.
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2430&f=Phoebus_34_11v01.zip"
@@ -657,9 +664,9 @@ download_dwarf_therapist () {
 
 		exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
 	fi
-	}
+}
 
-	download_quickfort () {
+download_quickfort () {
 	local QUICKFORT_DIR="$DOWNLOAD_DIR/quickfort"
 	local QUICKFORT_REPO_URL="https://github.com/joelpt/quickfort.git"
 
@@ -717,6 +724,14 @@ fix_jolly_bastion_missing_mouse_png () {
 	fi
 }
 
+fix_obsidian_gfx_font_ttf_name () {
+	local OBSIDIAN_FOLDER="$DEST_DIR/LNP/graphics/[16x16] Obsidian 0.8a"
+	
+	if [ -e "$OBSIDIAN_FOLDER/data/art/font.TTF" ]; then
+		mv "$OBSIDIAN_FOLDER/data/art/font.TTF" "$OBSIDIAN_FOLDER/data/art/font.ttf"
+	fi
+}
+
 fix_phoebus_missing_mouse_png () {
 	# Resolves GitHub issue #6.
 	local PHOEBUS_FOLDER="$DEST_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
@@ -734,6 +749,14 @@ fix_phoebus_missing_mouse_png () {
 	fi
 }
 
+fix_phoebus_gfx_font_ttf_name () {
+	local PHOEBUS_FOLDER="$DEST_DIR/LNP/graphics/[16x16] Phoebus 34.11v01"
+	
+	if [ -e "$PHOEBUS_FOLDER/data/art/font.TTF" ]; then
+		mv "$PHOEBUS_FOLDER/data/art/font.TTF" "$PHOEBUS_FOLDER/data/art/font.ttf"
+	fi
+}
+
 fix_soundsense_missing_gamelog () {
 	# SoundSense comes preconfigured to expect gamelog.txt to be in ../
 	# however this is not the case for the LNP.
@@ -745,16 +768,17 @@ fix_soundsense_missing_gamelog () {
 	# DF often starts after soundsense does. So instead of reworking the LNP start order,
 	# I just manually create a blank one using touch.
 
-	local GAMELOG_FILE="$DEST_DIR/df_linux/gamelog.txt"
+	local GAMELOG_FILE_TMP="$DEST_DIR/df_linux/gamelog.txt"
+	local GAMELOG_FILE_INSTALLED="$INSTALL_DIR/df_linux/gamelog.txt"
 
 	# Create the gamelog.txt file.
-	touch "$GAMELOG_FILE"
+	touch "$GAMELOG_FILE_TMP"
 
 	# Get the XML configuration file.
 	local SS_CONFIG_FILE="$DEST_DIR/LNP/utilities/soundsense/configuration.xml"
 	local FIND_LINE_WITH="\<gamelog"
 	local TEXT_TO_REPLACE="path=\"../gamelog.txt\""
-	local REPLACE_WITH="path=\"$GAMELOG_FILE\""
+	local REPLACE_WITH="path=\"$GAMELOG_FILE_INSTALLED\""
 
 	# substitute "foo" with "bar" ONLY for lines which contain "baz"
 	# sed '/baz/s/foo/bar/g'
@@ -1030,35 +1054,62 @@ install_dwarf_therapist () {
 }
 
 install_quickfort () {
-	if [ -z "$DOWNLOAD_DIR" ]; then
-		exit_with_error "Script failure. DOWNLOAD_DIR undefined."
-	fi
+    if [ -z "$DOWNLOAD_DIR" ]; then
+        exit_with_error "Script failure. DOWNLOAD_DIR undefined."
+    fi
 
-	if [ -z "$DEST_DIR" ]; then
-		exit_with_error "Script failure. DEST_DIR undefined."
-	fi
+    if [ -z "$DEST_DIR" ]; then
+        exit_with_error "Script failure. DEST_DIR undefined."
+    fi
 
-	local QFCONVERT_DIR="$DOWNLOAD_DIR/quickfort/qfconvert"
-	local UTILITIES_FOLDER="$DEST_DIR/LNP/utilities"
+    local QF_BLUEPRINTS_ZIP="$DOWNLOAD_DIR/blueprints.zip"
+    local QF_BLUEPRINTS_TEMP_FOLDER="./blueprints_unzip"
+    local QF_BLUEPRINTS_DIR="$DEST_DIR/df_linux/blueprints"
+    local QFCONVERT_DIR="$DOWNLOAD_DIR/quickfort/qfconvert"
+    local UTILITIES_FOLDER="$DEST_DIR/LNP/utilities"
 
-	mkdir -p "$UTILITIES_FOLDER/qfconvert"
+    unzip -d "$QF_BLUEPRINTS_TEMP_FOLDER" "$QF_BLUEPRINTS_ZIP"
+    # Quit if extracting failed.
+    if [ "$?" != "0" ]; then
+        # Clean up after ourself.
+        if [ -e "$QF_BLUEPRINTS_TEMP_FOLDER" ]; then
+            rm -r "$QF_BLUEPRINTS_TEMP_FOLDER"
+        fi
 
-	# Copy files.
-	cp -r "$QFCONVERT_DIR/"* "$UTILITIES_FOLDER/qfconvert/"
+        exit_with_error "Unzipping Quickfort blueprints failed."
+    fi
 
-	# Quit if copying failed.
-	if [ "$?" != "0" ]; then
-		# Clean up after ourself.
-		if [ -e "$UTILITIES_FOLDER/qfconvert/" ]; then
-			rm -r "$UTILITIES_FOLDER/qfconvert/"
-		fi
+    mkdir -p "$QF_BLUEPRINTS_DIR"
+    cp -nufr "$QF_BLUEPRINTS_TEMP_FOLDER/Community Quickfort Blueprints v2.1/"* "$QF_BLUEPRINTS_DIR"
 
-		exit_with_error "Copying qfconvert scripts failed."
-	fi
+    # Quit if copying failed.
+    if [ "$?" != "0" ]; then
+        # We don't want to delete the user's custom blueprints,
+        # so we leave df_linux/blueprints alone
+
+        exit_with_error "Copying quickfort blueprints failed."
+    fi
+
+    mkdir -p "$UTILITIES_FOLDER/qfconvert"
+
+    # Copy files.
+    cp -r "$QFCONVERT_DIR/"* "$UTILITIES_FOLDER/qfconvert/"
+
+    # Quit if copying failed.
+    if [ "$?" != "0" ]; then
+        # Clean up after ourself.
+        if [ -e "$UTILITIES_FOLDER/qfconvert/" ]; then
+            rm -r "$UTILITIES_FOLDER/qfconvert/"
+        fi
+
+        exit_with_error "Copying qfconvert scripts failed."
+    fi
+
+    rm -rf "$QF_BLUEPRINTS_TEMP_FOLDER"
 }
 
 install_falconne_dfhack_plugins () {
-	local FALCONNE_PLUGINS_ZIP="$DOWNLOAD_DIR/Utility_Plugins_v0.43-Windows-0.34.11.r3.zip.zip"
+	local FALCONNE_PLUGINS_ZIP="$DOWNLOAD_DIR/Utility_Plugins_v0.44-Windows-0.34.11.r3.zip.zip"
 	local FALCONNE_TEMP_FOLDER="./falconne_unzip"
 	mkdir -p "$FALCONNE_TEMP_FOLDER"
 
@@ -1501,12 +1552,12 @@ print_usage () {
 	echo ""
 	echo "Options:"
 	echo "--override-user-agent  # Download files as Mozilla user agent, not Wget user agent. Useful if you get 403 errors."
-	echo "--skip-download	     # Install using the existing contents of the ./downloads folder."
-	echo "--skip-deps	     # Install without checking for dependencies."
-	echo "--skip-sha	     # Install without checking file checksums."
-	echo "--upgrade, -u	     # Upgrade an existing DF installation."
-	echo "--version, -v	     # Print the df-lnp-installer version."
-	echo "--help, --usage	     # Print this message."
+	echo "--skip-download        # Install using the existing contents of the ./downloads folder."
+	echo "--skip-deps            # Install without checking for dependencies."
+	echo "--skip-sha             # Install without checking file checksums."
+	echo "--upgrade, -u          # Upgrade an existing DF installation."
+	echo "--version, -v          # Print the df-lnp-installer version."
+	echo "--help, --usage        # Print this message."
 }
 
 print_version () {
@@ -1608,7 +1659,7 @@ save_config_file () {
 ##############
 
 # Globals.
-VERSION="0.5.4"
+VERSION="0.5.5"
 
 # XDG_CONFIG_HOME is supposed to be defined as part of the freedesktop.org spec
 # but not all distros support it. Define it as $HOME/.config/ if it doesn't already exist.
