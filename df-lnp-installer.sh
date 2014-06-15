@@ -225,7 +225,8 @@ check_dependencies () {
 		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}libQt5Gui "
 	fi
 
-	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQt5Script.so')" ]; then
+	# The space is needed to detect libQt5Script.so and not libQt5Script.so.5
+	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQt5Script.so ')" ]; then
 		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}libQt5Script "
 	fi
 
