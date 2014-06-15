@@ -190,11 +190,6 @@ check_dependencies () {
 		MISSING_DEPS="${MISSING_DEPS}xterm "
 	fi
 
-	# Mercurial (required for DwarfTherapist)
-	if [ -z "$(which hg)" ]; then
-		MISSING_DEPS="${MISSING_DEPS}hg "
-	fi
-
 	# make (required for DwarfTherapist)
 	if [ -z "$(which make)" ]; then
 		MISSING_DEPS="${MISSING_DEPS}make "
@@ -256,6 +251,11 @@ check_dependencies () {
 		# qmake (required for DwarfTherapist)
 		if [ -z "$(find_qmake_qt4)" ]; then
 			MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
+		fi
+
+		# Mercurial (required for downloading DwarfTherapist from code.google)
+		if [ -z "$(which hg)" ]; then
+			MISSING_DEPS="${MISSING_DEPS}hg "
 		fi
 	fi
 
