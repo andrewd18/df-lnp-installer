@@ -126,13 +126,13 @@ find_qmake_qt4 () {
 }
 
 find_qmake_qt5 () {
-	for name in "qmake" "qmake-qt5"; do
+	for name in "qmake" "qmake-qt5" "qmake -qt5"; do
 		# If the executable exists...
 		# and its -query QT_VERSION output is "5"...
 		# then return that executable name.
 		if [ -n "$(which $name)" ] && [ "$($name -query QT_VERSION | cut -d . -f 1)" = "5" ]; then
-			#echo $name
-			echo "qmake-qt5"
+			echo $name
+			#echo "qmake-qt5"
 			break
 		fi
 	done
@@ -190,11 +190,6 @@ check_dependencies () {
 		MISSING_DEPS="${MISSING_DEPS}xterm "
 	fi
 
-	# Mercurial (required for DwarfTherapist)
-	if [ -z "$(which hg)" ]; then
-		MISSING_DEPS="${MISSING_DEPS}hg "
-	fi
-
 	# make (required for DwarfTherapist)
 	if [ -z "$(which make)" ]; then
 		MISSING_DEPS="${MISSING_DEPS}make "
@@ -225,7 +220,8 @@ check_dependencies () {
 		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}libQt5Gui "
 	fi
 
-	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQt5Script.so')" ]; then
+	# The space is needed to detect libQt5Script.so and not libQt5Script.so.5
+	if [ -z "$(/sbin/ldconfig -p | grep -P '^\tlibQt5Script.so ')" ]; then
 		MISSING_DEPS_QT5="${MISSING_DEPS_QT5}libQt5Script "
 	fi
 
@@ -255,6 +251,11 @@ check_dependencies () {
 		# qmake (required for DwarfTherapist)
 		if [ -z "$(find_qmake_qt4)" ]; then
 			MISSING_DEPS="${MISSING_DEPS}qmake_qt4 "
+		fi
+
+		# Mercurial (required for downloading DwarfTherapist from code.google)
+		if [ -z "$(which hg)" ]; then
+			MISSING_DEPS="${MISSING_DEPS}hg "
 		fi
 	fi
 
@@ -519,7 +520,7 @@ download_all () {
 	# Apps and utilities
 	download_file "http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2"
 	download_file "http://dethware.org/dfhack/download/dfhack-0.34.11-r3-Linux.tar.gz"
-	download_dffi_file "http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.44-Windows-0.34.11.r3.zip.zip"
+	download_dffi_file "http://dffd.wimbli.com/download.php?id=7248&f=Utility_Plugins_v0.47-Windows-0.34.11.r3.zip.zip"
 	download_file "http://df.zweistein.cz/soundsense/soundSense_42_186.zip"
 	download_file "http://drone.io/bitbucket.org/Dricus/lazy-newbpack/files/target/lazy-newbpack-linux-0.5.3-SNAPSHOT-20130822-1652.tar.bz2"
 	download_dffi_file "http://dffd.wimbli.com/download.php?id=2182&f=Chromafort.zip"
