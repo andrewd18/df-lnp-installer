@@ -1,3 +1,11 @@
+This Is Unmaintained
+====================
+As of 2014-06-24, this repository is unmaintained. No further updates will be added. See [this post for more
+information](http://www.bay12forums.com/smf/index.php?topic=130792.msg5403952#msg5403952).
+
+You are free to fork this under the terms of the
+[GPLv3](https://www.gnu.org/licenses/gpl.html) or study the code to build your own under another license.
+
 Overview
 ========
 
