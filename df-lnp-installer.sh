@@ -86,6 +86,23 @@ build_dwarf_therapist () {
 	cd -
 }
 
+build_dwarf_fortress_unfunck () {
+	if [ -z "$DOWNLOAD_DIR" ]; then
+		exit_with_error "Script failure. DOWNLOAD_DIR undefined."
+	fi
+
+	local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
+
+    ( cd "$DF_UNFUNCK_DIR/build" && cmake ..  && make -j2 )
+
+	if [ "$?" != "0" ]; then
+		# Clean up after ourself.
+		# Nothing to do; that's Make's job.
+
+		exit_with_error "Compiling dwarf_fortress_unfunck failed. See Make output above for details."
+	fi
+}
+
 # One-off bugfixes that either require multiple packages to be installed first
 # or have other non-trivial consequences.
 bugfix_all () {
@@ -358,6 +375,19 @@ check_dependencies () {
 	fi
 }
 
+check_libpng_version () {
+        # Check for libpng version 1.5; must be 32 bit.
+	local LIBPNG15_SO="$(/sbin/ldconfig -p | grep -P '^\tlibpng15.so' | sed 's/^[>]*> //')"
+        # Don't print the errors (if the file doesn't exist)
+	local LIBPNG15_SO_32_BIT="$(file -L $LIBPNG15_SO 2> /dev/null | grep "32-bit" | cut -d: -f1)"
+
+        # If libpng15 is not installed (for example if libpng16 is used), we have to recompile the libgraphics of DF.
+	if [ -z "$LIBPNG15_SO_32_BIT" ]; then
+		USE_FREE_LIBS=1
+	fi
+
+}
+
 check_install_dir_is_empty () {
 	local LS_OUTPUT="$(ls -A "$INSTALL_DIR")"
 
@@ -543,6 +573,10 @@ download_all () {
 
 	# Download quickfort repo.
 	download_quickfort
+
+        if [ "$USE_FREE_LIBS" = "1" ]; then
+                download_dwarf_fortress_unfunck
+        fi
 }
 
 download_dffi_file () {
@@ -657,12 +691,28 @@ download_dwarf_therapist () {
 
 	fi
 
+
 	# Quit if downloading failed.
 	if [ "$?" != "0" ]; then
 		# Clean up after ourself.
 		# Nothing to do; that's hg's job.
 
 		exit_with_error "Cloning / updating Dwarf Therapist HG repository failed."
+	fi
+}
+
+download_dwarf_fortress_unfunck () {
+	local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
+	local DF_UNFUNCK_REPO_URL="https://github.com/svenstaro/dwarf_fortress_unfuck"
+	local DF_UNFUNCK_REPO_URL="https://github.com/ramblurr/dwarf_fortress_unfuck"
+
+	if [ -d "$DF_UNFUNCK_DIR" ]; then
+		# This needs to be one unified command or else git doesn't know where the working directory is.
+		( cd "$DF_UNFUNCK_DIR" && git pull )
+	else
+		mkdir -p "$DF_UNFUNCK_DIR"
+		git clone "$DF_UNFUNCK_REPO_URL" "$DF_UNFUNCK_DIR"
+
 	fi
 }
 
@@ -878,6 +928,12 @@ install_all () {
 	# Must come after install_vanilla_df
 	install_lnp_embark_profiles
 
+        # Idem
+        if [ "$USE_FREE_LIBS" = "1" ]; then
+                build_dwarf_fortress_unfunck
+                install_dwarf_fortress_unfunck
+        fi
+
 	install_df_lnp_logo
 }
 
@@ -1051,6 +1107,38 @@ install_dwarf_therapist () {
 	# Copy the manual.
 	local MANUAL="$DOWNLOAD_DIR/Dwarf Therapist.pdf"
 	cp "$MANUAL" "$UTILITIES_FOLDER/dwarf_therapist/"
+}
+
+install_dwarf_fortress_unfunck () {
+	if [ -z "$DOWNLOAD_DIR" ]; then
+		exit_with_error "Script failure. DOWNLOAD_DIR undefined."
+	fi
+
+	if [ -z "$DEST_DIR" ]; then
+		exit_with_error "Script failure. DEST_DIR undefined."
+	fi
+
+	local DF_UNFUNCK_DIR="$DOWNLOAD_DIR/df_unfunck"
+
+    local LIBS_DIR="$DEST_DIR/df_linux/libs/"
+
+    # Copy libgraphics.so
+    echo "Installing libgraphics.so"
+    cp "$DF_UNFUNCK_DIR/build/libgraphics.so" "$LIBS_DIR/libgraphics.so"
+
+	# Quit if copying failed.
+	if [ "$?" != "0" ]; then
+		exit_with_error "Replacing libgraphics.so failed."
+	fi
+
+    rm "$LIBS_DIR/libstdc++.so.6"
+
+	# Quit if deleting failed.
+	if [ "$?" != "0" ]; then
+		exit_with_error "Deleting libgraphics.so failed."
+	fi
+
+
 }
 
 install_quickfort () {
@@ -1556,6 +1644,7 @@ print_usage () {
 	echo "--skip-deps            # Install without checking for dependencies."
 	echo "--skip-sha             # Install without checking file checksums."
 	echo "--upgrade, -u          # Upgrade an existing DF installation."
+	echo "--use-free-libs        # Force to use free graphic libs to solve \"Not found\" errors of DF."
 	echo "--version, -v          # Print the df-lnp-installer version."
 	echo "--help, --usage        # Print this message."
 }
@@ -1679,6 +1768,7 @@ SKIP_DOWNLOAD=0
 SKIP_DEPS=0
 SKIP_SHA=0
 UPGRADE=0
+USE_FREE_LIBS=0
 
 # If the user passed in arguments, parse them, otherwise assume "do everything".
 if [ -n "$1" ]; then
@@ -1689,6 +1779,7 @@ if [ -n "$1" ]; then
 			'--skip-deps') SKIP_DEPS=1 ;;
 			'--skip-sha') SKIP_SHA=1 ;;
 			'--upgrade'|'-u') UPGRADE=1 ;;
+                        '--use-free-libs') USE_FREE_LIBS=1 ;;
 			'--version'|'-v') print_version; exit 0 ;;
 			'--help'|'--usage') print_usage; exit 0 ;;
 			*) echo "Unknown argument: $1"; print_usage; exit 1 ;;
@@ -1703,6 +1794,8 @@ fi
 if [ "$SKIP_DEPS" = "0" ]; then
 	check_dependencies
 fi
+
+check_libpng_version
 
 ask_for_preferred_install_dir
 
