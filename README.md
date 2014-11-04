@@ -6,6 +6,10 @@ information](http://www.bay12forums.com/smf/index.php?topic=130792.msg5403952#ms
 You are free to fork this under the terms of the
 [GPLv3](https://www.gnu.org/licenses/gpl.html) or study the code to build your own under another license.
 
+See [github/Lazy-Newb-Pack-Linux](https://github.com/Lazy-Newb-Pack/Lazy-Newb-Pack-Linux) for the newer actively maintained pack.
+Alternatively head over to [Lazy Newb Pack - Linux](http://lazynewbpack.com/linux) for just the download.
+
+
 Overview
 ========
 
